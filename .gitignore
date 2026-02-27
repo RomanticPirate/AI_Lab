@@ -13,8 +13,9 @@ jdk-21-installer.exe
 *.exe
 *.msi
 
-# 다른 프로젝트들
+# 다른 프로젝트들 (APK 제외하고 무시)
 todo-app/
+!todo-app/app-release-final.apk
 
 # IDE
 .vscode/
