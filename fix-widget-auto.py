@@ -193,26 +193,57 @@ def sign_apk():
     else:
         print("✓ Keystore 이미 존재")
     
-    # APK 서명
-    print("  APK 서명 중 (jarsigner)...")
+    # APK 서명 (jarsigner for v1, apksigner for v2+)
+    print("  APK v1 서명 중 (jarsigner)...")
     cmd = [
         "jarsigner", "-verbose",
         "-sigalg", "SHA256withRSA", "-digestalg", "SHA-256",
         "-keystore", keystore,
         "-storepass", "android", "-keypass", "android",
-        "-signedjar", signed_apk,
         unsigned_apk, "todoapp"
     ]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        if result.returncode != 0:
+            print(f"✗ v1 서명 실패: {result.stderr}")
+            return False
+    except Exception as e:
+        print(f"✗ 오류: {e}")
+        return False
+    print("  v1 서명 완료")
+
+    # ensure apksigner jar exists
+    apksigner_jar = Path("apksigner.jar")
+    if not apksigner_jar.exists():
+        print("  apksigner.jar 다운로드 중...")
+        try:
+            import urllib.request
+            urllib.request.urlretrieve(
+                "https://dl.google.com/dl/android/maven2/com/android/tools/build/apksigner/0.10/apksigner-0.10.jar",
+                apksigner_jar
+            )
+            print("  apksigner.jar 다운로드 완료")
+        except Exception as e:
+            print(f"✗ apksigner 다운로드 실패: {e}")
+            return False
     
+    print("  APK v2+ 서명 중 (apksigner)...")
+    cmd = [
+        "java", "-jar", str(apksigner_jar), "sign",
+        "--ks", keystore,
+        "--ks-pass", "pass:android",
+        "--key-pass", "pass:android",
+        "--out", signed_apk,
+        unsigned_apk
+    ]
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
         if result.returncode == 0:
             size = Path(signed_apk).stat().st_size
-            print(f"✓ APK 서명 완료: {signed_apk}")
-            print(f"  파일 크기: {size:,} bytes")
+            print(f"✓ APK v2 서명 완료: {signed_apk} (크기 {size:,} bytes)")
             return True
         else:
-            print(f"✗ 서명 실패: {result.stderr}")
+            print(f"✗ v2 서명 실패: {result.stderr}")
             return False
     except Exception as e:
         print(f"✗ 오류: {e}")
