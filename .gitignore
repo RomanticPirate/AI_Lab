@@ -13,6 +13,9 @@ jdk-21-installer.exe
 *.exe
 *.msi
 
+# 다른 프로젝트들
+todo-app/
+
 # IDE
 .vscode/
 .idea/
