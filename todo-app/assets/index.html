@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Todo List</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #FFF8E7;
+    --text: #4E342E;
+    --toolbar: #FFF0D0;
+    --card: #FFFDF5;
+    --border: #F0E0C0;
+    --hover: rgba(0,0,0,0.03);
+    --checked: #999;
+    --placeholder: rgba(0,0,0,0.25);
+    --accent: #4a90d9;
+    --shadow: rgba(0,0,0,0.08);
+    --btn-bg: rgba(0,0,0,0.06);
+    --btn-border: rgba(0,0,0,0.12);
+    --btn-active: rgba(0,0,0,0.15);
+    --delete: #e74c3c;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.3s, color 0.3s;
+    overflow-x: hidden;
+  }
+
+  /* ===== NOTEBOOK LIST VIEW ===== */
+  #notebook-view {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nb-header {
+    padding: 20px 16px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nb-header h1 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .nb-header-btn {
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 16px;
+  }
+
+  .nb-header-btn:active { background: var(--btn-active); }
+
+  .nb-list {
+    flex: 1;
+    padding: 0 16px 120px;
+  }
+
+  .nb-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px var(--shadow);
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.12s;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  .nb-card:active { transform: scale(0.98); }
+
+  .nb-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nb-card-title .nb-icon { font-size: 18px; }
+
+  .nb-card-preview {
+    font-size: 13px;
+    color: var(--checked);
+    line-height: 1.5;
+    max-height: 60px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .nb-card-meta {
+    font-size: 11px;
+    color: var(--checked);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nb-card-delete {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--checked);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    opacity: 0.5;
+    z-index: 2;
+  }
+  .nb-card-delete:active { opacity: 1; color: var(--delete); }
+
+  .nb-empty {
+    text-align: center;
+    color: var(--placeholder);
+    padding: 80px 20px;
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  .fab {
+    position: fixed;
+    bottom: 24px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    font-size: 28px;
+    font-weight: 300;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(74,144,217,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    transition: transform 0.15s;
+  }
+  .fab:active { transform: scale(0.9); }
+
+  /* ===== EDITOR VIEW ===== */
+  #editor-view { display: none; min-height: 100vh; flex-direction: column; }
+  #editor-view.active { display: flex; }
+
+  .editor-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 12px 8px;
+    gap: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
+    transition: background 0.3s;
+  }
+
+  .back-btn {
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .back-btn:active { background: var(--btn-active); }
+
+  .editor-title {
+    flex: 1;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    outline: none;
+    border: none;
+    background: transparent;
+    padding: 6px 8px;
+    border-radius: 8px;
+    min-height: 32px;
+    transition: background 0.2s;
+  }
+  .editor-title:focus { background: var(--btn-bg); }
+  .editor-title:empty::before {
+    content: '메모 이름 입력...';
+    color: var(--placeholder);
+  }
+
+  /* Toolbar - BOTTOM fixed */
+  .toolbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: var(--toolbar);
+    border-top: 1px solid var(--border);
+    display: none;
+    align-items: center;
+    padding: 8px 12px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    gap: 6px;
+    box-shadow: 0 -2px 6px var(--shadow);
+    transition: background 0.3s;
+  }
+  .toolbar.active { display: flex; }
+
+  .toolbar button {
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    transition: background 0.15s, color 0.15s;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .toolbar button:active { background: var(--btn-active); }
+  .toolbar button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .toolbar button:disabled { opacity: 0.4; cursor: default; }
+  .toolbar .sep { width: 1px; height: 28px; background: var(--border); margin: 0 2px; }
+  .toolbar .spacer { flex: 1; }
+  .theme-dot {
+    display: inline-block; width: 18px; height: 18px; border-radius: 50%;
+    background: conic-gradient(#FF6B6B, #FECA57, #48DBFB, #FF9FF3, #FF6B6B);
+  }
+
+  /* Content area */
+  .content {
+    flex: 1;
+    padding: 0 16px 60vh;
+  }
+
+  #todo-list {
+    max-width: 700px;
+    margin: 0 auto;
+    background: var(--card);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px var(--shadow);
+    padding: 16px;
+    min-height: 200px;
+    transition: background 0.3s;
+  }
+
+  /* Todo items */
+  .todo-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 6px 4px;
+    border-radius: 6px;
+    transition: background 0.15s;
+    position: relative;
+  }
+  @media (hover: hover) { .todo-item:hover { background: var(--hover); } }
+
+  .todo-item.group .item-text { font-weight: 700; font-size: 16px; }
+
+  .group-bullet {
+    font-weight: 700; font-size: 16px; line-height: 1.5; margin-right: 4px;
+    flex-shrink: 0; user-select: none; -webkit-user-select: none; pointer-events: none;
+  }
+
+  .todo-item.checklist { padding-left: 20px; }
+
+  .todo-item .checkbox {
+    width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 4px;
+    margin-right: 10px; margin-top: 2px; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    user-select: none; -webkit-user-select: none;
+  }
+  .todo-item .checkbox:hover { border-color: var(--accent); }
+  .todo-item.checked .checkbox { background: var(--checked); border-color: var(--checked); }
+  .todo-item.checked .checkbox::after { content: '\2713'; color: #fff; font-size: 14px; font-weight: bold; }
+  .todo-item.checked .item-text { color: var(--checked) !important; text-decoration: line-through; }
+
+  .todo-item .item-text {
+    flex: 1; outline: none; font-size: 15px; line-height: 1.5; color: var(--text);
+    word-break: break-word; min-height: 24px; transition: color 0.3s;
+  }
+  .todo-item .item-text:not(:focus) { caret-color: transparent; }
+  .todo-item .item-text img { max-width: 100%; border-radius: 6px; margin: 4px 0; cursor: pointer; display: block; }
+  .todo-item .item-text img.resizing { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .todo-item .delete-btn {
+    opacity: 0; background: none; border: none; color: var(--checked); font-size: 18px;
+    cursor: pointer; padding: 2px 6px; margin-left: 4px; transition: opacity 0.15s, color 0.15s; flex-shrink: 0;
+  }
+  .todo-item:hover .delete-btn { opacity: 1; }
+  .todo-item .delete-btn:hover { color: var(--delete); }
+
+  /* Divider */
+  .todo-divider { border: none; border-top: 2px solid var(--border); margin: 12px 0; position: relative; }
+  .todo-divider:hover { border-top-color: var(--checked); }
+  .divider-wrapper { position: relative; padding: 4px 0; }
+  .divider-wrapper .delete-btn {
+    position: absolute; right: 0; top: -8px; opacity: 0; background: var(--card);
+    border: 1px solid var(--border); border-radius: 50%; width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; color: var(--checked);
+    transition: opacity 0.15s;
+  }
+  .divider-wrapper:hover .delete-btn { opacity: 1; }
+  .divider-wrapper .delete-btn:hover { color: var(--delete); border-color: var(--delete); }
+
+  .completion-badge { font-size: 11px; color: var(--checked); margin-left: 8px; white-space: nowrap; margin-top: 4px; }
+
+  .empty-state { text-align: center; color: var(--placeholder); padding: 60px 20px; font-size: 16px; cursor: pointer; }
+
+  .todo-item .item-text:empty::before { content: attr(data-placeholder); color: var(--placeholder); pointer-events: none; }
+
+  /* Theme overlay */
+  .theme-overlay {
+    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: flex-end;
+  }
+  .theme-overlay.show { display: flex; }
+  .theme-panel {
+    background: var(--card); border-radius: 16px 16px 0 0; width: 100%; max-width: 500px;
+    padding: 20px; padding-bottom: 28px; max-height: 75vh; overflow-y: auto;
+    animation: slideUp 0.25s ease; transition: background 0.3s;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .theme-title { margin-bottom: 12px; font-size: 17px; font-weight: 700; text-align: center; color: var(--text); }
+  .theme-section-title { font-size: 12px; font-weight: 600; color: var(--text); opacity: 0.5; margin: 14px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+  .theme-section-title:first-of-type { margin-top: 4px; }
+  .theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 4px; }
+  .theme-swatch {
+    aspect-ratio: 1; border-radius: 10px; cursor: pointer; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; border: 3px solid transparent;
+    transition: border-color 0.2s, transform 0.15s; box-shadow: 0 1px 4px rgba(0,0,0,0.15); padding: 2px;
+  }
+  .theme-swatch:active { transform: scale(0.93); }
+  .theme-swatch.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent), 0 2px 8px rgba(0,0,0,0.2); }
+  .theme-swatch .swatch-label { font-size: 9px; font-weight: 600; text-align: center; line-height: 1.2; padding: 0 1px; }
+
+  /* Confirm dialog */
+  .confirm-overlay {
+    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5); z-index: 300; justify-content: center; align-items: center;
+  }
+  .confirm-overlay.show { display: flex; }
+  .confirm-box { background: var(--card); border-radius: 14px; padding: 24px; max-width: 300px; width: 85%; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+  .confirm-box p { font-size: 15px; color: var(--text); margin-bottom: 20px; line-height: 1.5; }
+  .confirm-buttons { display: flex; gap: 10px; justify-content: center; }
+  .confirm-buttons button { flex: 1; padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; cursor: pointer; font-weight: 600; }
+  .confirm-buttons .btn-cancel { background: var(--btn-bg); color: var(--text); }
+  .confirm-buttons .btn-ok { background: var(--delete); color: #fff; border-color: var(--delete); }
+
+  /* ===== DRAG REORDER ===== */
+  .nb-card.dragging { opacity:0.5; transform:scale(0.95); }
+  .nb-card.drag-over { border:3px solid var(--accent); }
+  .nb-card .nb-pin { flex-shrink:0; line-height:1; display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; }
+  .nb-card .nb-pin svg { width:16px; height:16px; }
+
+  /* ===== ICON PICKER ===== */
+  .icon-picker-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:200; justify-content:center; align-items:center; }
+  .icon-picker-overlay.show { display:flex; }
+  .icon-picker-panel { background:var(--card); border-radius:16px; width:90%; max-width:360px; padding:20px; max-height:70vh; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,0.3); animation:slideUp 0.25s ease; }
+  .icon-picker-title { font-size:17px; font-weight:700; text-align:center; margin-bottom:14px; color:var(--text); }
+  .icon-picker-grid { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; }
+  .icon-picker-item { font-size:24px; text-align:center; padding:8px 0; cursor:pointer; border-radius:8px; transition:background 0.15s; }
+  .icon-picker-item:active { background:var(--btn-active); }
+  .icon-picker-item.selected { background:var(--accent); border-radius:8px; }
+
+  /* ===== ALARM ===== */
+  .alarm-btn { background:none; border:none; font-size:15px; cursor:pointer; padding:2px 4px; margin-left:2px; flex-shrink:0; opacity:0.3; transition:opacity 0.15s; line-height:1; }
+  .todo-item:hover .alarm-btn { opacity:0.6; }
+  .alarm-btn.alarm-active { opacity:1; color:var(--accent); animation:bellPulse 2s infinite; }
+  @keyframes bellPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+  .alarm-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:400; justify-content:center; align-items:center; }
+  .alarm-overlay.show { display:flex; }
+  .alarm-panel { background:var(--card); border-radius:16px; width:90%; max-width:340px; padding:24px 20px; box-shadow:0 8px 32px rgba(0,0,0,0.3); animation:slideUp 0.25s ease; }
+  .alarm-panel-title { font-size:18px; font-weight:700; text-align:center; margin-bottom:20px; color:var(--text); }
+  .alarm-row { margin-bottom:16px; }
+  .alarm-row label { display:block; font-size:13px; font-weight:600; color:var(--text); margin-bottom:6px; opacity:0.7; }
+  .alarm-time-inputs { display:flex; align-items:center; gap:6px; }
+  .alarm-time-inputs input, .alarm-repeat-input { width:60px; padding:8px 6px; border:1px solid var(--border); border-radius:8px; font-size:16px; text-align:center; background:var(--bg); color:var(--text); outline:none; }
+  .alarm-time-inputs input:focus, .alarm-repeat-input:focus { border-color:var(--accent); }
+  .alarm-time-inputs span, .alarm-unit { font-size:14px; color:var(--text); }
+  .alarm-unit { margin-left:6px; }
+  .alarm-type-group { display:flex; gap:6px; }
+  .alarm-type-btn { flex:1; padding:8px 4px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); font-size:12px; cursor:pointer; text-align:center; transition:all 0.15s; }
+  .alarm-type-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .alarm-buttons { display:flex; gap:10px; margin-top:20px; }
+  .alarm-buttons button { flex:1; padding:12px; border-radius:10px; border:1px solid var(--border); font-size:14px; font-weight:600; cursor:pointer; }
+  .alarm-btn-cancel { background:var(--btn-bg); color:var(--text); }
+  .alarm-btn-save { background:var(--accent); color:#fff; border-color:var(--accent) !important; }
+  .alarm-btn-delete { background:var(--delete); color:#fff; border-color:var(--delete) !important; }
+  .alarm-notif { position:fixed; top:0; left:0; right:0; z-index:500; background:var(--card); padding:16px 20px; cursor:pointer; box-shadow:0 4px 20px rgba(0,0,0,0.25); border-radius:0 0 14px 14px; transform:translateY(-100%); transition:transform 0.35s ease; }
+  .alarm-notif.show { transform:translateY(0); }
+  .alarm-notif-header { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+  .alarm-notif-icon { font-size:20px; }
+  .alarm-notif-title { font-size:15px; font-weight:700; color:var(--text); }
+  .alarm-notif-body { font-size:14px; color:var(--checked); line-height:1.4; }
+
+  @media (max-width: 600px) {
+    .content { padding: 0 8px 60vh; }
+    #todo-list { padding: 12px; border-radius: 8px; }
+    .toolbar.active { display: flex; padding: 6px 8px; gap: 4px; }
+    .toolbar button { padding: 8px 12px; font-size: 16px; min-width: 40px; height: 40px; }
+    .theme-grid { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .theme-swatch .swatch-label { font-size: 8px; }
+    .nb-header { padding: 16px 12px 10px; }
+    .nb-list { padding: 0 12px 120px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== NOTEBOOK LIST VIEW ===== -->
+<div id="notebook-view">
+  <div class="nb-header">
+    <h1><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAAE+klEQVRogc2a328UVRTHP+fuD1p3W3fZItuqoUqChBpMgBRIG3zRSCSkoAZDMP4BPvhCePHByJOBkPigvmh8wohp0KQQjYUEgxGVRnhRozFq5MHuIpVu7Q9gd2euD7udzk5nZ2Z/1M73ZXfOnPs933vPPXfu3VnBBXp0NM5c8SAwgqhtCA+BJBABhNpPaq+t77j4Vu2uPI42IjMgNxD5ClNOy8E9E25aZZn4D04/j8hJlDzK+k7IdsB9EYgr92biuLbfkBonD39xmARKAnc03NQwJyCcQ0VelX1DN1w7oEdHI8zePYGoo2xIwNZURXjLcOtcg5gGfhWYl2kiar88u/vK4q2lYZ29e4KIOspgBnZmwiMeIA0ManhA0mgu6s+/HaqJUJ02ZxnMQH+iTXHbJN7BqX9SMKVyotU22TeYV3p0NI5wgg2JcIsXQDSy2YROek2lTwIo5ooHUWojW1PhFr+IqEY2mgjqiP5iYkCh5QDrO8M15z0pBXpMSKBMrV5SKNlGtmMlIq0Apc3QYyCKvQqhr/XR/5/FA5LQgHpEgSRZo5zerURqHT7iAYgDIvcrazvQnkitI4h4ADSIoKrrUzsitY7A4rH2T01mYJXF21zU8o1Uw5FaRzPiq34NZiBM4lmsgaCNQia+6h8NloH6Prl8gbNjlbPGCyOD9GZTnkyWvzj9GxdvW4V8HOvAMEzefOscV6/9wVN7D3Ppm1sYhhnM/5nDXLqy6N9sdhdroG57b+LJ/DT5mwUATNOkMLPAZH66Qf9CM8qr8qwirnMkDIhiscjx48e5fPmyT8AG/T25xLaM1ovkg75sumbO92ZT9GXTdQI26B8IgugzY5qhLshElyJ5oWiCaYJSEFfkb9YWcXa9SxHbKGv9d1b8HZyBMBtD/5JC9JlzmqFktQMe4u+WIXcHyrYijSro7YSOaP12Xktls5xWB9L2GvAZ+UKpNhBUrm/fa048wHQTnDV0gZbRKlJxiDnSG1Owdk0dcl8DpOMQc9hjUp+zhq4y6AEfZEBHBPq7KiNU1hCVSrptyOULTFz/nZF9213Fj312jcHtG5cKuSMC/d1QMsHQEJHlg+TZiWY2c1FVCRxdHqg3myKzNsm7718kZ63vwmRumnffG6cnk3R/UseqnI2Ir3JH27rFERje/RhbNj/IxS9/ZOqfWQB6Ml0cOTRMOpVoYzBArCnUhl7YKNamk7z43O7WOf0CNlTEPlw+hhVC0yeyGg4/w8rBykCznVjFkV8M1XwGVlO89bXZGgiDeKxfJVrgcDesEFziNJyBMImv2j0ONH4cqy+eyAwKkRmKjXKstnigdAfp+thQiPzJXCMcIRBvzMP8GHDPUKDG+TsoR0jE3xoHXUCb3X8ptP6QBUym/DhCIL48VxFf/he0gRg9nyo58OQPaM7wm4AhdThCIN6Yh6kLlnjM7hIq/UZlA76GYyxIjp/dVqQQiHeMPJhQ3HRKBg7NWa30+e+GUfqCXqc7ZYsJSnuTthUB5rxNvC4NXFWPH9sFtjf1sn/X1whPM6Vu6++jUGjHW8sgaHDkywNXZWDHcN3WenziYW3qt0GNkATWGUinhpgjI+JG4TyeutVUAH+A8jzMnwddWJrzxU2n5IlXXqvHVtuRC9d3mIb5sijZA7IBkZT/X2m87tnsXn/XqT5hJfmRiZTK2uyeFKPnE+71vS479i84df4HlX+Xf5UhfrUAAAAASUVORK5CYII=" width="24" height="24" style="border-radius:4px">돌돌 메모</h1>
+    <button class="nb-header-btn" id="nb-theme-btn"><span class="theme-dot"></span></button>
+  </div>
+  <div class="nb-list" id="nb-list"></div>
+  <div class="nb-empty" id="nb-empty" style="display:none">
+    메모장이 없습니다<br>+ 버튼을 눌러 새 메모를 만들어보세요
+  </div>
+  <button class="fab" id="fab-add">+</button>
+</div>
+
+<!-- ===== EDITOR VIEW ===== -->
+<div id="editor-view">
+  <div class="editor-header">
+    <button class="back-btn" id="btn-back">&#x2190;</button>
+    <button class="back-btn" id="btn-nb-icon" style="font-size:18px" title="아이콘 변경">📝</button>
+    <div class="editor-title" contenteditable="true" id="editor-title"></div>
+  </div>
+  <div class="content">
+    <div id="todo-list">
+      <div class="empty-state" id="empty-state">여기를 탭하여 할 일을 입력하세요</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOOLBAR (editor only) -->
+<div class="toolbar" id="main-toolbar">
+  <button id="btn-indent" title="그룹으로 변경">&rarr;</button>
+  <button id="btn-outdent" title="체크리스트로 변경">&larr;</button>
+  <div class="sep"></div>
+  <button id="btn-bold" title="굵게"><b>B</b></button>
+  <div class="sep"></div>
+  <button id="btn-divider" title="구분선 추가">&#x2500;</button>
+  <div class="sep"></div>
+  <button id="btn-undo" title="실행 취소">&#x21A9;</button>
+  <button id="btn-redo" title="다시 실행">&#x21AA;</button>
+  <div class="spacer"></div>
+</div>
+
+<!-- THEME OVERLAY -->
+<div class="theme-overlay" id="theme-overlay">
+  <div class="theme-panel" id="theme-panel">
+    <div class="theme-title">테마 선택</div>
+    <div class="theme-section-title">파스텔 라이트</div>
+    <div class="theme-grid" id="theme-grid-light"></div>
+    <div class="theme-section-title">다크 & 딥</div>
+    <div class="theme-grid" id="theme-grid-dark"></div>
+    <div class="theme-section-title">뮤트 & 미드톤</div>
+    <div class="theme-grid" id="theme-grid-mid"></div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <p id="confirm-msg"></p>
+    <div class="confirm-buttons">
+      <button class="btn-cancel" id="confirm-cancel">취소</button>
+      <button class="btn-ok" id="confirm-ok">삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- ICON PICKER OVERLAY -->
+<div class="icon-picker-overlay" id="icon-picker-overlay">
+  <div class="icon-picker-panel">
+    <div class="icon-picker-title">아이콘 선택</div>
+    <div class="icon-picker-grid" id="icon-picker-grid"></div>
+  </div>
+</div>
+
+<!-- ALARM SETTINGS POPUP -->
+<div class="alarm-overlay" id="alarm-overlay">
+  <div class="alarm-panel">
+    <div class="alarm-panel-title">알람 설정하기</div>
+    <div class="alarm-row">
+      <label>반복 간격</label>
+      <div class="alarm-time-inputs">
+        <input type="number" id="alarm-hours" min="0" max="23" value="0">
+        <span>시간</span>
+        <input type="number" id="alarm-minutes" min="0" max="59" value="30">
+        <span>분</span>
+      </div>
+    </div>
+    <div class="alarm-row">
+      <label>반복 횟수</label>
+      <input type="number" id="alarm-repeat" min="1" max="99" value="1" class="alarm-repeat-input" maxlength="2">
+      <span class="alarm-unit">회</span>
+    </div>
+    <div class="alarm-row">
+      <label>알람 타입</label>
+      <div class="alarm-type-group" id="alarm-type-group">
+        <button class="alarm-type-btn active" data-type="sound">&#x1F514; 벨소리</button>
+        <button class="alarm-type-btn" data-type="vibrate">&#x1F4F3; 진동</button>
+        <button class="alarm-type-btn" data-type="silent">&#x1F515; 무음</button>
+      </div>
+    </div>
+    <div class="alarm-buttons">
+      <button class="alarm-btn-cancel" id="alarm-cancel">취소</button>
+      <button class="alarm-btn-delete" id="alarm-delete" style="display:none">삭제</button>
+      <button class="alarm-btn-save" id="alarm-save">설정</button>
+    </div>
+  </div>
+</div>
+
+<!-- ALARM NOTIFICATION BAR -->
+<div class="alarm-notif" id="alarm-notif">
+  <div class="alarm-notif-header">
+    <span class="alarm-notif-icon" id="alarm-notif-icon"></span>
+    <span class="alarm-notif-title" id="alarm-notif-title"></span>
+  </div>
+  <div class="alarm-notif-body" id="alarm-notif-body"></div>
+</div>
+
+<script>
+(function() {
+  // ── DOM refs ──
+  var nbView = document.getElementById('notebook-view');
+  var editorView = document.getElementById('editor-view');
+  var nbListEl = document.getElementById('nb-list');
+  var nbEmpty = document.getElementById('nb-empty');
+  var editorTitle = document.getElementById('editor-title');
+  var todoList = document.getElementById('todo-list');
+  var emptyState = document.getElementById('empty-state');
+  var toolbar = document.getElementById('main-toolbar');
+
+  var NB_KEY = 'todo_notebooks';
+  var OLD_KEY = 'todo_app_data';
+  var AUTO_DELETE_MS = 2 * 24 * 60 * 60 * 1000;
+  var dataLoaded = false;
+  var notebooks = [];
+  var currentNbId = null;
+
+  // ── Utility ──
+  function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
+
+  function formatDate(ts) {
+    if (!ts) return '';
+    var d = new Date(ts);
+    var now = new Date();
+    var diff = now - d;
+    if (diff < 60000) return '방금 전';
+    if (diff < 3600000) return Math.floor(diff / 60000) + '분 전';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + '시간 전';
+    if (diff < 604800000) return Math.floor(diff / 86400000) + '일 전';
+    return (d.getMonth() + 1) + '/' + d.getDate();
+  }
+
+  // ── Color helpers ──
+  function hexToRgb(hex) { hex = hex.replace('#',''); return {r:parseInt(hex.substr(0,2),16),g:parseInt(hex.substr(2,2),16),b:parseInt(hex.substr(4,2),16)}; }
+  function rgbToHex(r,g,b) { return '#'+[r,g,b].map(function(x){return Math.max(0,Math.min(255,Math.round(x))).toString(16).padStart(2,'0');}).join(''); }
+  function lighten(hex,p) { var c=hexToRgb(hex); return rgbToHex(c.r+(255-c.r)*p, c.g+(255-c.g)*p, c.b+(255-c.b)*p); }
+  function darken(hex,p) { var c=hexToRgb(hex); return rgbToHex(c.r*(1-p), c.g*(1-p), c.b*(1-p)); }
+  function isTextBright(hex) { var c=hexToRgb(hex); return (c.r*299+c.g*587+c.b*114)/1000 > 128; }
+
+  // ── 30 Themes ──
+  var THEME_RAW = [
+    [1,'바닐라 크림','#FFF8E7','#4E342E','light'],[2,'소프트 로즈','#FFF0F3','#9B1B30','light'],
+    [3,'라벤더 미스트','#F3E5F5','#4A148C','light'],[4,'모닝 스카이','#E8F4FD','#1565C0','light'],
+    [5,'프레시 민트','#E8F5E9','#2E7D32','light'],[6,'피치 블로썸','#FFF0E6','#BF360C','light'],
+    [7,'소프트 레몬','#FFFDE7','#827717','light'],[8,'베이비 핑크','#FCE4EC','#AD1457','light'],
+    [9,'아이스 블루','#E0F7FA','#00695C','light'],[10,'펄 그레이','#FAFAFA','#37474F','light'],
+    [11,'미드나잇 골드','#0D1B2A','#FFD700','dark'],[12,'딥 플럼','#2D1B3D','#E8B4B8','dark'],
+    [13,'차콜 민트','#2C2C2C','#80CBC4','dark'],[14,'네이비 코랄','#1B2838','#FF8A80','dark'],
+    [15,'다크 올리브','#2E3A1F','#F5F0E1','dark'],[16,'딥 틸','#004D40','#FFECB3','dark'],
+    [17,'에스프레소','#3E2723','#FFF8E1','dark'],[18,'슬레이트 살몬','#37474F','#FFAB91','dark'],
+    [19,'로열 퍼플','#311B92','#EDE7F6','dark'],[20,'와인 로즈','#4A0E2E','#F8BBD0','dark'],
+    [21,'더스티 로즈','#C9A0A0','#FFFAF5','mid'],[22,'세이지 그린','#8DA47E','#FFFFFF','mid'],
+    [23,'스톰 블루','#6889A5','#FFFFFF','mid'],[24,'테라코타','#C97B5E','#FFF8F0','mid'],
+    [25,'소프트 모브','#A882A8','#FFF5F5','mid'],[26,'노르딕 포그','#B0BEC5','#1A2530','mid'],
+    [27,'더스티 블루','#7FA0B5','#FFFFFF','mid'],[28,'올리브 모스','#8B956D','#FAFAF0','mid'],
+    [29,'번트 시에나','#C87941','#FFF5EC','mid'],[30,'뮤트 코랄','#E0887D','#FFFFFF','mid']
+  ];
+
+  var THEMES = THEME_RAW.map(function(d) {
+    var isDark = isTextBright(d[3]);
+    return {
+      id: d[0], name: d[1], bg: d[2], text: d[3], group: d[4], dark: isDark,
+      toolbar: isDark ? lighten(d[2], 0.08) : darken(d[2], 0.04),
+      card: isDark ? lighten(d[2], 0.06) : lighten(d[2], 0.5),
+      border: isDark ? lighten(d[2], 0.15) : darken(d[2], 0.1)
+    };
+  });
+
+  function findTheme(id) { for (var i = 0; i < THEMES.length; i++) { if (THEMES[i].id === id) return THEMES[i]; } return THEMES[0]; }
+
+  function applyTheme(t) {
+    var r = document.documentElement;
+    r.style.setProperty('--bg', t.bg); r.style.setProperty('--text', t.text);
+    r.style.setProperty('--toolbar', t.toolbar); r.style.setProperty('--card', t.card);
+    r.style.setProperty('--border', t.border);
+    r.style.setProperty('--hover', t.dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)');
+    r.style.setProperty('--checked', t.dark ? '#777' : '#999');
+    r.style.setProperty('--placeholder', t.dark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)');
+    r.style.setProperty('--btn-bg', t.dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)');
+    r.style.setProperty('--btn-border', t.dark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)');
+    r.style.setProperty('--btn-active', t.dark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)');
+    r.style.setProperty('--shadow', t.dark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.08)');
+    localStorage.setItem('todo_theme_id', t.id);
+    document.querySelectorAll('.theme-swatch').forEach(function(s) { s.classList.toggle('selected', parseInt(s.dataset.id) === t.id); });
+    if (window.TodoBridge) { try { window.TodoBridge.saveTheme(t.bg, t.text); } catch(e) {} }
+  }
+
+  function buildThemeGrid() {
+    var savedId = parseInt(localStorage.getItem('todo_theme_id') || '1');
+    var grids = { light: document.getElementById('theme-grid-light'), dark: document.getElementById('theme-grid-dark'), mid: document.getElementById('theme-grid-mid') };
+    THEMES.forEach(function(t) {
+      var swatch = document.createElement('div');
+      swatch.className = 'theme-swatch' + (t.id === savedId ? ' selected' : '');
+      swatch.dataset.id = t.id;
+      swatch.style.background = t.bg; swatch.style.color = t.text;
+      swatch.innerHTML = '<span class="swatch-label">' + t.name + '</span>';
+      swatch.addEventListener('click', function() { applyTheme(t); });
+      grids[t.group].appendChild(swatch);
+    });
+  }
+
+  // Theme overlay
+  var overlay = document.getElementById('theme-overlay');
+  document.getElementById('nb-theme-btn').addEventListener('click', function() { overlay.classList.add('show'); history.pushState({view:'theme'}, ''); });
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) { overlay.classList.remove('show'); } });
+
+  // ── Confirm dialog ──
+  var confirmOverlay = document.getElementById('confirm-overlay');
+  var confirmCallback = null;
+  document.getElementById('confirm-ok').addEventListener('click', function() {
+    confirmOverlay.classList.remove('show');
+    if (confirmCallback) { confirmCallback(); confirmCallback = null; }
+  });
+  document.getElementById('confirm-cancel').addEventListener('click', function() {
+    confirmOverlay.classList.remove('show'); confirmCallback = null;
+  });
+  function showConfirm(msg, cb) {
+    document.getElementById('confirm-msg').textContent = msg;
+    confirmCallback = cb; confirmOverlay.classList.add('show');
+  }
+
+  // ══════════════════════════════════════════
+  //  NOTEBOOK MANAGEMENT
+  // ══════════════════════════════════════════
+
+  function loadNotebooks() {
+    var raw = localStorage.getItem(NB_KEY);
+    if (raw) {
+      try { notebooks = JSON.parse(raw); } catch(e) { notebooks = []; }
+    }
+    // Migrate old single-notebook data
+    if (!notebooks.length) {
+      var oldData = localStorage.getItem(OLD_KEY);
+      if (oldData) {
+        try {
+          var oldItems = JSON.parse(oldData);
+          if (oldItems && oldItems.length) {
+            notebooks.push({
+              id: genId(), name: '내 메모', createdAt: Date.now(), updatedAt: Date.now(), items: oldItems
+            });
+            saveNotebooks();
+            localStorage.removeItem(OLD_KEY);
+          }
+        } catch(e) {}
+      }
+    }
+  }
+
+  function saveNotebooks() {
+    // Guard: never overwrite existing data with empty array
+    if (!notebooks.length) {
+      var existing = localStorage.getItem(NB_KEY);
+      if (existing) { try { var old = JSON.parse(existing); if (old && old.length) return; } catch(e) {} }
+    }
+    localStorage.setItem(NB_KEY, JSON.stringify(notebooks));
+  }
+
+  function findNb(id) {
+    for (var i = 0; i < notebooks.length; i++) { if (notebooks[i].id === id) return notebooks[i]; }
+    return null;
+  }
+
+  function getPreviewText(nb) {
+    if (!nb.items || !nb.items.length) return '비어있는 메모';
+    var lines = [];
+    for (var i = 0; i < nb.items.length && lines.length < 3; i++) {
+      var it = nb.items[i];
+      if (it.type === 'divider') continue;
+      var txt = (it.html || '').replace(/<[^>]*>/g, '').trim();
+      if (!txt) continue;
+      var prefix = it.type === 'group' ? '● ' : (it.checked ? '✓ ' : '☐ ');
+      lines.push(prefix + txt);
+    }
+    return lines.join('\n') || '비어있는 메모';
+  }
+
+  function getItemCount(nb) {
+    if (!nb.items) return 0;
+    var c = 0;
+    nb.items.forEach(function(it) { if (it.type !== 'divider') c++; });
+    return c;
+  }
+
+  // ── Render notebook list (array order, no sort) ──
+  var dragSrcIdx = null;
+  function renderNbList() {
+    nbListEl.innerHTML = '';
+    if (!notebooks.length) {
+      nbEmpty.style.display = 'block';
+      return;
+    }
+    nbEmpty.style.display = 'none';
+    notebooks.forEach(function(nb, idx) {
+      var card = document.createElement('div');
+      card.className = 'nb-card';
+      card.dataset.idx = idx;
+
+      var title = document.createElement('div');
+      title.className = 'nb-card-title';
+      var iconChar = nb.icon || '\uD83D\uDCDD';
+      // Pin icon on first (top) notebook - SVG pin to avoid green square on Android
+      var pinHtml = (idx === 0) ? '<span class="nb-pin"><svg viewBox="0 0 24 24" fill="none" stroke="#E57373" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M5 11h14l-1.5-6.5a1 1 0 0 0-1-.5h-9a1 1 0 0 0-1 .5L5 11z"/><circle cx="12" cy="11" r="1"/></svg></span>' : '';
+      title.innerHTML = pinHtml + '<span class="nb-icon">' + iconChar + '</span>' + escHtml(nb.name || '이름 없는 메모');
+
+      var preview = document.createElement('div');
+      preview.className = 'nb-card-preview';
+      preview.textContent = getPreviewText(nb);
+
+      var meta = document.createElement('div');
+      meta.className = 'nb-card-meta';
+      meta.innerHTML = '<span>' + getItemCount(nb) + '개 항목</span><span>' + formatDate(nb.updatedAt) + '</span>';
+
+      var del = document.createElement('button');
+      del.className = 'nb-card-delete';
+      del.innerHTML = '\u2715';
+      del.addEventListener('click', function(e) {
+        e.stopPropagation();
+        showConfirm('\'' + (nb.name || '이름 없는 메모') + '\' 메모를 삭제하시겠습니까?', function() {
+          notebooks = notebooks.filter(function(n) { return n.id !== nb.id; });
+          saveNotebooks();
+          renderNbList();
+          syncWidgetFromNotebooks();
+        });
+      });
+
+      // Long-press drag to reorder
+      var longPressTimer = null;
+      card.addEventListener('touchstart', function(e) {
+        longPressTimer = setTimeout(function() {
+          longPressTimer = null;
+          startDrag(card, idx, e);
+        }, 500);
+      }, {passive: true});
+      card.addEventListener('touchend', function() { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; } });
+      card.addEventListener('touchmove', function() { if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; } }, {passive: true});
+
+      card.appendChild(del);
+      card.appendChild(title);
+      card.appendChild(preview);
+      card.appendChild(meta);
+      card.addEventListener('click', function() { if (dragSrcIdx === null) openNotebook(nb.id); });
+      nbListEl.appendChild(card);
+    });
+  }
+
+  // ── Drag reorder logic ──
+  function startDrag(card, idx) {
+    dragSrcIdx = idx;
+    card.classList.add('dragging');
+    // Vibrate feedback
+    try { if (navigator.vibrate) navigator.vibrate(30); } catch(e) {}
+
+    function onTouchMove(e) {
+      var touch = e.touches[0];
+      var el = document.elementFromPoint(touch.clientX, touch.clientY);
+      var target = el ? el.closest('.nb-card') : null;
+      nbListEl.querySelectorAll('.nb-card').forEach(function(c) { c.classList.remove('drag-over'); });
+      if (target && target !== card) target.classList.add('drag-over');
+    }
+    function onTouchEnd(e) {
+      document.removeEventListener('touchmove', onTouchMove);
+      document.removeEventListener('touchend', onTouchEnd);
+      card.classList.remove('dragging');
+      var overCard = nbListEl.querySelector('.nb-card.drag-over');
+      if (overCard) {
+        var toIdx = parseInt(overCard.dataset.idx);
+        overCard.classList.remove('drag-over');
+        if (toIdx !== dragSrcIdx) {
+          var moved = notebooks.splice(dragSrcIdx, 1)[0];
+          notebooks.splice(toIdx, 0, moved);
+          saveNotebooks();
+          syncWidgetFromNotebooks();
+        }
+      }
+      dragSrcIdx = null;
+      renderNbList();
+    }
+    document.addEventListener('touchmove', onTouchMove, {passive: true});
+    document.addEventListener('touchend', onTouchEnd);
+  }
+
+  function escHtml(s) {
+    var d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+  }
+
+  // ── Create notebook ──
+  function createNotebook() {
+    var nb = { id: genId(), name: '새 메모', createdAt: Date.now(), updatedAt: Date.now(), items: [] };
+    notebooks.push(nb);
+    saveNotebooks();
+    openNotebook(nb.id);
+  }
+
+  document.getElementById('fab-add').addEventListener('click', createNotebook);
+
+  // ══════════════════════════════════════════
+  //  VIEW SWITCHING
+  // ══════════════════════════════════════════
+
+  function openNotebook(id) {
+    var nb = findNb(id);
+    if (!nb) return;
+    currentNbId = id;
+    // Switch views
+    nbView.style.display = 'none';
+    editorView.classList.add('active');
+    toolbar.classList.add('active');
+    // Set title and icon
+    editorTitle.textContent = nb.name || '';
+    document.getElementById('btn-nb-icon').textContent = nb.icon || '\uD83D\uDCDD';
+    // Load items into editor
+    loadEditorItems(nb.items || []);
+    dataLoaded = true;
+    // Push history state for back button handling
+    history.pushState({view: 'editor', nbId: id}, '');
+    window.scrollTo(0, 0);
+  }
+
+  function closeNotebook() {
+    if (currentNbId) {
+      saveCurrentNb();
+    }
+    currentNbId = null;
+    dataLoaded = false;
+    // Switch views
+    editorView.classList.remove('active');
+    toolbar.classList.remove('active');
+    nbView.style.display = '';
+    // Clear editor
+    todoList.querySelectorAll('.todo-item, .divider-wrapper').forEach(function(el) { el.remove(); });
+    emptyState.style.display = 'block';
+    undoStack = [];
+    redoStack = [];
+    lastFocusedItem = null;
+    window.scrollTo(0, 0);
+    renderNbList();
+  }
+
+  document.getElementById('btn-back').addEventListener('click', closeNotebook);
+
+  // Handle Android back button (popstate)
+  window.addEventListener('popstate', function(e) {
+    // Priority: close overlays first, then close editor
+    if (alarmOverlay && alarmOverlay.classList.contains('show')) {
+      alarmOverlay.classList.remove('show'); alarmPopupItem = null;
+      if (currentNbId) history.pushState({view:'editor'}, '');
+      return;
+    }
+    if (iconPickerOverlay && iconPickerOverlay.classList.contains('show')) {
+      iconPickerOverlay.classList.remove('show');
+      if (currentNbId) history.pushState({view:'editor'}, '');
+      return;
+    }
+    if (confirmOverlay.classList.contains('show')) {
+      confirmOverlay.classList.remove('show'); confirmCallback = null;
+      if (currentNbId) history.pushState({view:'editor'}, '');
+      return;
+    }
+    var overlay = document.getElementById('theme-overlay');
+    if (overlay.classList.contains('show')) {
+      overlay.classList.remove('show');
+      if (currentNbId) history.pushState({view:'editor'}, '');
+      return;
+    }
+    if (currentNbId) {
+      closeNotebook();
+    }
+  });
+
+  // Editor title change → save
+  editorTitle.addEventListener('input', function() {
+    if (!currentNbId) return;
+    var nb = findNb(currentNbId);
+    if (nb) {
+      nb.name = editorTitle.textContent.trim();
+      nb.updatedAt = Date.now();
+      saveNotebooks();
+    }
+  });
+  editorTitle.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); editorTitle.blur(); }
+  });
+
+  // ══════════════════════════════════════════
+  //  EDITOR (existing todo logic)
+  // ══════════════════════════════════════════
+
+  // ── Auto-scroll helpers ──
+  function getToolbarHeight() { var tb = document.querySelector('.toolbar.active'); return tb ? tb.offsetHeight : 60; }
+  function afterLayout(fn) { requestAnimationFrame(function() { requestAnimationFrame(fn); }); }
+
+  function getCursorRect() {
+    var sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return null;
+    var range = sel.getRangeAt(0);
+    var rect = range.getBoundingClientRect();
+    if (rect && rect.height > 0 && rect.bottom > 0) return rect;
+    var focused = document.activeElement;
+    if (!focused || !focused.classList.contains('item-text')) return null;
+    var tempRange = range.cloneRange(); tempRange.collapse(false);
+    var marker = document.createElement('span'); marker.textContent = '\u200B';
+    try { tempRange.insertNode(marker); rect = marker.getBoundingClientRect(); marker.parentNode.removeChild(marker); focused.normalize(); } catch(e) { return null; }
+    return rect;
+  }
+
+  function doScroll(rect) {
+    if (!rect) return;
+    var safeBottom = window.innerHeight - getToolbarHeight() - 20;
+    if (rect.bottom > safeBottom) { var s = rect.bottom - safeBottom + 24; document.documentElement.scrollTop += s; document.body.scrollTop += s; }
+    else if (rect.top < 10) { var s2 = rect.top - 24; document.documentElement.scrollTop += s2; document.body.scrollTop += s2; }
+  }
+
+  function ensureCursorVisible() { afterLayout(function() { doScroll(getCursorRect()); }); }
+
+  function scrollToItem(item) {
+    if (!item) return;
+    afterLayout(function() { doScroll(item.getBoundingClientRect()); afterLayout(function() { doScroll(getCursorRect()); }); });
+  }
+
+  // ── State ──
+  var undoStack = [];
+  var redoStack = [];
+  var lastFocusedItem = null;
+
+  todoList.addEventListener('focusin', function(e) {
+    var item = e.target.closest('.todo-item');
+    if (item) { lastFocusedItem = item; ensureCursorVisible(); }
+  });
+
+  todoList.addEventListener('focusout', function(e) {
+    setTimeout(function() {
+      if (!document.activeElement || !document.activeElement.classList.contains('item-text')) {
+        window.getSelection().removeAllRanges();
+      }
+    }, 150);
+  });
+
+  toolbar.addEventListener('mousedown', function(e) { e.preventDefault(); });
+
+  // ── Widget sync ──
+  function syncWidgetData() {
+    if (!window.TodoBridge) return;
+    try {
+      var lines = [];
+      todoList.querySelectorAll('.todo-item').forEach(function(el) {
+        var type = el.classList.contains('group') ? 'group' : 'checklist';
+        var checked = el.classList.contains('checked') ? '1' : '0';
+        var text = el.querySelector('.item-text').textContent.trim();
+        if (text) lines.push(type + '|' + checked + '|' + text);
+      });
+      window.TodoBridge.saveTodos(lines.join('\n'));
+    } catch(e) {}
+  }
+
+  function syncWidgetFromNotebooks() {
+    if (!window.TodoBridge) return;
+    // Sync the first (top) notebook to widget
+    if (!notebooks.length) { try { window.TodoBridge.saveTodos(''); } catch(e) {} return; }
+    var nb = notebooks[0]; // top notebook = widget
+    var nbIcon = nb.icon || '\uD83D\uDCDD';
+    var nbName = nb.name || '메모';
+    var lines = [];
+    // First line: widget header info (icon|name)
+    lines.push('HEADER|' + nbIcon + '|' + nbName);
+    (nb.items || []).forEach(function(it) {
+      if (it.type === 'divider') return;
+      var text = (it.html || '').replace(/<[^>]*>/g, '').trim();
+      if (!text) return;
+      lines.push(it.type + '|' + (it.checked ? '1' : '0') + '|' + text);
+    });
+    try { window.TodoBridge.saveTodos(lines.join('\n')); } catch(e) {}
+  }
+
+  // ── Save / Load for current notebook ──
+  function saveCurrentNb() {
+    if (!dataLoaded || !currentNbId) return;
+    var nb = findNb(currentNbId);
+    if (!nb) return;
+    var items = [];
+    todoList.querySelectorAll('.todo-item, .divider-wrapper').forEach(function(el) {
+      if (el.classList.contains('divider-wrapper')) {
+        items.push({ type: 'divider' });
+      } else {
+        var itemData = {
+          id: el.dataset.itemId || genId(),
+          type: el.classList.contains('group') ? 'group' : 'checklist',
+          html: el.querySelector('.item-text').innerHTML,
+          checked: el.classList.contains('checked'),
+          checkedAt: el.dataset.checkedAt || null
+        };
+        if (el._alarmData) itemData.alarm = el._alarmData;
+        items.push(itemData);
+      }
+    });
+    nb.items = items;
+    nb.updatedAt = Date.now();
+    saveNotebooks();
+    syncWidgetData();
+  }
+
+  // Alias for existing code
+  function saveState() { saveCurrentNb(); }
+
+  function pushUndo() {
+    undoStack.push(todoList.innerHTML);
+    if (undoStack.length > 50) undoStack.shift();
+    redoStack = [];
+  }
+
+  function loadEditorItems(items) {
+    todoList.querySelectorAll('.todo-item, .divider-wrapper').forEach(function(el) { el.remove(); });
+    emptyState.style.display = 'block';
+    if (!items || !items.length) return;
+    emptyState.style.display = 'none';
+    items.forEach(function(item) {
+      if (item.type === 'divider') {
+        appendDivider();
+      } else {
+        var el = createTodoItem(item.type, item.html, item.id);
+        if (item.checked) {
+          el.classList.add('checked');
+          el.dataset.checkedAt = item.checkedAt;
+          addCompletionBadge(el);
+        }
+        if (item.alarm && item.alarm.remainingRepeats > 0) {
+          el._alarmData = item.alarm;
+          var ab = el.querySelector('.alarm-btn');
+          if (ab) ab.classList.add('alarm-active');
+        }
+        todoList.appendChild(el);
+      }
+    });
+  }
+
+  // ── Group sub-items helper ──
+  function getGroupSubItems(groupItem) {
+    var subItems = []; var next = groupItem.nextElementSibling;
+    while (next) {
+      if (next.classList.contains('todo-item') && next.classList.contains('group')) break;
+      if (next.classList.contains('divider-wrapper')) break;
+      if (next.classList.contains('todo-item') && next.classList.contains('checklist')) subItems.push(next);
+      next = next.nextElementSibling;
+    }
+    return subItems;
+  }
+
+  function deleteGroupWithSubs(item) {
+    var subItems = getGroupSubItems(item);
+    pushUndo(); subItems.forEach(function(sub) { sub.remove(); }); item.remove();
+    checkEmpty(); saveState();
+  }
+
+  function handleGroupDelete(item) {
+    var subItems = getGroupSubItems(item);
+    var hasContent = subItems.some(function(sub) { var t = sub.querySelector('.item-text'); return t && t.textContent.trim() !== ''; });
+    if (hasContent) { showConfirm('하위 목록들이 있습니다. 삭제하시겠습니까?', function() { deleteGroupWithSubs(item); }); }
+    else { deleteGroupWithSubs(item); }
+  }
+
+  // ── Create Todo Item ──
+  function createTodoItem(type, html, itemId) {
+    var item = document.createElement('div');
+    item.className = 'todo-item ' + type;
+    item.dataset.itemId = itemId || genId();
+    if (type === 'checklist') {
+      var checkbox = document.createElement('div'); checkbox.className = 'checkbox';
+      checkbox.addEventListener('click', function() { toggleCheck(item); });
+      item.appendChild(checkbox);
+    }
+    if (type === 'group') {
+      var bullet = document.createElement('span'); bullet.className = 'group-bullet'; bullet.textContent = '\u25CF ';
+      item.appendChild(bullet);
+    }
+    var text = document.createElement('div'); text.className = 'item-text'; text.contentEditable = true;
+    text.setAttribute('data-placeholder', type === 'group' ? '할 일 그룹 입력...' : '할 일 입력...');
+    if (html) text.innerHTML = html;
+    item.appendChild(text);
+    // Alarm button (checklist only)
+    if (type === 'checklist') {
+      var ab = document.createElement('button'); ab.className = 'alarm-btn'; ab.innerHTML = '\uD83D\uDD14';
+      ab.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+      ab.addEventListener('click', function(e) { e.stopPropagation(); openAlarmPopup(item); });
+      item.appendChild(ab);
+    }
+    var del = document.createElement('button'); del.className = 'delete-btn'; del.innerHTML = '\u2715';
+    del.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+    del.addEventListener('click', function() {
+      if (item.classList.contains('group')) { handleGroupDelete(item); }
+      else { cancelAlarmTimer(item.dataset.itemId); pushUndo(); item.remove(); checkEmpty(); saveState(); }
+    });
+    item.appendChild(del);
+    attachTextEvents(item, text);
+    return item;
+  }
+
+  function attachTextEvents(item, text) {
+    text.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); return; }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); redo(); return; }
+      var currentType = item.classList.contains('group') ? 'group' : 'checklist';
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault(); pushUndo();
+        var newItem = createTodoItem(currentType, '');
+        item.after(newItem); focusItem(newItem); scrollToItem(newItem); saveState();
+      }
+      if (e.key === 'Backspace' && text.textContent.trim() === '' && !text.querySelector('img')) {
+        e.preventDefault();
+        if (currentType === 'checklist') {
+          pushUndo(); item.classList.remove('checklist', 'checked'); item.classList.add('group');
+          item.dataset.checkedAt = ''; removeCompletionBadge(item);
+          var cb = item.querySelector('.checkbox'); if (cb) cb.remove();
+          // Remove alarm button when converting to group via backspace
+          var abk = item.querySelector('.alarm-btn'); if (abk) { cancelAlarmTimer(item.dataset.itemId); item._alarmData = null; abk.remove(); }
+          if (!item.querySelector('.group-bullet')) {
+            var bul = document.createElement('span'); bul.className = 'group-bullet'; bul.textContent = '\u25CF ';
+            item.insertBefore(bul, text);
+          }
+          text.setAttribute('data-placeholder', '할 일 그룹 입력...'); saveState(); ensureCursorVisible();
+        } else {
+          var prev = findPrevItem(item); pushUndo(); item.remove();
+          if (prev) { focusItemEnd(prev); lastFocusedItem = prev; }
+          checkEmpty(); saveState();
+        }
+      }
+    });
+    text.addEventListener('input', function() { ensureCursorVisible(); saveState(); });
+    text.addEventListener('paste', function(e) {
+      var clipItems = e.clipboardData.items;
+      for (var i = 0; i < clipItems.length; i++) {
+        if (clipItems[i].type.startsWith('image/')) {
+          e.preventDefault(); var file = clipItems[i].getAsFile(); var reader = new FileReader();
+          reader.onload = function(ev) {
+            pushUndo(); var img = document.createElement('img'); img.src = ev.target.result;
+            img.style.maxWidth = '100%'; img.style.width = '300px'; setupImageResize(img);
+            text.appendChild(img); saveState();
+          };
+          reader.readAsDataURL(file); return;
+        }
+      }
+    });
+  }
+
+  // ── Image Resize ──
+  function setupImageResize(img) {
+    var isResizing = false, startX, startWidth;
+    img.addEventListener('mousedown', startResize); img.addEventListener('touchstart', startResizeTouch, { passive: false });
+    function startResize(e) { e.preventDefault(); isResizing = true; startX = e.clientX; startWidth = img.offsetWidth; img.classList.add('resizing'); document.addEventListener('mousemove', doResize); document.addEventListener('mouseup', stopResize); }
+    function startResizeTouch(e) { if (e.touches.length !== 1) return; e.preventDefault(); isResizing = true; startX = e.touches[0].clientX; startWidth = img.offsetWidth; img.classList.add('resizing'); document.addEventListener('touchmove', doResizeTouch, { passive: false }); document.addEventListener('touchend', stopResize); }
+    function doResize(e) { if (!isResizing) return; img.style.width = Math.max(50, Math.min(startWidth + e.clientX - startX, 700)) + 'px'; }
+    function doResizeTouch(e) { if (!isResizing || !e.touches.length) return; e.preventDefault(); img.style.width = Math.max(50, Math.min(startWidth + e.touches[0].clientX - startX, 700)) + 'px'; }
+    function stopResize() { isResizing = false; img.classList.remove('resizing'); document.removeEventListener('mousemove', doResize); document.removeEventListener('mouseup', stopResize); document.removeEventListener('touchmove', doResizeTouch); document.removeEventListener('touchend', stopResize); saveState(); }
+  }
+
+  // ── Check/Uncheck ──
+  function toggleCheck(item) {
+    pushUndo();
+    if (item.classList.contains('checked')) { item.classList.remove('checked'); item.dataset.checkedAt = ''; removeCompletionBadge(item); }
+    else { item.classList.add('checked'); item.dataset.checkedAt = Date.now().toString(); addCompletionBadge(item); }
+    saveState();
+  }
+
+  function addCompletionBadge(item) {
+    removeCompletionBadge(item); if (!item.dataset.checkedAt) return;
+    var badge = document.createElement('span'); badge.className = 'completion-badge';
+    var d = new Date(parseInt(item.dataset.checkedAt) + AUTO_DELETE_MS);
+    badge.textContent = (d.getMonth()+1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0') + ' 삭제예정';
+    item.appendChild(badge);
+  }
+
+  function removeCompletionBadge(item) { var b = item.querySelector('.completion-badge'); if (b) b.remove(); }
+
+  function cleanupCompleted() {
+    var now = Date.now(); var changed = false;
+    todoList.querySelectorAll('.todo-item.checked').forEach(function(item) {
+      var checkedAt = parseInt(item.dataset.checkedAt);
+      if (checkedAt && (now - checkedAt) >= AUTO_DELETE_MS) { item.remove(); changed = true; }
+    });
+    if (changed) { checkEmpty(); saveState(); }
+  }
+
+  // ── Divider ──
+  function appendDivider() { var w = createDividerEl(); todoList.appendChild(w); return w; }
+  function createDividerEl() {
+    var wrapper = document.createElement('div'); wrapper.className = 'divider-wrapper';
+    var hr = document.createElement('hr'); hr.className = 'todo-divider'; wrapper.appendChild(hr);
+    var del = document.createElement('button'); del.className = 'delete-btn'; del.innerHTML = '\u2715';
+    del.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+    del.addEventListener('click', function() { pushUndo(); wrapper.remove(); saveState(); });
+    wrapper.appendChild(del); return wrapper;
+  }
+
+  function addDivider() {
+    pushUndo(); emptyState.style.display = 'none'; var wrapper = createDividerEl();
+    if (lastFocusedItem && lastFocusedItem.parentNode === todoList) { lastFocusedItem.after(wrapper); }
+    else { todoList.appendChild(wrapper); }
+    saveState();
+  }
+
+  // ── Indent / Outdent ──
+  function indentItem() {
+    var item = lastFocusedItem; if (!item || !item.parentNode || item.classList.contains('group')) return;
+    pushUndo(); item.classList.remove('checklist', 'checked'); item.classList.add('group');
+    item.dataset.checkedAt = ''; removeCompletionBadge(item);
+    var checkbox = item.querySelector('.checkbox'); if (checkbox) checkbox.remove();
+    // Remove alarm button when converting to group
+    var alarmBtn = item.querySelector('.alarm-btn'); if (alarmBtn) { cancelAlarmTimer(item.dataset.itemId); item._alarmData = null; alarmBtn.remove(); }
+    var textEl = item.querySelector('.item-text');
+    if (!item.querySelector('.group-bullet')) {
+      var bul = document.createElement('span'); bul.className = 'group-bullet'; bul.textContent = '\u25CF ';
+      item.insertBefore(bul, textEl);
+    }
+    textEl.setAttribute('data-placeholder', '할 일 그룹 입력...'); saveState();
+  }
+
+  function outdentItem() {
+    var item = lastFocusedItem; if (!item || !item.parentNode || item.classList.contains('checklist')) return;
+    pushUndo(); item.classList.remove('group'); item.classList.add('checklist');
+    var bullet = item.querySelector('.group-bullet'); if (bullet) bullet.remove();
+    var textEl = item.querySelector('.item-text'); textEl.setAttribute('data-placeholder', '할 일 입력...');
+    if (!item.querySelector('.checkbox')) {
+      var checkbox = document.createElement('div'); checkbox.className = 'checkbox';
+      checkbox.addEventListener('click', function() { toggleCheck(item); });
+      item.insertBefore(checkbox, textEl);
+    }
+    // Add alarm button if missing
+    if (!item.querySelector('.alarm-btn')) {
+      var ab = document.createElement('button'); ab.className = 'alarm-btn'; ab.innerHTML = '\uD83D\uDD14';
+      ab.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+      ab.addEventListener('click', function(e) { e.stopPropagation(); openAlarmPopup(item); });
+      var delBtn = item.querySelector('.delete-btn');
+      item.insertBefore(ab, delBtn);
+    }
+    saveState();
+  }
+
+  // ── Bold ──
+  function toggleBold() {
+    if (lastFocusedItem) { var t = lastFocusedItem.querySelector('.item-text'); if (t) t.focus(); }
+    document.execCommand('bold', false, null); updateBoldButton(); saveState();
+  }
+
+  function updateBoldButton() {
+    var btn = document.getElementById('btn-bold');
+    btn.classList.toggle('active', document.queryCommandState('bold'));
+  }
+
+  // ── Undo / Redo ──
+  function undo() {
+    if (!undoStack.length) return;
+    redoStack.push(todoList.innerHTML); todoList.innerHTML = undoStack.pop();
+    reattachEvents(); checkEmpty(); saveState();
+  }
+
+  function redo() {
+    if (!redoStack.length) return;
+    undoStack.push(todoList.innerHTML); todoList.innerHTML = redoStack.pop();
+    reattachEvents(); checkEmpty(); saveState();
+  }
+
+  // ── Helpers ──
+  function findPrevItem(item) {
+    var prev = item.previousElementSibling;
+    while (prev && !prev.classList.contains('todo-item')) prev = prev.previousElementSibling;
+    return prev;
+  }
+
+  function focusItem(item) { var text = item.querySelector('.item-text'); if (text) { text.focus(); lastFocusedItem = item; } }
+
+  function focusItemEnd(item) {
+    var text = item.querySelector('.item-text'); if (!text) return;
+    text.focus(); var range = document.createRange(); range.selectNodeContents(text); range.collapse(false);
+    var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range); lastFocusedItem = item;
+  }
+
+  function checkEmpty() {
+    var hasItems = todoList.querySelector('.todo-item, .divider-wrapper');
+    emptyState.style.display = hasItems ? 'none' : 'block';
+  }
+
+  // ── Reattach events after undo/redo ──
+  function reattachEvents() {
+    lastFocusedItem = null;
+    todoList.querySelectorAll('.todo-item').forEach(function(item) {
+      var text = item.querySelector('.item-text');
+      var del = item.querySelector('.delete-btn');
+      var checkbox = item.querySelector('.checkbox');
+      if (checkbox) {
+        var newCb = checkbox.cloneNode(true); checkbox.replaceWith(newCb);
+        newCb.addEventListener('click', function() { toggleCheck(item); });
+      }
+      // Reattach alarm button
+      var ab = item.querySelector('.alarm-btn');
+      if (ab) {
+        var newAb = ab.cloneNode(true); ab.replaceWith(newAb);
+        newAb.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+        newAb.addEventListener('click', function(e) { e.stopPropagation(); openAlarmPopup(item); });
+      }
+      if (del) {
+        var newDel = del.cloneNode(true); del.replaceWith(newDel);
+        newDel.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+        newDel.addEventListener('click', function() {
+          if (item.classList.contains('group')) { handleGroupDelete(item); }
+          else { cancelAlarmTimer(item.dataset.itemId); pushUndo(); item.remove(); checkEmpty(); saveState(); }
+        });
+      }
+      var newText = text.cloneNode(true); text.replaceWith(newText);
+      newText.contentEditable = true; attachTextEvents(item, newText);
+      newText.querySelectorAll('img').forEach(function(img) { setupImageResize(img); });
+    });
+    todoList.querySelectorAll('.divider-wrapper').forEach(function(wrapper) {
+      var del = wrapper.querySelector('.delete-btn');
+      if (del) {
+        var newDel = del.cloneNode(true); del.replaceWith(newDel);
+        newDel.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+        newDel.addEventListener('click', function() { pushUndo(); wrapper.remove(); saveState(); });
+      }
+    });
+  }
+
+  // ── Empty state click ──
+  emptyState.addEventListener('click', function() {
+    emptyState.style.display = 'none';
+    var item = createTodoItem('group', ''); todoList.appendChild(item); focusItem(item); saveState();
+  });
+
+  // ── Toolbar buttons ──
+  document.getElementById('btn-indent').addEventListener('click', outdentItem);
+  document.getElementById('btn-outdent').addEventListener('click', indentItem);
+  document.getElementById('btn-bold').addEventListener('click', toggleBold);
+  document.getElementById('btn-divider').addEventListener('click', addDivider);
+  document.getElementById('btn-undo').addEventListener('click', undo);
+  document.getElementById('btn-redo').addEventListener('click', redo);
+  document.addEventListener('selectionchange', updateBoldButton);
+
+  // ── Pause / Resume state management ──
+  var savedFocusInfo = null;
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+      // ─── SAVE on hide ───
+      if (currentNbId) saveCurrentNb();
+      var items = todoList.querySelectorAll('.todo-item');
+      var focusIdx = -1;
+      for (var i = 0; i < items.length; i++) { if (items[i] === lastFocusedItem) { focusIdx = i; break; } }
+      savedFocusInfo = { index: focusIdx, scrollTop: document.documentElement.scrollTop || document.body.scrollTop, nbId: currentNbId };
+    } else {
+      // ─── RELOAD on show (fixes data loss from multiple Activity instances) ───
+      var prevNbId = currentNbId;
+      // Always re-read localStorage to get latest data (another instance may have changed it)
+      loadNotebooks();
+
+      if (prevNbId) {
+        var nb = findNb(prevNbId);
+        if (nb) {
+          // Refresh editor with latest data from localStorage
+          loadEditorItems(nb.items || []);
+          editorTitle.textContent = nb.name || '';
+          document.getElementById('btn-nb-icon').textContent = nb.icon || '\uD83D\uDCDD';
+          dataLoaded = true;
+          // Restore focus/scroll
+          if (savedFocusInfo && savedFocusInfo.nbId === prevNbId) {
+            var scrollVal = savedFocusInfo.scrollTop;
+            if (savedFocusInfo.index >= 0) {
+              var items = todoList.querySelectorAll('.todo-item');
+              if (savedFocusInfo.index < items.length) {
+                var targetItem = items[savedFocusInfo.index];
+                setTimeout(function() { focusItemEnd(targetItem); document.documentElement.scrollTop = scrollVal; document.body.scrollTop = scrollVal; }, 100);
+              }
+            } else { document.documentElement.scrollTop = scrollVal; document.body.scrollTop = scrollVal; }
+          }
+        } else {
+          // Notebook was deleted by another instance, go back to list
+          closeNotebook();
+        }
+      } else {
+        // Was on notebook list, refresh it
+        renderNbList();
+      }
+      savedFocusInfo = null;
+    }
+  });
+
+  // ══════════════════════════════════════════
+  //  ICON PICKER
+  // ══════════════════════════════════════════
+  // 55 icons sorted by SNS popularity
+  var ICONS = [
+    '\u2764\uFE0F','\uD83D\uDE02','\uD83D\uDE0D','\uD83D\uDD25','\uD83D\uDE0A',
+    '\uD83E\uDD70','\uD83D\uDE2D','\uD83D\uDC95','\uD83D\uDE4F','\u2728',
+    '\uD83D\uDE18','\uD83D\uDC9C','\uD83E\uDD7A','\uD83D\uDC99','\uD83D\uDE0E',
+    '\uD83D\uDCAA','\uD83D\uDC4D','\uD83C\uDF89','\uD83D\uDC9A','\uD83D\uDC9B',
+    '\uD83D\uDDA4','\u2B50','\uD83C\uDF1F','\uD83C\uDF08','\uD83C\uDFB6',
+    '\uD83D\uDCF8','\uD83C\uDF82','\uD83C\uDF38','\uD83C\uDF40','\uD83E\uDD8B',
+    '\uD83C\uDF19','\u2600\uFE0F','\uD83C\uDFB5','\uD83D\uDCAB','\uD83E\uDD17',
+    '\uD83D\uDE0B','\uD83C\uDFC6','\uD83D\uDC8E','\uD83C\uDF80','\uD83C\uDF3A',
+    '\uD83C\uDF55','\u2615','\uD83C\uDF70','\uD83D\uDCDD','\uD83D\uDCDA',
+    '\uD83D\uDCBB','\uD83D\uDCF1','\u2708\uFE0F','\uD83C\uDFE0','\uD83C\uDFAF',
+    '\uD83C\uDFA8','\uD83D\uDCA1','\uD83D\uDD11','\uD83D\uDC36','\uD83D\uDC31'
+  ];
+  var iconPickerOverlay = document.getElementById('icon-picker-overlay');
+  var iconPickerGrid = document.getElementById('icon-picker-grid');
+  var btnNbIcon = document.getElementById('btn-nb-icon');
+
+  function buildIconPicker() {
+    iconPickerGrid.innerHTML = '';
+    var nb = findNb(currentNbId);
+    var currentIcon = (nb && nb.icon) || '\uD83D\uDCDD';
+    ICONS.forEach(function(icon) {
+      var el = document.createElement('div');
+      el.className = 'icon-picker-item' + (icon === currentIcon ? ' selected' : '');
+      el.textContent = icon;
+      el.addEventListener('click', function() {
+        if (!currentNbId) return;
+        var nb2 = findNb(currentNbId);
+        if (nb2) { nb2.icon = icon; nb2.updatedAt = Date.now(); saveNotebooks(); syncWidgetFromNotebooks(); }
+        btnNbIcon.textContent = icon;
+        iconPickerOverlay.classList.remove('show');
+      });
+      iconPickerGrid.appendChild(el);
+    });
+  }
+
+  btnNbIcon.addEventListener('click', function() {
+    buildIconPicker();
+    iconPickerOverlay.classList.add('show');
+    history.pushState({view:'iconpicker'}, '');
+  });
+  iconPickerOverlay.addEventListener('click', function(e) {
+    if (e.target === iconPickerOverlay) iconPickerOverlay.classList.remove('show');
+  });
+
+  // ══════════════════════════════════════════
+  //  ALARM SYSTEM
+  // ══════════════════════════════════════════
+
+  var alarmTimers = {}; // { itemId: timeoutId }
+  var alarmPopupItem = null; // DOM item currently editing alarm
+  var alarmNotifTimeout = null;
+
+  // DOM refs for alarm popup
+  var alarmOverlay = document.getElementById('alarm-overlay');
+  var alarmHoursInput = document.getElementById('alarm-hours');
+  var alarmMinutesInput = document.getElementById('alarm-minutes');
+  var alarmRepeatInput = document.getElementById('alarm-repeat');
+  var alarmTypeGroup = document.getElementById('alarm-type-group');
+  var alarmDeleteBtn = document.getElementById('alarm-delete');
+
+  // Alarm type toggle buttons
+  alarmTypeGroup.addEventListener('click', function(e) {
+    var btn = e.target.closest('.alarm-type-btn');
+    if (!btn) return;
+    alarmTypeGroup.querySelectorAll('.alarm-type-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+  });
+
+  function getSelectedAlarmType() {
+    var active = alarmTypeGroup.querySelector('.alarm-type-btn.active');
+    return active ? active.dataset.type : 'sound';
+  }
+
+  function setSelectedAlarmType(type) {
+    alarmTypeGroup.querySelectorAll('.alarm-type-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.type === type);
+    });
+  }
+
+  function openAlarmPopup(item) {
+    alarmPopupItem = item;
+    var data = item._alarmData;
+    if (data && data.remainingRepeats > 0) {
+      alarmHoursInput.value = data.intervalH || 0;
+      alarmMinutesInput.value = data.intervalM || 30;
+      alarmRepeatInput.value = data.repeatCount || 1;
+      setSelectedAlarmType(data.alarmType || 'sound');
+      alarmDeleteBtn.style.display = '';
+    } else {
+      alarmHoursInput.value = 0;
+      alarmMinutesInput.value = 30;
+      alarmRepeatInput.value = 1;
+      setSelectedAlarmType('sound');
+      alarmDeleteBtn.style.display = 'none';
+    }
+    alarmOverlay.classList.add('show');
+    history.pushState({view:'alarm'}, '');
+  }
+
+  // Cancel popup
+  document.getElementById('alarm-cancel').addEventListener('click', function() {
+    alarmOverlay.classList.remove('show'); alarmPopupItem = null;
+  });
+  alarmOverlay.addEventListener('click', function(e) {
+    if (e.target === alarmOverlay) { alarmOverlay.classList.remove('show'); alarmPopupItem = null; }
+  });
+
+  // Delete alarm
+  document.getElementById('alarm-delete').addEventListener('click', function() {
+    if (!alarmPopupItem) return;
+    cancelAlarmTimer(alarmPopupItem.dataset.itemId);
+    alarmPopupItem._alarmData = null;
+    var ab = alarmPopupItem.querySelector('.alarm-btn');
+    if (ab) ab.classList.remove('alarm-active');
+    saveState();
+    alarmOverlay.classList.remove('show'); alarmPopupItem = null;
+  });
+
+  // Save alarm
+  document.getElementById('alarm-save').addEventListener('click', function() {
+    if (!alarmPopupItem) return;
+    var h = Math.max(0, Math.min(23, parseInt(alarmHoursInput.value) || 0));
+    var m = Math.max(0, Math.min(59, parseInt(alarmMinutesInput.value) || 0));
+    var rpt = Math.max(1, Math.min(99, parseInt(alarmRepeatInput.value) || 1));
+    var type = getSelectedAlarmType();
+    if (h === 0 && m === 0) m = 1; // minimum 1 minute
+    var intervalMs = (h * 3600000) + (m * 60000);
+    var now = Date.now();
+    var alarmData = {
+      intervalH: h, intervalM: m, repeatCount: rpt,
+      alarmType: type, startedAt: now,
+      nextFireTime: now + intervalMs, remainingRepeats: rpt
+    };
+    alarmPopupItem._alarmData = alarmData;
+    var ab = alarmPopupItem.querySelector('.alarm-btn');
+    if (ab) ab.classList.add('alarm-active');
+    // Schedule timer
+    var itemId = alarmPopupItem.dataset.itemId;
+    scheduleAlarmTimer(currentNbId, itemId, intervalMs, intervalMs, rpt, type);
+    saveState();
+    alarmOverlay.classList.remove('show'); alarmPopupItem = null;
+  });
+
+  // Limit repeat input to 2 digits
+  alarmRepeatInput.addEventListener('input', function() {
+    if (this.value.length > 2) this.value = this.value.slice(0, 2);
+  });
+
+  // ── Timer Management ──
+  function scheduleAlarmTimer(nbId, itemId, delayMs, repeatIntervalMs, remaining, alarmType) {
+    cancelAlarmTimer(itemId);
+    if (remaining <= 0 || delayMs < 0) return;
+    alarmTimers[itemId] = setTimeout(function() {
+      fireAlarm(nbId, itemId, repeatIntervalMs, remaining, alarmType);
+    }, Math.max(0, delayMs));
+  }
+
+  function cancelAlarmTimer(itemId) {
+    if (alarmTimers[itemId]) { clearTimeout(alarmTimers[itemId]); delete alarmTimers[itemId]; }
+  }
+
+  function fireAlarm(nbId, itemId, repeatIntervalMs, remaining, alarmType) {
+    delete alarmTimers[itemId];
+    // Find notebook and item data
+    var nb = findNb(nbId);
+    if (!nb) return;
+    var itemData = null;
+    for (var i = 0; i < (nb.items || []).length; i++) {
+      if (nb.items[i].id === itemId) { itemData = nb.items[i]; break; }
+    }
+    if (!itemData) return;
+
+    var itemText = (itemData.html || '').replace(/<[^>]*>/g, '').trim();
+    var nbIcon = '\uD83D\uDCDD';
+    var nbName = nb.name || '메모';
+
+    // Show notification
+    showAlarmNotification(nbIcon, nbName, itemText, alarmType);
+
+    // Update remaining
+    remaining--;
+    if (itemData.alarm) {
+      itemData.alarm.remainingRepeats = remaining;
+      itemData.alarm.nextFireTime = remaining > 0 ? Date.now() + repeatIntervalMs : null;
+    }
+    saveNotebooks();
+
+    // Update UI if viewing this notebook
+    if (currentNbId === nbId) {
+      var el = todoList.querySelector('[data-item-id="' + itemId + '"]');
+      if (el) {
+        if (remaining > 0) {
+          el._alarmData = itemData.alarm;
+        } else {
+          el._alarmData = null;
+          var ab = el.querySelector('.alarm-btn');
+          if (ab) ab.classList.remove('alarm-active');
+        }
+      }
+    }
+
+    // Schedule next
+    if (remaining > 0) {
+      scheduleAlarmTimer(nbId, itemId, repeatIntervalMs, repeatIntervalMs, remaining, alarmType);
+    }
+  }
+
+  // ── Notification Display ──
+  function showAlarmNotification(icon, title, body, alarmType) {
+    // Play sound / vibrate
+    if (alarmType === 'sound') { playAlarmSound(); }
+    else if (alarmType === 'vibrate') { tryVibrate(); }
+
+    // Show Android system notification (status bar)
+    if (window.TodoBridge && window.TodoBridge.showNotification) {
+      try { window.TodoBridge.showNotification(icon + ' ' + title, body); } catch(e) {}
+    }
+
+    // Show in-app notification bar
+    var notifEl = document.getElementById('alarm-notif');
+    document.getElementById('alarm-notif-icon').textContent = icon;
+    document.getElementById('alarm-notif-title').textContent = title;
+    document.getElementById('alarm-notif-body').textContent = body;
+    notifEl.classList.add('show');
+
+    // Auto-dismiss after 8s
+    if (alarmNotifTimeout) clearTimeout(alarmNotifTimeout);
+    alarmNotifTimeout = setTimeout(function() { notifEl.classList.remove('show'); }, 8000);
+  }
+
+  // Tap notification to dismiss
+  document.getElementById('alarm-notif').addEventListener('click', function() {
+    this.classList.remove('show');
+    if (alarmNotifTimeout) { clearTimeout(alarmNotifTimeout); alarmNotifTimeout = null; }
+  });
+
+  // ── Sound via Web Audio API ──
+  function playAlarmSound() {
+    try {
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      // Play two-tone beep
+      function beep(freq, start, dur) {
+        var osc = ctx.createOscillator(); var gain = ctx.createGain();
+        osc.type = 'sine'; osc.frequency.value = freq;
+        gain.gain.value = 0.3;
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + start);
+        osc.stop(ctx.currentTime + start + dur);
+      }
+      beep(800, 0, 0.2); beep(1000, 0.25, 0.2); beep(800, 0.5, 0.2); beep(1000, 0.75, 0.3);
+      setTimeout(function() { ctx.close(); }, 1500);
+    } catch(e) {}
+  }
+
+  function tryVibrate() {
+    try { if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 300]); } catch(e) {}
+  }
+
+  // ── Restore Alarms on Load ──
+  function restoreAllAlarms() {
+    notebooks.forEach(function(nb) {
+      (nb.items || []).forEach(function(item) {
+        if (!item.id) item.id = genId();
+        if (!item.alarm || !item.alarm.remainingRepeats || item.alarm.remainingRepeats <= 0) return;
+        var now = Date.now();
+        var nextFire = item.alarm.nextFireTime;
+        var intervalMs = (item.alarm.intervalH * 3600000) + (item.alarm.intervalM * 60000);
+        if (intervalMs <= 0) intervalMs = 60000;
+        if (!nextFire || nextFire <= now) {
+          // Missed alarm - fire soon
+          scheduleAlarmTimer(nb.id, item.id, 500, intervalMs, item.alarm.remainingRepeats, item.alarm.alarmType);
+        } else {
+          scheduleAlarmTimer(nb.id, item.id, nextFire - now, intervalMs, item.alarm.remainingRepeats, item.alarm.alarmType);
+        }
+      });
+    });
+  }
+
+  // Check missed alarms when app comes back to foreground
+  // (notebooks array is already refreshed by the visibilitychange handler above)
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+      // Re-check timers for missed alarms using refreshed notebooks
+      notebooks.forEach(function(nb) {
+        (nb.items || []).forEach(function(item) {
+          if (!item.alarm || !item.alarm.remainingRepeats || item.alarm.remainingRepeats <= 0) return;
+          if (alarmTimers[item.id]) return; // already scheduled
+          var now = Date.now();
+          var nextFire = item.alarm.nextFireTime;
+          var intervalMs = (item.alarm.intervalH * 3600000) + (item.alarm.intervalM * 60000);
+          if (intervalMs <= 0) intervalMs = 60000;
+          if (!nextFire || nextFire <= now) {
+            scheduleAlarmTimer(nb.id, item.id, 300, intervalMs, item.alarm.remainingRepeats, item.alarm.alarmType);
+          } else {
+            scheduleAlarmTimer(nb.id, item.id, nextFire - now, intervalMs, item.alarm.remainingRepeats, item.alarm.alarmType);
+          }
+        });
+      });
+    }
+  });
+
+  // ══════════════════════════════════════════
+  //  INIT
+  // ══════════════════════════════════════════
+
+  buildThemeGrid();
+  var savedThemeId = parseInt(localStorage.getItem('todo_theme_id') || '1');
+  applyTheme(findTheme(savedThemeId));
+
+  loadNotebooks();
+  // Ensure all items have IDs
+  notebooks.forEach(function(nb) {
+    (nb.items || []).forEach(function(item) { if (!item.id) item.id = genId(); });
+  });
+  saveNotebooks();
+  renderNbList();
+  restoreAllAlarms();
+
+  setInterval(function() { if (currentNbId) cleanupCompleted(); }, 60 * 1000);
+
+  // Save on all possible exit events
+  function emergencySave() {
+    if (currentNbId && dataLoaded) {
+      saveCurrentNb();
+    }
+  }
+  window.addEventListener('pagehide', emergencySave);
+  window.addEventListener('beforeunload', emergencySave);
+  window.addEventListener('unload', emergencySave);
+
+  // ══════════════════════════════════════════
+  //  ANDROID BACK BUTTON HANDLER
+  // ══════════════════════════════════════════
+  // Called from native Android onBackPressed via loadUrl("javascript:...")
+  // Handles closing overlays, going back from editor, or exiting app.
+  window.handleAndroidBack = function() {
+    // Priority 1: Close alarm overlay
+    if (alarmOverlay && alarmOverlay.classList.contains('show')) {
+      alarmOverlay.classList.remove('show');
+      alarmPopupItem = null;
+      return;
+    }
+    // Priority 2: Close icon picker
+    if (iconPickerOverlay && iconPickerOverlay.classList.contains('show')) {
+      iconPickerOverlay.classList.remove('show');
+      return;
+    }
+    // Priority 3: Close confirm dialog
+    if (confirmOverlay.classList.contains('show')) {
+      confirmOverlay.classList.remove('show');
+      confirmCallback = null;
+      return;
+    }
+    // Priority 4: Close theme overlay
+    var themeOv = document.getElementById('theme-overlay');
+    if (themeOv.classList.contains('show')) {
+      themeOv.classList.remove('show');
+      return;
+    }
+    // Priority 5: Close editor, go back to notebook list
+    if (currentNbId) {
+      closeNotebook();
+      return;
+    }
+    // Nothing to close - exit the app
+    if (window.TodoBridge && window.TodoBridge.exitApp) {
+      window.TodoBridge.exitApp();
+    }
+  };
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+# 빌드 아티팩트
+app-release.apk
+*.jks
+*.keystore
+
+# 임시 파일
+*.zip
+*.tmp
+*.bak
+
+# 대용량 파일 (GitHub 100MB 제한) - apktool.jar은 제외
+jdk-21-installer.exe
+*.exe
+*.msi
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node/Python
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 시스템 파일
+.DS_Store
+Thumbs.db
