@@ -165,7 +165,9 @@ const 전투시스템 = {
         if (this.내HP <= 0) {
             this.진행중 = false;
             this.idle토글(false);
-            // KO 연출 → 2.5초 후 콜백
+            // 승패 포즈
+            document.getElementById('전투왼쪽펫').classList.add('defeat');
+            document.getElementById('전투오른쪽펫').classList.add('victory');
             await new Promise(resolve => {
                 화면.KO연출(resolve);
             });
@@ -175,6 +177,8 @@ const 전투시스템 = {
         if (this.상대HP <= 0) {
             this.진행중 = false;
             this.idle토글(false);
+            document.getElementById('전투오른쪽펫').classList.add('defeat');
+            document.getElementById('전투왼쪽펫').classList.add('victory');
             await new Promise(resolve => {
                 화면.KO연출(resolve);
             });
@@ -224,8 +228,8 @@ const 전투시스템 = {
         const 충돌Y = 200;
         화면.히트이펙트(충돌X, 충돌Y);
 
-        // 히트 스파크 파티클
-        this.히트스파크(충돌X, 충돌Y, 스킬);
+        // 히트 스파크 파티클 (속성 색상 반영)
+        this.히트스파크(충돌X, 충돌Y, 스킬, 공격펫);
 
         // 대미지 팝업
         if (대상 === '나') {
@@ -250,52 +254,60 @@ const 전투시스템 = {
         await this.지연(300);
     },
 
+    // 액션 → CSS 클래스 매핑
+    _액션클래스: { '주먹': 'atk-punch', '발차기': 'atk-kick', '날라차기': 'atk-fly' },
+
     async 공격애니메이션(결과, 내액션, 상대액션) {
         const 왼쪽펫 = document.getElementById('전투왼쪽펫');
         const 오른쪽펫 = document.getElementById('전투오른쪽펫');
+        const 내클래스 = this._액션클래스[내액션];
+        const 상대클래스 = this._액션클래스[상대액션];
 
         if (결과 === 'win') {
+            왼쪽펫.classList.add(내클래스);
             왼쪽펫.classList.add('move-center-l');
             await this.지연(350);
             화면.전투플래시();
             화면.화면흔들림();
             화면.히트이펙트(560, 200);
             this.히트스파크(560, 200, false);
-            await this.지연(300);
-            왼쪽펫.classList.remove('move-center-l');
+            오른쪽펫.classList.add('hit-react');
+            await this.지연(350);
+            왼쪽펫.classList.remove('move-center-l', 내클래스);
+            오른쪽펫.classList.remove('hit-react');
         } else if (결과 === 'lose') {
+            오른쪽펫.classList.add(상대클래스);
             오른쪽펫.classList.add('move-center-r');
             await this.지연(350);
             화면.전투플래시();
             화면.화면흔들림();
             화면.히트이펙트(640, 200);
             this.히트스파크(640, 200, false);
-            await this.지연(300);
-            오른쪽펫.classList.remove('move-center-r');
+            왼쪽펫.classList.add('hit-react');
+            await this.지연(350);
+            오른쪽펫.classList.remove('move-center-r', 상대클래스);
+            왼쪽펫.classList.remove('hit-react');
         } else {
-            // 무승부 - 둘 다 충돌
-            왼쪽펫.classList.add('move-center-l');
-            오른쪽펫.classList.add('move-center-r');
+            왼쪽펫.classList.add(내클래스, 'move-center-l');
+            오른쪽펫.classList.add(상대클래스, 'move-center-r');
             await this.지연(350);
             화면.전투플래시();
             화면.화면흔들림();
             화면.히트이펙트(600, 200);
             this.히트스파크(600, 200, false);
-            await this.지연(300);
-            왼쪽펫.classList.remove('move-center-l');
-            오른쪽펫.classList.remove('move-center-r');
+            await this.지연(350);
+            왼쪽펫.classList.remove('move-center-l', 내클래스);
+            오른쪽펫.classList.remove('move-center-r', 상대클래스);
         }
     },
 
     히트애니메이션(쪽) {
         const id = 쪽 === '왼쪽' ? '전투왼쪽펫' : '전투오른쪽펫';
         const el = document.getElementById(id);
-        // 밝은 플래시
         el.style.filter = 'brightness(3) saturate(2)';
         setTimeout(() => { el.style.filter = ''; }, 200);
-        // 강한 흔들림
-        el.style.animation = 'hitShake 0.3s ease-in-out';
-        setTimeout(() => { el.style.animation = ''; }, 400);
+        el.classList.add('hit-react');
+        setTimeout(() => el.classList.remove('hit-react'), 400);
     },
 
     idle토글(활성) {
@@ -359,13 +371,18 @@ const 전투시스템 = {
         return new Promise(resolve => setTimeout(resolve, ms));
     },
 
-    // ========== 히트 스파크 (캔버스에 즉시 추가) ==========
-    히트스파크(x, y, 스킬) {
+    // ========== 히트 스파크 (속성 색상 반영) ==========
+    히트스파크(x, y, 스킬, 공격펫 = null) {
         if (!this.파티클상태) return;
         const 개수 = 스킬 ? 30 : 15;
-        const 색상들 = 스킬
-            ? ['#c080ff', '#a060e0', '#e0a0ff', '#fff']
-            : ['#ffe040', '#ff8020', '#ffaa40', '#fff'];
+        // 공격 펫의 속성 색상 사용
+        let 색상들;
+        if (스킬 && 공격펫) {
+            const 속성 = 게임데이터.속성가져오기(공격펫.속성 || '무');
+            색상들 = [...속성.파티클, '#fff'];
+        } else {
+            색상들 = ['#ffe040', '#ff8020', '#ffaa40', '#fff'];
+        }
         for (let i = 0; i < 개수; i++) {
             const 각도 = Math.random() * Math.PI * 2;
             const 속도 = 2 + Math.random() * (스킬 ? 8 : 5);
@@ -390,8 +407,11 @@ const 전투시스템 = {
         canvas.width = 1280;
         canvas.height = 720;
 
-        const 내색 = this.내펫.색상;
-        const 상대색 = this.상대펫.색상;
+        // 속성 색상 사용
+        const 내속성 = 게임데이터.속성가져오기(this.내펫.속성 || '무');
+        const 상대속성 = 게임데이터.속성가져오기(this.상대펫.속성 || '무');
+        const 내색 = 내속성.주색;
+        const 상대색 = 상대속성.주색;
 
         // 파티클 상태 객체
         this.파티클상태 = {

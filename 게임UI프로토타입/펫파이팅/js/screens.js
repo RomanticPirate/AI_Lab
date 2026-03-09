@@ -538,7 +538,11 @@ const 화면 = {
         오른쪽.appendChild(펫렌더러.그리기(상대펫, 320, true));
         if (오른쪽오라) { 오른쪽오라.style.background = 상대펫.색상; 오른쪽.appendChild(오른쪽오라); }
         if (오른쪽그림자) 오른쪽.appendChild(오른쪽그림자);
-        // 아이들 애니메이션 활성화
+        // 상태 클래스 리셋 + 아이들 애니메이션 활성화
+        ['idle','victory','defeat','hit-react','atk-punch','atk-kick','atk-fly'].forEach(c => {
+            왼쪽.classList.remove(c);
+            오른쪽.classList.remove(c);
+        });
         왼쪽.classList.add('idle');
         오른쪽.classList.add('idle');
 
