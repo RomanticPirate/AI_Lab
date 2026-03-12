@@ -18,7 +18,7 @@ const 펫렌더러 = {
         const 색 = 펫.색상;
         const 보조 = 펫.보조색상;
         const 속성 = 펫.속성 || '무';
-        const 속성색 = 속성효과[속성] || 속성효과['무'];
+        const 속성색 = 속성효과[속성] || 속성효과['불'];
 
         const 공통defs = `
             <radialGradient id="몸g${uid}" cx="50%" cy="35%">
@@ -81,15 +81,6 @@ const 펫렌더러 = {
                 <path d="M115 55 Q125 50 135 55 Q145 60 155 55" fill="none" stroke="${색.보조}" stroke-width="1">
                     <animate attributeName="d" values="M115 55 Q125 50 135 55 Q145 60 155 55;M115 50 Q125 45 135 50 Q145 55 155 50;M115 55 Q125 50 135 55 Q145 60 155 55" dur="2.5s" repeatCount="indefinite"/>
                 </path>
-            </g>`;
-            case '어둠': return `<g class="pet-effect" filter="url(#속성빛${uid})" opacity=".2">
-                <circle cx="60" cy="55" r="8" fill="${색.주색}">
-                    <animate attributeName="r" values="8;12;8" dur="3s" repeatCount="indefinite"/>
-                    <animate attributeName="opacity" values=".3;.1;.3" dur="3s" repeatCount="indefinite"/>
-                </circle>
-                <circle cx="145" cy="45" r="6" fill="${색.보조}">
-                    <animate attributeName="r" values="6;10;6" dur="2.5s" repeatCount="indefinite"/>
-                </circle>
             </g>`;
             case '금속': return `<g class="pet-effect" opacity=".2">
                 <line x1="60" y1="40" x2="75" y2="55" stroke="${색.보조}" stroke-width="2" stroke-linecap="round">

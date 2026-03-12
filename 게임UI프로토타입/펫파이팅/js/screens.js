@@ -40,35 +40,42 @@ const 화면 = {
         const 오른쪽 = document.getElementById('타이틀오른쪽펫');
         if (!왼쪽 || !오른쪽) return;
 
-        // 왼쪽팀: 불곰, 바람여우, 독수리왕
-        const 왼쪽팀 = [1, 3, 4];
-        // 오른쪽팀: 번개늑대, 그림자고양이, 독사킹
-        const 오른쪽팀 = [2, 5, 7];
+        // 왼쪽팀: 불곰(리더 크게), 독사킹(뒤에 작게)
+        const 왼쪽팀 = [
+            { id: 1, 크기: 140, x: 120, y: 0, z: 2 },   // 불곰 - 앞쪽 중심
+            { id: 7, 크기: 100, x: 0, y: 40, z: 1 },     // 독사킹 - 뒤쪽 왼편
+        ];
+        // 오른쪽팀: 독수리왕(리더 크게), 그림자고양이, 철갑거북(뒤에 작게)
+        const 오른쪽팀 = [
+            { id: 4, 크기: 140, x: 120, y: 0, z: 3 },    // 독수리왕 - 앞쪽 중심
+            { id: 5, 크기: 100, x: 0, y: 30, z: 2 },     // 그림자고양이 - 뒤쪽 왼편
+            { id: 6, 크기: 90, x: 250, y: 50, z: 1 },    // 철갑거북 - 뒤쪽 오른편
+        ];
 
         왼쪽.innerHTML = '';
         오른쪽.innerHTML = '';
 
-        왼쪽팀.forEach((id, i) => {
-            const 펫 = 게임데이터.펫찾기(id);
+        왼쪽팀.forEach(cfg => {
+            const 펫 = 게임데이터.펫찾기(cfg.id);
             if (!펫) return;
-            const el = 펫렌더러.그리기(펫, 100 + (2 - i) * 20, false);
+            const el = 펫렌더러.그리기(펫, cfg.크기, false);
             el.classList.add('title-pet-svg');
             el.style.position = 'absolute';
-            el.style.bottom = (i * 30) + 'px';
-            el.style.left = (i * 35) + 'px';
-            el.style.zIndex = 3 - i;
+            el.style.bottom = cfg.y + 'px';
+            el.style.left = cfg.x + 'px';
+            el.style.zIndex = cfg.z;
             왼쪽.appendChild(el);
         });
 
-        오른쪽팀.forEach((id, i) => {
-            const 펫 = 게임데이터.펫찾기(id);
+        오른쪽팀.forEach(cfg => {
+            const 펫 = 게임데이터.펫찾기(cfg.id);
             if (!펫) return;
-            const el = 펫렌더러.그리기(펫, 100 + (2 - i) * 20, true);
+            const el = 펫렌더러.그리기(펫, cfg.크기, true);
             el.classList.add('title-pet-svg');
             el.style.position = 'absolute';
-            el.style.bottom = (i * 30) + 'px';
-            el.style.right = (i * 35) + 'px';
-            el.style.zIndex = 3 - i;
+            el.style.bottom = cfg.y + 'px';
+            el.style.right = cfg.x + 'px';
+            el.style.zIndex = cfg.z;
             오른쪽.appendChild(el);
         });
     },
@@ -201,24 +208,21 @@ const 화면 = {
         div.innerHTML = `
             <div class="select-bg"></div>
             <div class="select-header">캐릭터 선택</div>
-            <div class="select-body">
-                <div class="select-portrait-big" id="선택큰초상화"></div>
-                <div class="select-info">
-                    <div class="select-pet-name" id="선택펫이름">캐릭터를 선택하세요</div>
+            <div class="select-detail" id="선택상세">
+                <div class="select-portrait-big" id="선택큰초상화">
+                    <div class="select-empty-prompt">캐릭터를 선택하세요</div>
+                </div>
+                <div class="select-info" id="선택정보" style="opacity:0">
+                    <div class="select-pet-name" id="선택펫이름"></div>
                     <div class="select-pet-story" id="선택펫스토리"></div>
                     <div class="select-divider"></div>
                     <div class="select-stats" id="선택스탯"></div>
-                    <div class="select-skill" id="선택스킬" style="display:none">
-                        <div class="select-skill-icon" id="선택스킬아이콘">⚡</div>
-                        <div>
-                            <div class="select-skill-name" id="선택스킬이름"></div>
-                            <div class="select-skill-desc" id="선택스킬설명"></div>
-                        </div>
-                    </div>
-                    <div class="select-divider"></div>
-                    <div class="select-thumbs" id="선택썸네일목록"></div>
-                    <button class="select-confirm disabled" id="선택확인버튼">선택</button>
+                    <div class="select-skills-area" id="선택스킬영역"></div>
                 </div>
+            </div>
+            <div class="select-footer">
+                <div class="select-thumbs" id="선택썸네일목록"></div>
+                <button class="select-confirm disabled" id="선택확인버튼">선택</button>
             </div>
             <div class="vignette"></div>
         `;
@@ -228,12 +232,11 @@ const 화면 = {
     캐릭터선택초기화(선택콜백) {
         const 목록 = document.getElementById('선택썸네일목록');
         const 큰초상화 = document.getElementById('선택큰초상화');
+        const 정보 = document.getElementById('선택정보');
         const 이름 = document.getElementById('선택펫이름');
         const 스토리 = document.getElementById('선택펫스토리');
         const 스탯 = document.getElementById('선택스탯');
-        const 스킬 = document.getElementById('선택스킬');
-        const 스킬이름 = document.getElementById('선택스킬이름');
-        const 스킬설명 = document.getElementById('선택스킬설명');
+        const 스킬영역 = document.getElementById('선택스킬영역');
         const 확인 = document.getElementById('선택확인버튼');
         let 선택된펫 = null;
 
@@ -249,21 +252,26 @@ const 화면 = {
             썸.appendChild(이름라벨);
 
             썸.onclick = () => {
-                // 선택 표시
                 목록.querySelectorAll('.select-thumb').forEach(t => t.classList.remove('selected'));
                 썸.classList.add('selected');
                 선택된펫 = 펫;
 
+                // 안내 텍스트 숨기고 정보 표시
+                const 안내 = 큰초상화.querySelector('.select-empty-prompt');
+                if (안내) 안내.style.display = 'none';
+                정보.style.opacity = '1';
+
                 // 정보 업데이트
-                큰초상화.innerHTML = '';
                 큰초상화.style.background = `radial-gradient(ellipse, ${펫.배경색}, #0a0818)`;
-                큰초상화.appendChild(펫렌더러.그리기(펫, 220));
+                // 기존 SVG만 제거 (안내 텍스트는 이미 숨김)
+                const 기존SVG = 큰초상화.querySelector('.pet-svg');
+                if (기존SVG) 기존SVG.remove();
+                큰초상화.appendChild(펫렌더러.그리기(펫, 340));
 
                 이름.textContent = 펫.이름;
                 이름.style.color = 펫.색상;
                 스토리.textContent = 펫.배경스토리;
 
-                // 스탯
                 const 대미지값 = (v) => {
                     let stars = '';
                     for (let i = 0; i < Math.min(v, 5); i++) stars += '★';
@@ -293,10 +301,14 @@ const 화면 = {
                     </div>
                 `;
 
-                // 스킬
-                스킬.style.display = 'flex';
-                스킬이름.textContent = 펫.스킬이름;
-                스킬설명.textContent = 펫.스킬설명;
+                const 스킬들 = 게임데이터.펫스킬(펫);
+                스킬영역.innerHTML = 스킬들.map(s => `
+                    <div class="select-skill">
+                        <div class="select-skill-badge ${s.종류 === '패시브' ? 'passive' : 'active'}">${s.종류}</div>
+                        <div class="select-skill-name">${s.이름}</div>
+                        <div class="select-skill-desc">${s.설명}</div>
+                    </div>
+                `).join('');
 
                 확인.className = 'select-confirm enabled';
             };
@@ -498,13 +510,30 @@ const 화면 = {
             <div class="battle-ko" id="KO연출">
                 <div class="battle-ko-text">경기 종료</div>
             </div>
-            <!-- 스킬 컷씬 -->
+            <!-- 스킬 컷씬 (하이퍼 콤보 스타일) -->
             <div class="skill-cutscene" id="스킬컷씬">
                 <div class="skill-cutscene-bg">
+                    <div class="skill-bg-tint" id="스킬배경틴트"></div>
                     <div class="skill-speedlines"></div>
+                    <div class="skill-speedlines delayed"></div>
+                    <div class="skill-slash-lines">
+                        <div class="skill-slash s1"></div>
+                        <div class="skill-slash s2"></div>
+                        <div class="skill-slash s3"></div>
+                    </div>
+                    <div class="skill-burst" id="스킬버스트"></div>
                 </div>
-                <div class="skill-face" id="스킬얼굴"></div>
-                <div class="skill-name-display" id="스킬이름표시"></div>
+                <div class="skill-portrait-area">
+                    <div class="skill-face" id="스킬얼굴"></div>
+                    <div class="skill-face-flash" id="스킬얼굴플래시"></div>
+                </div>
+                <div class="skill-text-area">
+                    <div class="skill-badge-display" id="스킬뱃지">ACTIVE SKILL</div>
+                    <div class="skill-name-display" id="스킬이름표시"></div>
+                    <div class="skill-name-shadow" id="스킬이름그림자"></div>
+                </div>
+                <div class="skill-flash-overlay" id="스킬플래시"></div>
+                <canvas class="skill-spark-canvas" id="스킬스파크캔버스"></canvas>
             </div>
             <!-- 플래시 오버레이 -->
             <div class="flash-overlay" id="전투플래시"></div>
@@ -648,24 +677,130 @@ const 화면 = {
         });
     },
 
-    스킬컷씬표시(펫, 콜백) {
+    스킬컷씬표시(펫, 스킬이름, 콜백) {
         const 컷씬 = document.getElementById('스킬컷씬');
         const 얼굴 = document.getElementById('스킬얼굴');
+        const 얼굴플래시 = document.getElementById('스킬얼굴플래시');
         const 이름 = document.getElementById('스킬이름표시');
+        const 그림자 = document.getElementById('스킬이름그림자');
+        const 뱃지 = document.getElementById('스킬뱃지');
+        const 틴트 = document.getElementById('스킬배경틴트');
+        const 버스트 = document.getElementById('스킬버스트');
+        const 플래시 = document.getElementById('스킬플래시');
+        const 캔버스 = document.getElementById('스킬스파크캔버스');
 
+        // 펫 색상 기반 세팅
+        const 색 = 펫.색상;
         얼굴.innerHTML = '';
         얼굴.style.background = `radial-gradient(ellipse, ${펫.배경색}, #0a0818)`;
-        얼굴.style.borderColor = 펫.색상;
-        얼굴.appendChild(펫렌더러.그리기(펫, 200));
-        이름.textContent = 펫.스킬이름;
-        이름.style.color = 펫.색상;
-        이름.style.textShadow = `0 2px 12px ${펫.색상}80, 0 0 30px ${펫.색상}40`;
+        얼굴.style.borderColor = 색;
+        얼굴.appendChild(펫렌더러.그리기(펫, 220));
+        얼굴플래시.style.borderColor = 색;
+        얼굴플래시.style.boxShadow = `0 0 60px ${색}, 0 0 120px ${색}80`;
 
+        이름.textContent = 스킬이름;
+        이름.style.color = '#fff';
+        이름.style.textShadow = `0 0 20px ${색}, 0 0 40px ${색}80, 0 4px 8px rgba(0,0,0,.8)`;
+        그림자.textContent = 스킬이름;
+        그림자.style.color = 색;
+
+        뱃지.style.background = `linear-gradient(90deg, ${색}cc, ${색}60)`;
+        뱃지.style.boxShadow = `0 0 20px ${색}40`;
+
+        틴트.style.background = `radial-gradient(ellipse at 30% 50%, ${색}25, transparent 70%)`;
+        버스트.style.background = `radial-gradient(circle, ${색}30, ${색}10 30%, transparent 60%)`;
+
+        // 스파크 파티클 캔버스
+        캔버스.width = 1280;
+        캔버스.height = 720;
+        const ctx = 캔버스.getContext('2d');
+        const 속성 = 게임데이터.속성가져오기(펫.속성 || '불');
+        const 파티클색 = [...속성.파티클, '#fff', '#ffe080'];
+        const 스파크들 = [];
+
+        // 스파크 생성
+        for (let i = 0; i < 50; i++) {
+            const 각 = Math.random() * Math.PI * 2;
+            const 속도 = 3 + Math.random() * 12;
+            스파크들.push({
+                x: 350, y: 360,
+                vx: Math.cos(각) * 속도,
+                vy: Math.sin(각) * 속도,
+                크기: Math.random() * 3 + 1,
+                수명: 0.6 + Math.random() * 0.4,
+                감쇠: 0.008 + Math.random() * 0.012,
+                색: 파티클색[Math.floor(Math.random() * 파티클색.length)],
+                지연: Math.random() * 300
+            });
+        }
+
+        let 시작시간 = 0;
+        const 스파크그리기 = (timestamp) => {
+            if (!시작시간) 시작시간 = timestamp;
+            const 경과 = timestamp - 시작시간;
+            ctx.clearRect(0, 0, 1280, 720);
+
+            스파크들.forEach(s => {
+                if (경과 < s.지연) return;
+                s.x += s.vx; s.y += s.vy;
+                s.vy += 0.1; s.vx *= 0.99;
+                s.수명 -= s.감쇠;
+                if (s.수명 <= 0) return;
+
+                ctx.globalAlpha = s.수명;
+                ctx.fillStyle = s.색;
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = s.색;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.크기, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 꼬리
+                ctx.globalAlpha = s.수명 * 0.3;
+                ctx.strokeStyle = s.색;
+                ctx.lineWidth = s.크기 * 0.5;
+                ctx.beginPath();
+                ctx.moveTo(s.x, s.y);
+                ctx.lineTo(s.x - s.vx * 3, s.y - s.vy * 3);
+                ctx.stroke();
+            });
+
+            ctx.shadowBlur = 0;
+            ctx.globalAlpha = 1;
+
+            if (컷씬.classList.contains('show')) {
+                requestAnimationFrame(스파크그리기);
+            }
+        };
+
+        // 시퀀스 시작
+        컷씬.classList.remove('show', 'phase2');
+        void 컷씬.offsetWidth;
+
+        // Phase 1: 등장 (0ms)
         컷씬.classList.add('show');
+        requestAnimationFrame(스파크그리기);
+
+        // 초기 플래시
+        플래시.classList.add('flash');
+        setTimeout(() => 플래시.classList.remove('flash'), 200);
+
+        // Phase 2: 줌인 강조 (400ms)
         setTimeout(() => {
-            컷씬.classList.remove('show');
+            컷씬.classList.add('phase2');
+            // 두 번째 플래시
+            플래시.classList.add('flash');
+            setTimeout(() => 플래시.classList.remove('flash'), 150);
+            // 화면 흔들림
+            this.화면흔들림();
+        }, 400);
+
+        // Phase 3: 종료 (1800ms)
+        setTimeout(() => {
+            컷씬.classList.remove('show', 'phase2');
+            ctx.clearRect(0, 0, 1280, 720);
             if (콜백) 콜백();
-        }, 1500);
+        }, 1800);
     },
 
     // 라운드 시작 연출

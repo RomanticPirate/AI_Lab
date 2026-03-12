@@ -4,7 +4,7 @@
     --bg:#080410;--gold:#ffc040;--gold-d:#a07020;
     --red:#ff4030;--blue:#3080ff;--green:#40c060;--purple:#a060e0;
 }
-body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:center;align-items:center;font-family:'Noto Sans KR',sans-serif;color:#e0e0e0}
+body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:center;align-items:center;font-family:'Noto Sans KR',sans-serif;color:#e0e0e0;font-size:11px}
 .game{width:1280px;height:720px;position:relative;overflow:hidden;background:var(--bg)}
 .loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:#666}
 
@@ -38,10 +38,10 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 .title-press{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);text-align:center;z-index:20;cursor:pointer}
 .title-press-text{font-size:20px;font-weight:900;color:#ffe8c0;letter-spacing:6px;text-shadow:0 0 20px rgba(255,200,100,.5);animation:blink 2s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.title-pets{position:absolute;bottom:80px;z-index:10}
-.title-pets.left{left:40px}
-.title-pets.right{right:40px}
-.title-pet-svg{filter:drop-shadow(0 4px 16px rgba(0,0,0,.5))}
+.title-pets{position:absolute;bottom:50px;z-index:10;width:400px;height:220px}
+.title-pets.left{left:20px}
+.title-pets.right{right:20px}
+.title-pet-svg{filter:drop-shadow(0 6px 20px rgba(0,0,0,.6))}
 
 /* ===== 인트로 화면 ===== */
 .intro-bg{position:absolute;inset:0;background:linear-gradient(180deg,#0a0818,#1a1030)}
@@ -57,26 +57,37 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 /* ===== 캐릭터 선택 ===== */
 .select-bg{position:absolute;inset:0;background:linear-gradient(180deg,#0a0818,#14102a)}
 .select-header{padding:16px 24px;font-family:'Black Han Sans',sans-serif;font-size:28px;color:var(--gold);text-align:center;text-shadow:0 2px 8px rgba(255,192,64,.3);z-index:10}
-.select-body{flex:1;display:flex;padding:0 24px 12px;gap:16px;z-index:10;min-height:0}
-.select-portrait-big{width:280px;border:2px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
-.select-info{flex:1;display:flex;flex-direction:column;gap:10px}
+
+/* 상세 정보 영역 (상단~중앙) */
+.select-detail{position:absolute;top:60px;left:24px;right:24px;bottom:140px;display:flex;gap:16px;z-index:10}
+.select-portrait-big{width:400px;flex-shrink:0;border:2px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.select-empty-prompt{font-family:'Black Han Sans',sans-serif;font-size:20px;color:rgba(255,200,100,.4);letter-spacing:3px;text-align:center;animation:promptPulse 2s ease-in-out infinite}
+@keyframes promptPulse{0%,100%{opacity:.4}50%{opacity:.8}}
+.select-info{flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto;transition:opacity .3s ease-out}
 .select-pet-name{font-family:'Black Han Sans',sans-serif;font-size:32px}
-.select-pet-story{font-size:13px;color:#a098b8;line-height:1.6;min-height:42px}
+.select-pet-story{font-size:14px;color:#a098b8;line-height:1.7;min-height:42px}
 .select-stats{display:flex;gap:8px}
-.select-stat{flex:1;padding:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;text-align:center}
-.select-stat-icon{font-size:28px;margin-bottom:4px}
-.select-stat-name{font-size:11px;color:#8080a0;margin-bottom:4px}
-.select-stat-stars{color:var(--gold);font-size:14px;letter-spacing:2px}
-.select-skill{padding:12px;background:rgba(168,85,247,.05);border:1px solid rgba(168,85,247,.15);border-radius:6px;display:flex;align-items:center;gap:12px}
-.select-skill-icon{width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,#2a1050,#1a0830);border:1px solid rgba(168,85,247,.3);display:flex;align-items:center;justify-content:center;font-size:20px}
-.select-skill-name{font-size:14px;font-weight:700;color:var(--purple)}
-.select-skill-desc{font-size:11px;color:#8078a0}
-.select-thumbs{display:flex;gap:6px;padding:8px 0}
-.select-thumb{width:70px;height:70px;border:2px solid rgba(255,255,255,.08);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;position:relative;overflow:hidden;background:rgba(0,0,0,.3)}
-.select-thumb:hover{border-color:rgba(255,255,255,.25);transform:translateY(-2px)}
-.select-thumb.selected{border-color:var(--gold);box-shadow:0 0 12px rgba(255,192,64,.3)}
-.select-thumb-name{position:absolute;bottom:2px;font-size:8px;color:rgba(255,255,255,.6);text-shadow:0 1px 2px #000}
-.select-confirm{padding:14px 40px;font-family:'Black Han Sans',sans-serif;font-size:18px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;letter-spacing:2px;align-self:flex-end;margin-top:auto}
+.select-stat{flex:1;padding:14px 8px;background:rgba(255,200,100,.04);border:1px solid rgba(255,200,100,.12);border-radius:8px;text-align:center}
+.select-stat-icon{font-size:32px;margin-bottom:6px}
+.select-stat-name{font-size:13px;color:#a0a0c0;margin-bottom:6px;font-weight:700}
+.select-stat-stars{color:var(--gold);font-size:20px;letter-spacing:3px;text-shadow:0 0 8px rgba(255,192,64,.3)}
+.select-skills-area{display:flex;gap:10px;flex-direction:column}
+.select-skill{padding:14px 16px;background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:8px;display:flex;align-items:center;gap:12px;transition:all .2s}
+.select-skill:hover{background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.35)}
+.select-skill-badge{padding:4px 12px;border-radius:12px;font-size:12px;font-weight:900;letter-spacing:2px;flex-shrink:0}
+.select-skill-badge.passive{background:rgba(40,160,80,.25);border:1px solid rgba(40,160,80,.5);color:#60d080;box-shadow:0 0 8px rgba(40,160,80,.15)}
+.select-skill-badge.active{background:rgba(255,80,40,.2);border:1px solid rgba(255,80,40,.4);color:#ff8060;box-shadow:0 0 8px rgba(255,80,40,.15)}
+.select-skill-name{font-size:16px;font-weight:900;color:var(--purple);flex-shrink:0;text-shadow:0 0 6px rgba(160,96,224,.2)}
+.select-skill-desc{font-size:13px;color:#a098c0;line-height:1.4}
+
+/* 하단 - 썸네일 + 확인 버튼 (항상 하단 고정) */
+.select-footer{position:absolute;bottom:0;left:0;right:0;z-index:12;display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 24px 16px;background:linear-gradient(180deg,transparent,rgba(8,4,16,.8) 30%)}
+.select-thumbs{display:flex;gap:10px;justify-content:center}
+.select-thumb{width:80px;height:80px;border:2px solid rgba(255,255,255,.08);border-radius:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .2s;position:relative;overflow:hidden;background:rgba(0,0,0,.3)}
+.select-thumb:hover{border-color:rgba(255,255,255,.25);transform:translateY(-4px);box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.select-thumb.selected{border-color:var(--gold);box-shadow:0 0 16px rgba(255,192,64,.4)}
+.select-thumb-name{position:absolute;bottom:4px;font-size:11px;color:rgba(255,255,255,.7);text-shadow:0 1px 2px #000;font-weight:700}
+.select-confirm{padding:12px 50px;font-family:'Black Han Sans',sans-serif;font-size:18px;border:none;border-radius:6px;cursor:pointer;transition:all .2s;letter-spacing:3px}
 .select-confirm.disabled{background:#2a2a3a;color:#555;cursor:default}
 .select-confirm.enabled{background:linear-gradient(180deg,#ffc040,#e08010);color:#1a0800;box-shadow:0 4px 16px rgba(255,192,64,.3)}
 .select-confirm.enabled:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,192,64,.4)}
@@ -140,9 +151,9 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 /* 아이들 호흡 애니메이션 */
 .battle-pet.idle{animation:petIdle 2s ease-in-out infinite}
 @keyframes petIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-/* 공격 이동 */
-.battle-pet.move-center-l{left:360px !important;transition:left .35s cubic-bezier(.4,0,.2,1)}
-.battle-pet.move-center-r{right:360px !important;transition:right .35s cubic-bezier(.4,0,.2,1)}
+/* 공격 이동 - 상대 쪽으로 돌진 */
+.battle-pet.move-center-l{left:700px !important;transition:left .3s cubic-bezier(.4,0,.2,1)}
+.battle-pet.move-center-r{right:700px !important;transition:right .3s cubic-bezier(.4,0,.2,1)}
 /* 오라 이펙트 */
 .battle-pet-aura{position:absolute;inset:-20px;border-radius:50%;opacity:0;pointer-events:none;filter:blur(20px);transition:opacity .3s}
 .battle-pet-aura.active{opacity:.4;animation:auraPulse 1s ease-in-out infinite}
@@ -162,7 +173,7 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 .battle-action-btn.disabled{opacity:.35;cursor:default;pointer-events:none;filter:grayscale(.5)}
 .battle-action-btn .icon{font-size:34px;margin-bottom:2px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))}
 .battle-action-btn .name{font-size:13px;font-weight:900;color:#e0d8f0;text-shadow:0 1px 2px rgba(0,0,0,.5);letter-spacing:1px}
-.battle-action-btn .dmg{font-size:10px;color:var(--gold);margin-top:2px;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.battle-action-btn .dmg{font-size:11px;color:var(--gold);margin-top:2px;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 /* 시스템(적) 버튼 */
 .battle-sys-btn{width:128px;padding:10px 8px;border:2px solid rgba(80,130,255,.12);background:linear-gradient(180deg,rgba(10,12,30,.9),rgba(5,8,20,.9));border-radius:8px;text-align:center;opacity:.5;transition:all .12s;position:relative;overflow:hidden}
 .battle-sys-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(80,130,255,.15),transparent)}
@@ -170,7 +181,7 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 @keyframes sysFlash{0%,100%{background:linear-gradient(180deg,rgba(10,12,30,.9),rgba(5,8,20,.9))}50%{background:linear-gradient(180deg,rgba(30,40,80,.9),rgba(15,20,50,.9))}}
 .battle-sys-btn .icon{font-size:34px;margin-bottom:2px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))}
 .battle-sys-btn .name{font-size:13px;font-weight:900;color:#7080a0;letter-spacing:1px}
-.battle-sys-btn .dmg{font-size:10px;color:rgba(100,160,255,.4);margin-top:2px}
+.battle-sys-btn .dmg{font-size:11px;color:rgba(100,160,255,.4);margin-top:2px}
 
 /* 메시지 팝업 */
 .battle-msg{position:absolute;z-index:30;font-family:'Black Han Sans',sans-serif;pointer-events:none;opacity:0}
@@ -204,21 +215,94 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 .game.screen-shake{animation:screenShake .3s ease-out}
 @keyframes screenShake{0%{transform:translate(0)}15%{transform:translate(-8px,4px)}30%{transform:translate(6px,-6px)}45%{transform:translate(-4px,3px)}60%{transform:translate(3px,-2px)}75%{transform:translate(-2px,1px)}100%{transform:translate(0)}}
 
-/* 스킬 컷씬 - 화려하게 */
-.skill-cutscene{position:absolute;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.8);opacity:0;pointer-events:none}
-.skill-cutscene.show{opacity:1;pointer-events:auto;animation:cutsceneIn .3s ease-out}
+/* ===== 스킬 컷씬 - 하이퍼 콤보 스타일 ===== */
+.skill-cutscene{position:absolute;inset:0;z-index:60;opacity:0;pointer-events:none;overflow:hidden}
+.skill-cutscene.show{opacity:1;pointer-events:auto;animation:cutsceneIn .15s ease-out}
 @keyframes cutsceneIn{from{opacity:0}to{opacity:1}}
-.skill-cutscene-bg{position:absolute;inset:0;overflow:hidden}
-/* 집중선 */
-.skill-speedlines{position:absolute;inset:-200px;background:conic-gradient(from 0deg at 50% 50%,transparent 0deg,rgba(255,255,255,.04) 2deg,transparent 4deg,transparent 10deg);animation:speedSpin .5s linear infinite}
+
+/* 배경 */
+.skill-cutscene-bg{position:absolute;inset:0;background:#000;overflow:hidden}
+.skill-bg-tint{position:absolute;inset:0;opacity:0;animation:tintPulse 1.8s ease-in-out}
+@keyframes tintPulse{0%{opacity:0}15%{opacity:1}80%{opacity:.6}100%{opacity:0}}
+
+/* 집중선 (이중, 회전) */
+.skill-speedlines{position:absolute;inset:-400px;background:conic-gradient(from 0deg at 50% 50%,transparent 0deg,rgba(255,255,255,.06) 1.5deg,transparent 3deg,transparent 8deg);animation:speedSpin .4s linear infinite}
+.skill-speedlines.delayed{animation-delay:-.2s;background:conic-gradient(from 45deg at 50% 50%,transparent 0deg,rgba(255,200,100,.04) 1deg,transparent 2deg,transparent 6deg);animation-duration:.6s}
 @keyframes speedSpin{to{transform:rotate(360deg)}}
-.skill-face{width:280px;height:280px;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:faceZoom .7s cubic-bezier(.34,1.56,.64,1);border:4px solid;position:relative;z-index:2;box-shadow:0 0 40px rgba(0,0,0,.5)}
-.skill-face::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:2px solid;opacity:.3;animation:faceRing 1s ease-out}
-@keyframes faceRing{0%{transform:scale(.8);opacity:.6}100%{transform:scale(1.3);opacity:0}}
-@keyframes faceZoom{0%{transform:scale(4) rotate(-5deg);opacity:0}50%{transform:scale(1.05) rotate(1deg);opacity:1}100%{transform:scale(1) rotate(0)}}
-.skill-name-display{position:absolute;bottom:180px;font-family:'Black Han Sans',sans-serif;font-size:44px;z-index:2;animation:skillNameIn .4s ease-out .3s both;letter-spacing:3px}
-@keyframes skillNameIn{from{transform:translateX(-80px);opacity:0}to{transform:translateX(0);opacity:1}}
-.skill-name-display::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:3px;background:currentColor;opacity:.4;border-radius:2px}
+
+/* 대각선 슬래시 라인 */
+.skill-slash-lines{position:absolute;inset:0}
+.skill-slash{position:absolute;background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent);height:3px;width:200%;left:-50%;transform-origin:center}
+.skill-slash.s1{top:30%;transform:rotate(-25deg) scaleX(0);animation:slashIn .3s ease-out .1s forwards}
+.skill-slash.s2{top:55%;transform:rotate(-25deg) scaleX(0);animation:slashIn .25s ease-out .2s forwards;height:2px;opacity:.6}
+.skill-slash.s3{top:75%;transform:rotate(-25deg) scaleX(0);animation:slashIn .2s ease-out .3s forwards;height:1px;opacity:.4}
+@keyframes slashIn{0%{transform:rotate(-25deg) scaleX(0) translateX(-30%)}60%{transform:rotate(-25deg) scaleX(1.2) translateX(10%)}100%{transform:rotate(-25deg) scaleX(0) translateX(50%)}}
+
+/* 중앙 버스트 */
+.skill-burst{position:absolute;left:25%;top:30%;width:500px;height:500px;border-radius:50%;transform:scale(0);animation:burstGrow .6s ease-out .1s forwards;filter:blur(40px)}
+@keyframes burstGrow{0%{transform:scale(0);opacity:1}60%{transform:scale(1.2);opacity:.5}100%{transform:scale(1.5);opacity:0}}
+
+/* 초상화 영역 */
+.skill-portrait-area{position:absolute;left:60px;top:50%;transform:translateY(-50%);z-index:3}
+
+/* 캐릭터 얼굴 - 사이드에서 슬라이드 인 */
+.skill-face{width:300px;height:300px;border-radius:12px;display:flex;align-items:center;justify-content:center;border:4px solid;position:relative;overflow:hidden;
+    box-shadow:0 0 40px rgba(0,0,0,.8),0 0 80px rgba(0,0,0,.4);
+    transform:translateX(-400px) scale(1.3) rotate(-3deg);
+    animation:faceSlideIn .35s cubic-bezier(.2,1,.3,1) forwards}
+.skill-cutscene.phase2 .skill-face{animation:facePunch .15s ease-out forwards}
+@keyframes faceSlideIn{
+    0%{transform:translateX(-400px) scale(1.3) rotate(-3deg);opacity:0}
+    70%{transform:translateX(20px) scale(1.02) rotate(1deg);opacity:1}
+    100%{transform:translateX(0) scale(1) rotate(0);opacity:1}
+}
+@keyframes facePunch{
+    0%{transform:scale(1)}
+    50%{transform:scale(1.08) rotate(-1deg)}
+    100%{transform:scale(1) rotate(0)}
+}
+.skill-face::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 50%);z-index:1;pointer-events:none}
+.skill-face::after{content:'';position:absolute;inset:-6px;border-radius:16px;border:2px solid;opacity:.4;animation:faceRing .8s ease-out forwards}
+@keyframes faceRing{0%{transform:scale(.95);opacity:.6}100%{transform:scale(1.1);opacity:0}}
+
+/* 얼굴 플래시 (등장 시 화이트아웃) */
+.skill-face-flash{position:absolute;left:60px;top:50%;transform:translateY(-50%);width:300px;height:300px;border-radius:12px;border:4px solid;z-index:4;
+    background:rgba(255,255,255,.9);opacity:0;animation:faceFlashAnim .5s ease-out .1s forwards;pointer-events:none}
+@keyframes faceFlashAnim{0%{opacity:.9}100%{opacity:0}}
+
+/* 텍스트 영역 - 오른쪽 */
+.skill-text-area{position:absolute;right:80px;top:50%;transform:translateY(-50%);z-index:3;text-align:right}
+
+/* 뱃지 */
+.skill-badge-display{display:inline-block;padding:4px 16px;border-radius:3px;font-size:11px;font-weight:900;letter-spacing:3px;color:#fff;margin-bottom:8px;
+    transform:translateX(100px);opacity:0;animation:badgeIn .3s ease-out .15s forwards}
+@keyframes badgeIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* 스킬 이름 - 대형 */
+.skill-name-display{font-family:'Black Han Sans',sans-serif;font-size:72px;z-index:2;letter-spacing:6px;position:relative;
+    transform:translateX(200px) scale(1.5);opacity:0;animation:skillNameSlam .4s cubic-bezier(.2,1,.3,1) .25s forwards;
+    -webkit-text-stroke:2px rgba(255,255,255,.3)}
+.skill-cutscene.phase2 .skill-name-display{animation:skillNameSlam .4s cubic-bezier(.2,1,.3,1) .25s forwards,namePulse .15s ease-out forwards}
+@keyframes skillNameSlam{
+    0%{transform:translateX(200px) scale(1.5);opacity:0}
+    70%{transform:translateX(-10px) scale(1.02);opacity:1}
+    100%{transform:translateX(0) scale(1);opacity:1}
+}
+@keyframes namePulse{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+.skill-name-display::after{content:'';position:absolute;bottom:-6px;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent,currentColor,transparent);opacity:.5;border-radius:2px;
+    transform:scaleX(0);animation:nameLineIn .3s ease-out .5s forwards}
+@keyframes nameLineIn{to{transform:scaleX(1)}}
+
+/* 이름 그림자 (뒤에 큰 글자) */
+.skill-name-shadow{font-family:'Black Han Sans',sans-serif;font-size:120px;position:absolute;right:-30px;top:50%;transform:translateY(-50%);opacity:.06;letter-spacing:10px;z-index:1;white-space:nowrap}
+
+/* 스킬 플래시 오버레이 */
+.skill-flash-overlay{position:absolute;inset:0;z-index:5;background:#fff;opacity:0;pointer-events:none}
+.skill-flash-overlay.flash{animation:skillFlash .2s ease-out forwards}
+@keyframes skillFlash{0%{opacity:.8}100%{opacity:0}}
+
+/* 스파크 캔버스 */
+.skill-spark-canvas{position:absolute;inset:0;z-index:4;pointer-events:none}
 
 /* KO 연출 */
 .battle-ko{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);z-index:55;pointer-events:none;opacity:0}
@@ -280,78 +364,216 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
     50%{opacity:1}
 }
 
-/* 공격 포즈 - 주먹 */
-.battle-pet.atk-punch .pet-arm-l{
-    animation:punchL .35s cubic-bezier(.4,0,.2,1) forwards !important;
+/* ===== 공격 포즈 - 주먹 ===== */
+.battle-pet.atk-punch{animation:punchLunge .4s cubic-bezier(.4,0,.2,1) !important}
+.battle-pet.atk-punch .pet-arm-l{animation:punchArmL .4s cubic-bezier(.2,1,.3,1) forwards !important}
+.battle-pet.atk-punch .pet-arm-r{animation:punchArmR .4s ease-out forwards !important}
+.battle-pet.atk-punch .pet-body{animation:punchBody .4s ease-out forwards !important}
+.battle-pet.atk-punch .pet-head{animation:punchHead .4s ease-out forwards !important}
+@keyframes punchLunge{
+    0%{transform:translateX(0)}20%{transform:translateX(-10px)}
+    50%{transform:translateX(30px)}100%{transform:translateX(0)}
 }
-@keyframes punchL{
-    0%{transform:rotate(0deg) translateX(0)}
-    40%{transform:rotate(-30deg) translateX(20px)}
-    100%{transform:rotate(0deg) translateX(0)}
+@keyframes punchArmL{
+    0%{transform:rotate(0deg)}20%{transform:rotate(40deg) translateY(-10px)}
+    45%{transform:rotate(-50deg) translateX(30px) translateY(-5px)}100%{transform:rotate(0deg)}
+}
+@keyframes punchArmR{
+    0%{transform:rotate(0deg)}30%{transform:rotate(15deg) translateY(-5px)}100%{transform:rotate(0deg)}
+}
+@keyframes punchBody{
+    0%{transform:rotate(0deg)}25%{transform:rotate(5deg)}50%{transform:rotate(-8deg)}100%{transform:rotate(0deg)}
+}
+@keyframes punchHead{
+    0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(12px) rotate(-3deg)}100%{transform:translateX(0) rotate(0deg)}
 }
 
-/* 공격 포즈 - 발차기 */
-.battle-pet.atk-kick .pet-leg{
-    animation:kickLeg .35s cubic-bezier(.4,0,.2,1) forwards !important;
+/* ===== 공격 포즈 - 발차기 ===== */
+.battle-pet.atk-kick{animation:kickLunge .45s cubic-bezier(.4,0,.2,1) !important}
+.battle-pet.atk-kick .pet-leg{animation:kickLeg .45s cubic-bezier(.2,1,.3,1) forwards !important}
+.battle-pet.atk-kick .pet-body{animation:kickBody .45s ease-out forwards !important}
+.battle-pet.atk-kick .pet-head{animation:kickHead .45s ease-out forwards !important}
+@keyframes kickLunge{
+    0%{transform:translateX(0) translateY(0)}20%{transform:translateX(-8px) translateY(5px)}
+    50%{transform:translateX(25px) translateY(-8px)}100%{transform:translateX(0) translateY(0)}
 }
 @keyframes kickLeg{
-    0%{transform:translateX(0)}
-    40%{transform:translateX(15px) translateY(-8px)}
-    100%{transform:translateX(0) translateY(0)}
+    0%{transform:translateX(0) translateY(0)}
+    30%{transform:translateX(-5px) translateY(5px)}
+    55%{transform:translateX(35px) translateY(-15px) rotate(-10deg)}
+    100%{transform:translateX(0) translateY(0) rotate(0deg)}
+}
+@keyframes kickBody{
+    0%{transform:rotate(0deg)}30%{transform:rotate(8deg)}55%{transform:rotate(-12deg) translateX(5px)}100%{transform:rotate(0deg)}
+}
+@keyframes kickHead{
+    0%{transform:translateY(0)}30%{transform:translateY(3px)}55%{transform:translateY(-5px) translateX(8px)}100%{transform:translateY(0) translateX(0)}
 }
 
-/* 공격 포즈 - 날라차기 */
-.battle-pet.atk-fly .pet-svg,.battle-pet.atk-fly{
-    animation:flyKick .4s cubic-bezier(.4,0,.2,1) forwards !important;
-}
+/* ===== 공격 포즈 - 날라차기 ===== */
+.battle-pet.atk-fly{animation:flyKick .5s cubic-bezier(.3,1,.3,1) !important}
+.battle-pet.atk-fly .pet-leg{animation:flyLeg .5s cubic-bezier(.2,1,.3,1) forwards !important}
+.battle-pet.atk-fly .pet-arm-l,.battle-pet.atk-fly .pet-arm-r{animation:flyArms .5s ease-out forwards !important}
+.battle-pet.atk-fly .pet-body{animation:flyBody .5s ease-out forwards !important}
 @keyframes flyKick{
-    0%{transform:translateY(0) rotate(0deg)}
-    30%{transform:translateY(-20px) rotate(-5deg)}
-    60%{transform:translateY(-10px) rotate(3deg) translateX(15px)}
-    100%{transform:translateY(0) rotate(0deg) translateX(0)}
+    0%{transform:translateY(0) translateX(0) rotate(0deg)}
+    15%{transform:translateY(10px) translateX(-15px)}
+    40%{transform:translateY(-60px) translateX(20px) rotate(-15deg)}
+    60%{transform:translateY(-40px) translateX(40px) rotate(10deg)}
+    100%{transform:translateY(0) translateX(0) rotate(0deg)}
+}
+@keyframes flyLeg{
+    0%{transform:translateX(0)}40%{transform:translateY(-10px)}
+    60%{transform:translateX(40px) translateY(-20px) rotate(-15deg)}100%{transform:translateX(0) translateY(0) rotate(0deg)}
+}
+@keyframes flyArms{
+    0%{transform:rotate(0deg)}30%{transform:rotate(-30deg) translateY(-10px)}
+    60%{transform:rotate(20deg)}100%{transform:rotate(0deg)}
+}
+@keyframes flyBody{
+    0%{transform:rotate(0deg)}40%{transform:rotate(-20deg)}60%{transform:rotate(15deg)}100%{transform:rotate(0deg)}
 }
 
-/* 피격 */
-.battle-pet.hit-react .pet-head{
-    animation:hitHead .3s ease-out !important;
+/* ===== 피격 - 약한 히트 (기본) ===== */
+.battle-pet.hit-react{animation:hitRecoil .4s ease-out !important}
+.battle-pet.hit-react .pet-head{animation:hitHeadSnap .4s ease-out !important}
+.battle-pet.hit-react .pet-body{animation:hitBodySquash .4s ease-out !important}
+.battle-pet.hit-react .pet-arm-l,.battle-pet.hit-react .pet-arm-r{animation:hitArmFlail .4s ease-out !important}
+@keyframes hitRecoil{
+    0%{transform:translateX(0)}15%{transform:translateX(-20px) rotate(3deg)}
+    40%{transform:translateX(-15px) rotate(-2deg)}70%{transform:translateX(5px)}100%{transform:translateX(0) rotate(0deg)}
 }
-.battle-pet.hit-react .pet-body{
-    animation:hitBody .3s ease-out !important;
+@keyframes hitHeadSnap{
+    0%{transform:translateX(0) rotate(0deg)}
+    15%{transform:translateX(-12px) rotate(-10deg) scaleY(.9)}
+    40%{transform:translateX(-8px) rotate(6deg) scaleY(.95)}
+    100%{transform:translateX(0) rotate(0deg) scaleY(1)}
 }
-@keyframes hitHead{
+@keyframes hitBodySquash{
+    0%{transform:scale(1)}15%{transform:scale(.92,.96) translateX(-5px)}
+    40%{transform:scale(1.04,.98)}100%{transform:scale(1)}
+}
+@keyframes hitArmFlail{
+    0%{transform:rotate(0deg)}15%{transform:rotate(20deg) translateY(5px)}
+    40%{transform:rotate(-10deg)}100%{transform:rotate(0deg)}
+}
+
+/* ===== 피격 - 강한 히트 (스킬/크리티컬) ===== */
+.battle-pet.hit-heavy{animation:hitHeavyRecoil .6s ease-out !important}
+.battle-pet.hit-heavy .pet-head{animation:hitHeavyHead .6s ease-out !important}
+.battle-pet.hit-heavy .pet-body{animation:hitHeavyBody .6s ease-out !important}
+.battle-pet.hit-heavy .pet-arm-l,.battle-pet.hit-heavy .pet-arm-r{animation:hitHeavyArm .6s ease-out !important}
+@keyframes hitHeavyRecoil{
     0%{transform:translateX(0)}
-    25%{transform:translateX(-8px) rotate(-5deg)}
-    50%{transform:translateX(6px) rotate(3deg)}
+    10%{transform:translateX(-35px) rotate(8deg)}
+    25%{transform:translateX(-25px) rotate(-5deg) translateY(-10px)}
+    50%{transform:translateX(-15px) rotate(3deg) translateY(0)}
     100%{transform:translateX(0) rotate(0deg)}
 }
-@keyframes hitBody{
-    0%{transform:scale(1)}
-    30%{transform:scale(.95) translateX(-3px)}
-    100%{transform:scale(1) translateX(0)}
+@keyframes hitHeavyHead{
+    0%{transform:rotate(0deg) scaleY(1)}
+    10%{transform:rotate(-15deg) scaleY(.8) translateX(-15px)}
+    30%{transform:rotate(10deg) scaleY(.85) translateX(-8px)}
+    60%{transform:rotate(-3deg) scaleY(.95)}
+    100%{transform:rotate(0deg) scaleY(1) translateX(0)}
+}
+@keyframes hitHeavyBody{
+    0%{transform:scale(1)}10%{transform:scale(.85,.9) translateX(-8px)}
+    30%{transform:scale(1.08,.95)}60%{transform:scale(.98,1.02)}100%{transform:scale(1)}
+}
+@keyframes hitHeavyArm{
+    0%{transform:rotate(0deg)}10%{transform:rotate(35deg) translateY(8px)}
+    30%{transform:rotate(-20deg) translateY(-5px)}100%{transform:rotate(0deg) translateY(0)}
 }
 
-/* 승리 */
-.battle-pet.victory .pet-head{
-    animation:victoryBounce .6s ease-in-out infinite !important;
+/* ===== 피격 시 빨간 플래시 ===== */
+.battle-pet.hit-flash .pet-svg{animation:hitRedFlash .3s ease-out !important}
+@keyframes hitRedFlash{
+    0%{filter:brightness(1)}15%{filter:brightness(3) saturate(2) hue-rotate(-20deg)}
+    40%{filter:brightness(1.5) saturate(1.5)}100%{filter:brightness(1)}
 }
-.battle-pet.victory .pet-arm-l,.battle-pet.victory .pet-arm-r{
-    animation:victoryArms .8s ease-in-out infinite !important;
+
+/* ===== 승리 ===== */
+.battle-pet.victory{animation:victoryJump .6s ease-in-out infinite !important}
+.battle-pet.victory .pet-head{animation:victoryBounce .4s ease-in-out infinite !important}
+.battle-pet.victory .pet-arm-l{animation:victoryArmL .6s ease-in-out infinite !important}
+.battle-pet.victory .pet-arm-r{animation:victoryArmR .6s ease-in-out infinite .1s !important}
+.battle-pet.victory .pet-tail{animation:victoryTail .3s ease-in-out infinite !important}
+@keyframes victoryJump{
+    0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}
 }
 @keyframes victoryBounce{
-    0%,100%{transform:translateY(0)}
-    50%{transform:translateY(-8px) rotate(3deg)}
+    0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-5px) rotate(5deg)}
 }
-@keyframes victoryArms{
-    0%,100%{transform:rotate(0deg)}
-    50%{transform:rotate(-15deg) translateY(-5px)}
+@keyframes victoryArmL{
+    0%,100%{transform:rotate(0deg)}50%{transform:rotate(-40deg) translateY(-15px)}
+}
+@keyframes victoryArmR{
+    0%,100%{transform:rotate(0deg)}50%{transform:rotate(40deg) translateY(-15px)}
+}
+@keyframes victoryTail{
+    0%,100%{transform:rotate(0deg)}25%{transform:rotate(15deg)}75%{transform:rotate(-15deg)}
 }
 
-/* 패배 */
-.battle-pet.defeat{
-    filter:grayscale(.6) brightness(.6) !important;
-    transform:translateY(10px) rotate(-5deg) !important;
-    transition:all .5s ease-out !important;
+/* ===== 패배 - 다단계 쓰러짐 ===== */
+.battle-pet.defeat-stagger{animation:defeatStagger .6s ease-out forwards !important}
+.battle-pet.defeat-stagger .pet-head{animation:defeatStaggerHead .6s ease-out forwards !important}
+@keyframes defeatStagger{
+    0%{transform:translateX(0)}20%{transform:translateX(-15px) rotate(5deg)}
+    50%{transform:translateX(10px) rotate(-3deg)}80%{transform:translateX(-8px) rotate(2deg)}
+    100%{transform:translateX(-5px)}
 }
+@keyframes defeatStaggerHead{
+    0%{transform:rotate(0deg)}30%{transform:rotate(-8deg) translateY(3px)}
+    60%{transform:rotate(5deg) scaleY(.9)}100%{transform:rotate(-3deg) scaleY(.92) translateY(2px)}
+}
+
+.battle-pet.defeat-fall{animation:defeatFall .8s cubic-bezier(.6,0,1,.4) forwards !important}
+.battle-pet.defeat-fall .pet-head{animation:defeatFallHead .8s ease-out forwards !important}
+.battle-pet.defeat-fall .pet-arm-l,.battle-pet.defeat-fall .pet-arm-r{animation:defeatFallArm .8s ease-out forwards !important}
+@keyframes defeatFall{
+    0%{transform:translateX(-5px) translateY(0) rotate(0deg);filter:brightness(1)}
+    30%{transform:translateX(-10px) translateY(-20px) rotate(-15deg);filter:brightness(.8)}
+    60%{transform:translateX(-20px) translateY(10px) rotate(60deg) scaleY(.85);filter:brightness(.5)}
+    80%{transform:translateX(-25px) translateY(15px) rotate(75deg) scaleY(.8);filter:brightness(.4)}
+    100%{transform:translateX(-30px) translateY(20px) rotate(80deg) scaleY(.75);filter:grayscale(.7) brightness(.4)}
+}
+@keyframes defeatFallHead{
+    0%{transform:rotate(0deg)}40%{transform:rotate(-20deg) scaleY(.8)}
+    100%{transform:rotate(-15deg) scaleY(.75) translateY(5px)}
+}
+@keyframes defeatFallArm{
+    0%{transform:rotate(0deg)}50%{transform:rotate(30deg) translateY(10px)}
+    100%{transform:rotate(25deg) translateY(15px)}
+}
+
+/* 패배 바운스 (바닥에 부딪힘) */
+.battle-pet.defeat-bounce{animation:defeatBounce .3s ease-out forwards !important}
+@keyframes defeatBounce{
+    0%{transform:translateX(-30px) translateY(20px) rotate(80deg) scaleY(.75)}
+    50%{transform:translateX(-28px) translateY(12px) rotate(78deg) scaleY(.78)}
+    100%{transform:translateX(-30px) translateY(20px) rotate(80deg) scaleY(.75);filter:grayscale(.7) brightness(.35)}
+}
+
+/* 패배 최종 상태 */
+.battle-pet.defeat-final{
+    transform:translateX(-30px) translateY(20px) rotate(80deg) scaleY(.75) !important;
+    filter:grayscale(.7) brightness(.35) !important;
+    transition:none !important;
+}
+
+/* 피격 이모티콘 오버레이 */
+.hit-emotion{position:absolute;z-index:30;pointer-events:none;font-size:28px;opacity:0}
+.hit-emotion.show{animation:emotionPop .6s ease-out forwards}
+@keyframes emotionPop{
+    0%{opacity:0;transform:scale(.3) translateY(0)}
+    30%{opacity:1;transform:scale(1.3) translateY(-15px)}
+    100%{opacity:0;transform:scale(1) translateY(-40px)}
+}
+/* 패배 별/어지러움 이펙트 */
+.defeat-stars{position:absolute;z-index:30;pointer-events:none;opacity:0}
+.defeat-stars.show{opacity:1;animation:starsOrbit 1s linear infinite}
+@keyframes starsOrbit{to{transform:rotate(360deg)}}
 
 /* 파티클 캔버스 */
 .particle-canvas{position:absolute;inset:0;pointer-events:none;z-index:5}
