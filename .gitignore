@@ -1,0 +1,10 @@
+node_modules/
+.appdata/
+.dotnet/
+__pycache__/
+*.log
+AI_Lab.sln
+todo-app/
+.claude/settings.json
+.claude/settings.local.json
+~$*
