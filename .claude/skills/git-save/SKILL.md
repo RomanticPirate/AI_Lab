@@ -50,7 +50,18 @@ git push
 ```
 - push 실패 시 → **충돌 해결 플로우**로 이동
 
-### 7. 완료 안내
+### 7. Claude 대화 동기화
+코드 저장 후 Claude 메모리/대화 기록도 함께 동기화한다.
+```bash
+cd "C:/Users/jwjeon/.claude"
+git add -A
+git diff --cached --quiet || git commit -m "🧠 대화 동기화 $(date '+%Y-%m-%d %H:%M')"
+git push
+cd -
+```
+- 실패해도 조용히 넘어간다 (코드 저장은 이미 완료됐으므로)
+
+### 8. 완료 안내
 ```
 ✅ 세이브포인트 저장 완료!
    저장 내용: [커밋 메시지 요약]
