@@ -38,9 +38,9 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 .title-press{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);text-align:center;z-index:20;cursor:pointer}
 .title-press-text{font-size:20px;font-weight:900;color:#ffe8c0;letter-spacing:6px;text-shadow:0 0 20px rgba(255,200,100,.5);animation:blink 2s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.title-pets{position:absolute;bottom:50px;z-index:10;width:400px;height:220px}
-.title-pets.left{left:20px}
-.title-pets.right{right:20px}
+.title-pets{position:absolute;bottom:20px;z-index:10;width:500px;height:400px}
+.title-pets.left{left:0px}
+.title-pets.right{right:0px}
 .title-pet-svg{filter:drop-shadow(0 6px 20px rgba(0,0,0,.6))}
 
 /* ===== 인트로 화면 ===== */
@@ -94,21 +94,99 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 .select-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent)}
 
 /* ===== 대전 상대 선택 ===== */
-.vs-screen-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1a0818,#0a0820)}
+/* ===== VS 화면 (다크스토커즈 스타일) ===== */
+.vs-screen-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0a0015,#050010,#0a0015)}
+
+/* 대각선 분할 */
+.vs-diagonal-split{position:absolute;inset:0;z-index:1;overflow:hidden}
+.vs-split-left{position:absolute;top:0;left:0;width:55%;height:100%;clip-path:polygon(0 0,100% 0,85% 100%,0 100%);opacity:0;animation:splitSlideL .5s ease-out .1s forwards}
+.vs-split-right{position:absolute;top:0;right:0;width:55%;height:100%;clip-path:polygon(15% 0,100% 0,100% 100%,0 100%);opacity:0;animation:splitSlideR .5s ease-out .1s forwards}
+@keyframes splitSlideL{from{transform:translateX(-100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes splitSlideR{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* 대각선 분할선 (에너지 충돌) */
+.vs-split-line{position:absolute;top:-10%;left:47%;width:6%;height:120%;background:linear-gradient(180deg,transparent,rgba(255,255,255,.15) 20%,rgba(255,200,100,.4) 50%,rgba(255,255,255,.15) 80%,transparent);transform:rotate(-8deg);z-index:2;animation:splitLineFlicker 2s ease-in-out infinite;filter:blur(1px)}
+@keyframes splitLineFlicker{0%,100%{opacity:.6}25%{opacity:1}50%{opacity:.4}75%{opacity:.9}}
+
+/* 번개 이펙트 */
+.vs-lightning{position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0}
+.vs-lightning.strike{opacity:1;animation:lightningStrike .1s ease-out;
+    background:radial-gradient(ellipse at 50% 50%,rgba(255,255,255,.3),transparent 60%)}
+@keyframes lightningStrike{0%{opacity:1}100%{opacity:0}}
+
+/* 화면 흔들림 */
+.vs-shake{animation:vsShake .3s ease-out!important}
+@keyframes vsShake{
+    0%{transform:translate(0,0)}
+    20%{transform:translate(-8px,4px)}
+    40%{transform:translate(6px,-3px)}
+    60%{transform:translate(-4px,2px)}
+    80%{transform:translate(3px,-1px)}
+    100%{transform:translate(0,0)}
+}
+.vs-micro-shake{animation:vsMicroShake .15s ease-out!important}
+@keyframes vsMicroShake{
+    0%{transform:translate(0,0)}
+    33%{transform:translate(-2px,1px)}
+    66%{transform:translate(2px,-1px)}
+    100%{transform:translate(0,0)}
+}
+
+/* VS 플래시 */
+.vs-flash{position:absolute;inset:0;z-index:50;background:#fff;opacity:0;pointer-events:none}
+.vs-flash.flash{animation:vsFlashAnim .2s ease-out forwards}
+@keyframes vsFlashAnim{0%{opacity:.8}100%{opacity:0}}
+
 .vs-screen-body{flex:1;display:flex;align-items:center;justify-content:center;gap:0;z-index:10}
 .vs-screen-side{width:400px;display:flex;flex-direction:column;align-items:center;gap:12px;padding:40px}
-.vs-screen-side.left{animation:vsSlideL .6s ease-out}
-.vs-screen-side.right{animation:vsSlideR .6s ease-out}
-@keyframes vsSlideL{from{transform:translateX(-200px);opacity:0}to{transform:translateX(0);opacity:1}}
-@keyframes vsSlideR{from{transform:translateX(200px);opacity:0}to{transform:translateX(0);opacity:1}}
-.vs-screen-portrait{width:240px;height:260px;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
-.vs-screen-name{font-family:'Black Han Sans',sans-serif;font-size:32px;text-shadow:0 2px 8px rgba(0,0,0,.5)}
-.vs-screen-label{font-size:12px;color:rgba(255,255,255,.4);letter-spacing:2px}
-.vs-center{display:flex;flex-direction:column;align-items:center;gap:8px;z-index:20;animation:vsCenter .4s ease-out .3s both}
-@keyframes vsCenter{from{transform:scale(2);opacity:0}to{transform:scale(1);opacity:1}}
-.vs-center-text{font-family:'Black Han Sans',sans-serif;font-size:72px;background:linear-gradient(180deg,#fff,#ffe040,#ff8020,#ff2000);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 12px rgba(255,120,20,.5))}
-.vs-fight-btn{margin-top:20px;padding:14px 60px;font-family:'Black Han Sans',sans-serif;font-size:20px;background:linear-gradient(180deg,#ff6020,#c02000);color:#fff;border:none;border-radius:8px;cursor:pointer;letter-spacing:4px;box-shadow:0 4px 20px rgba(255,64,32,.4);animation:fightPulse 1.5s ease-in-out infinite;z-index:20}
-@keyframes fightPulse{0%,100%{transform:scale(1);box-shadow:0 4px 20px rgba(255,64,32,.4)}50%{transform:scale(1.05);box-shadow:0 6px 30px rgba(255,64,32,.6)}}
+
+/* 캐릭터 등장: 양쪽에서 빠르게 슬라이드 + 약간의 바운스 */
+.vs-screen-side.left{transform:translateX(-600px) scale(1.1);opacity:0;animation:vsSideSlideL .5s cubic-bezier(.2,1,.3,1) .15s forwards}
+.vs-screen-side.right{transform:translateX(600px) scale(1.1);opacity:0;animation:vsSideSlideR .5s cubic-bezier(.2,1,.3,1) .15s forwards}
+@keyframes vsSideSlideL{
+    0%{transform:translateX(-600px) scale(1.1);opacity:0}
+    60%{transform:translateX(20px) scale(1.02);opacity:1}
+    80%{transform:translateX(-8px) scale(1)}
+    100%{transform:translateX(0) scale(1);opacity:1}
+}
+@keyframes vsSideSlideR{
+    0%{transform:translateX(600px) scale(1.1);opacity:0}
+    60%{transform:translateX(-20px) scale(1.02);opacity:1}
+    80%{transform:translateX(8px) scale(1)}
+    100%{transform:translateX(0) scale(1);opacity:1}
+}
+
+/* 초상화에 글로우 + 호흡 애니메이션 */
+.vs-screen-portrait{width:260px;height:280px;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;
+    border:3px solid rgba(255,255,255,.1);box-shadow:0 0 40px rgba(0,0,0,.6)}
+.vs-screen-side.left .vs-screen-portrait{animation:vsPortraitPulseL 2.5s ease-in-out .8s infinite}
+.vs-screen-side.right .vs-screen-portrait{animation:vsPortraitPulseR 2.5s ease-in-out 1s infinite}
+@keyframes vsPortraitPulseL{0%,100%{box-shadow:0 0 40px rgba(0,0,0,.6)}50%{box-shadow:0 0 60px rgba(255,100,50,.3),0 0 40px rgba(0,0,0,.6)}}
+@keyframes vsPortraitPulseR{0%,100%{box-shadow:0 0 40px rgba(0,0,0,.6)}50%{box-shadow:0 0 60px rgba(50,100,255,.3),0 0 40px rgba(0,0,0,.6)}}
+
+.vs-screen-name{font-family:'Black Han Sans',sans-serif;font-size:36px;letter-spacing:3px}
+.vs-screen-label{font-size:13px;color:rgba(255,255,255,.5);letter-spacing:4px;font-weight:bold}
+
+/* VS 텍스트: 크게 임팩트 등장 */
+.vs-center{display:flex;flex-direction:column;align-items:center;gap:12px;z-index:20;
+    transform:scale(4) rotate(-10deg);opacity:0;animation:vsCenterSlam .4s cubic-bezier(.2,1,.3,1) .4s forwards}
+@keyframes vsCenterSlam{
+    0%{transform:scale(4) rotate(-10deg);opacity:0}
+    50%{transform:scale(.9) rotate(2deg);opacity:1}
+    70%{transform:scale(1.1) rotate(-1deg)}
+    100%{transform:scale(1) rotate(0);opacity:1}
+}
+.vs-center-text{font-family:'Black Han Sans',sans-serif;font-size:90px;
+    background:linear-gradient(180deg,#fff,#ffe040,#ff8020,#ff2000);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 0 20px rgba(255,120,20,.6)) drop-shadow(0 4px 12px rgba(0,0,0,.8));
+    animation:vsTextPulse 1.5s ease-in-out .9s infinite}
+@keyframes vsTextPulse{0%,100%{filter:drop-shadow(0 0 20px rgba(255,120,20,.6)) drop-shadow(0 4px 12px rgba(0,0,0,.8))}50%{filter:drop-shadow(0 0 40px rgba(255,120,20,.9)) drop-shadow(0 4px 12px rgba(0,0,0,.8))}}
+.vs-fight-btn{margin-top:16px;padding:16px 70px;font-family:'Black Han Sans',sans-serif;font-size:22px;
+    background:linear-gradient(180deg,#ff6020,#c02000);color:#fff;border:2px solid rgba(255,255,255,.2);
+    border-radius:8px;cursor:pointer;letter-spacing:6px;
+    box-shadow:0 4px 24px rgba(255,64,32,.5);animation:fightPulse 1.5s ease-in-out infinite;z-index:20}
+@keyframes fightPulse{0%,100%{transform:scale(1);box-shadow:0 4px 24px rgba(255,64,32,.4)}50%{transform:scale(1.06);box-shadow:0 8px 36px rgba(255,64,32,.7)}}
+.vs-fight-btn:hover{background:linear-gradient(180deg,#ff8040,#e03010);transform:scale(1.1)!important}
 
 /* ============================================= */
 /* ===== 게임 화면 (격투 게임 스타일) ===== */
@@ -215,6 +293,7 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 .game.screen-shake{animation:screenShake .3s ease-out}
 @keyframes screenShake{0%{transform:translate(0)}15%{transform:translate(-8px,4px)}30%{transform:translate(6px,-6px)}45%{transform:translate(-4px,3px)}60%{transform:translate(3px,-2px)}75%{transform:translate(-2px,1px)}100%{transform:translate(0)}}
 
+
 /* ===== 스킬 컷씬 - 하이퍼 콤보 스타일 ===== */
 .skill-cutscene{position:absolute;inset:0;z-index:60;opacity:0;pointer-events:none;overflow:hidden}
 .skill-cutscene.show{opacity:1;pointer-events:auto;animation:cutsceneIn .15s ease-out}
@@ -222,8 +301,8 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 
 /* 배경 */
 .skill-cutscene-bg{position:absolute;inset:0;background:#000;overflow:hidden}
-.skill-bg-tint{position:absolute;inset:0;opacity:0;animation:tintPulse 1.8s ease-in-out}
-@keyframes tintPulse{0%{opacity:0}15%{opacity:1}80%{opacity:.6}100%{opacity:0}}
+.skill-bg-tint{position:absolute;inset:0;opacity:0;animation:tintPulse 4s ease-in-out}
+@keyframes tintPulse{0%{opacity:0}8%{opacity:1}80%{opacity:.7}100%{opacity:0}}
 
 /* 집중선 (이중, 회전) */
 .skill-speedlines{position:absolute;inset:-400px;background:conic-gradient(from 0deg at 50% 50%,transparent 0deg,rgba(255,255,255,.06) 1.5deg,transparent 3deg,transparent 8deg);animation:speedSpin .4s linear infinite}
@@ -293,16 +372,80 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
     transform:scaleX(0);animation:nameLineIn .3s ease-out .5s forwards}
 @keyframes nameLineIn{to{transform:scaleX(1)}}
 
+/* ===== 스킬 미니 연출 (패시브/소규모 스킬) ===== */
+.skill-mini-overlay{position:absolute;inset:0;z-index:95;pointer-events:none;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    background:rgba(0,0,0,.6);opacity:0;transition:opacity .1s}
+.skill-mini-overlay.show{opacity:1}
+.skill-mini-overlay.show .skill-mini-name{animation:miniNameSlam .2s cubic-bezier(.2,1,.3,1) forwards}
+.skill-mini-overlay.show .skill-mini-desc{animation:miniDescIn .25s ease-out .1s forwards}
+.skill-mini-name{font-family:'Black Han Sans',sans-serif;font-size:64px;letter-spacing:6px;white-space:nowrap;
+    -webkit-text-stroke:1px rgba(255,255,255,.2);
+    transform:scale(2);opacity:0}
+.skill-mini-desc{font-family:'Black Han Sans',sans-serif;font-size:24px;letter-spacing:3px;white-space:nowrap;
+    opacity:0}
+@keyframes miniNameSlam{
+    0%{transform:scale(2.5) rotate(-3deg);opacity:0}
+    50%{transform:scale(.95) rotate(1deg);opacity:1}
+    100%{transform:scale(1) rotate(0);opacity:1}
+}
+@keyframes miniDescIn{
+    from{transform:translateY(10px);opacity:0}
+    to{transform:translateY(0);opacity:.9}
+}
+
+/* 스킬 효과 설명 */
+.skill-desc-display{font-family:'Black Han Sans',sans-serif;font-size:28px;letter-spacing:2px;margin-top:12px;z-index:2;position:relative;
+    transform:translateX(150px);opacity:0;animation:descSlideIn .35s cubic-bezier(.2,1,.3,1) .4s forwards;
+    text-shadow:0 2px 8px rgba(0,0,0,.9)}
+@keyframes descSlideIn{
+    0%{transform:translateX(150px);opacity:0}
+    70%{transform:translateX(-5px);opacity:1}
+    100%{transform:translateX(0);opacity:1}
+}
+/* 페이드아웃 단계 */
+.skill-cutscene.phase-fadeout .skill-name-display,
+.skill-cutscene.phase-fadeout .skill-desc-display,
+.skill-cutscene.phase-fadeout .skill-badge-display{animation:textFadeOut .4s ease-in forwards}
+@keyframes textFadeOut{to{opacity:0;transform:translateY(-10px)}}
+
+/* 텍스트 흔들림 (0.2초 임팩트 셰이크) */
+.skill-name-display.shake{animation:textImpactShake .2s ease-out!important}
+.skill-desc-display.shake{animation:textImpactShake .2s ease-out .05s!important}
+@keyframes textImpactShake{
+    0%{transform:translate(0,0)}
+    15%{transform:translate(-6px,3px)}
+    30%{transform:translate(5px,-2px)}
+    45%{transform:translate(-4px,-3px)}
+    60%{transform:translate(3px,2px)}
+    75%{transform:translate(-2px,-1px)}
+    100%{transform:translate(0,0)}
+}
+
+/* 잉크 스플래시 (길티기어 스타일) */
+.skill-ink-splash{position:absolute;inset:-100px;z-index:2;pointer-events:none;opacity:0;
+    clip-path:polygon(0% 35%,15% 20%,25% 40%,40% 15%,55% 35%,65% 10%,80% 30%,90% 20%,100% 45%,85% 60%,100% 75%,80% 85%,60% 70%,45% 90%,30% 75%,15% 85%,0% 65%);
+    transform:scale(0);filter:blur(2px)}
+.skill-ink-splash.splash{animation:inkSplash .5s cubic-bezier(.2,1,.3,1) forwards}
+@keyframes inkSplash{
+    0%{transform:scale(0) rotate(-10deg);opacity:.8}
+    50%{transform:scale(1.3) rotate(2deg);opacity:.5}
+    100%{transform:scale(1.5) rotate(0deg);opacity:0}
+}
+
 /* 이름 그림자 (뒤에 큰 글자) */
 .skill-name-shadow{font-family:'Black Han Sans',sans-serif;font-size:120px;position:absolute;right:-30px;top:50%;transform:translateY(-50%);opacity:.06;letter-spacing:10px;z-index:1;white-space:nowrap}
 
-/* 스킬 플래시 오버레이 */
+/* 스킬 플래시 오버레이 - 강화 */
 .skill-flash-overlay{position:absolute;inset:0;z-index:5;background:#fff;opacity:0;pointer-events:none}
-.skill-flash-overlay.flash{animation:skillFlash .2s ease-out forwards}
-@keyframes skillFlash{0%{opacity:.8}100%{opacity:0}}
+.skill-flash-overlay.flash{animation:skillFlash .15s ease-out forwards}
+@keyframes skillFlash{0%{opacity:.9}100%{opacity:0}}
 
 /* 스파크 캔버스 */
 .skill-spark-canvas{position:absolute;inset:0;z-index:4;pointer-events:none}
+
+/* 스킬 이름 더 크게 (길티기어 스타일) */
+.skill-cutscene.phase2 .skill-name-display{font-size:88px;animation:skillNameSlam .4s cubic-bezier(.2,1,.3,1) .25s forwards,namePulse .15s ease-out forwards}
 
 /* KO 연출 */
 .battle-ko{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);z-index:55;pointer-events:none;opacity:0}
@@ -310,20 +453,79 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 @keyframes koIn{0%{opacity:0;transform:translate(-50%,-50%) scale(5) rotate(-15deg)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.1) rotate(3deg)}50%{transform:translate(-50%,-50%) scale(1) rotate(0)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 .battle-ko-text{font-family:'Black Han Sans',sans-serif;font-size:90px;background:linear-gradient(180deg,#fff,#ffe040,#ff6020,#cc0000);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 6px 20px rgba(255,60,20,.6));letter-spacing:8px}
 
-/* ===== 결과 화면 ===== */
-.result-bg{position:absolute;inset:0}
-.result-bg.win{background:radial-gradient(ellipse at 50% 40%,#2a2000,#140c00 50%,#080400)}
-.result-bg.lose{background:radial-gradient(ellipse at 50% 40%,#200010,#100008 50%,#080004)}
-.result-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;gap:20px}
-.result-title{font-family:'Black Han Sans',sans-serif;font-size:80px;animation:resultIn .6s cubic-bezier(.34,1.56,.64,1)}
-@keyframes resultIn{from{transform:scale(3) translateY(-30px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
-.result-title.win{background:linear-gradient(180deg,#ffe080,#ffa020,#e06000);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 12px rgba(255,160,40,.4))}
-.result-title.lose{background:linear-gradient(180deg,#c0c0c0,#808090,#404050);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}
-.result-pet{width:200px;height:200px;display:flex;align-items:center;justify-content:center}
-.result-btn{padding:16px 60px;font-family:'Black Han Sans',sans-serif;font-size:20px;border:none;border-radius:8px;cursor:pointer;letter-spacing:4px;margin-top:20px;transition:all .2s}
+/* ===== 결과 화면 (KOF 2002 UM 스타일) ===== */
+.result-bg{position:absolute;inset:0;transition:background .3s}
+
+/* 대각선 컬러 슬래시 */
+.result-color-slash{position:absolute;inset:0;z-index:1;opacity:0;animation:slashFadeIn .8s ease-out .2s forwards}
+@keyframes slashFadeIn{to{opacity:1}}
+
+/* 집중선 */
+.result-speedlines{position:absolute;inset:-400px;z-index:2;animation:resultSpeedSpin 3s linear infinite;opacity:.5}
+@keyframes resultSpeedSpin{to{transform:rotate(360deg)}}
+
+/* 승리자 영역 (왼쪽 대형) */
+.result-winner-area{position:absolute;left:40px;top:50%;transform:translateY(-50%);z-index:10;width:400px;height:400px;display:flex;align-items:center;justify-content:center}
+.result-winner-pet{position:relative;z-index:2;
+    transform:translateX(-500px) scale(1.2);opacity:0;
+    animation:winnerSlideIn .6s cubic-bezier(.2,1,.3,1) .1s forwards}
+@keyframes winnerSlideIn{
+    0%{transform:translateX(-500px) scale(1.2);opacity:0}
+    60%{transform:translateX(30px) scale(1.02);opacity:1}
+    100%{transform:translateX(0) scale(1);opacity:1}
+}
+.result-winner-glow{position:absolute;inset:-80px;z-index:1;border-radius:50%;
+    opacity:0;animation:glowPulse 2s ease-in-out .3s infinite}
+@keyframes glowPulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.6;transform:scale(1.1)}}
+
+/* 오른쪽 텍스트 영역 */
+.result-text-area{position:absolute;right:80px;top:50%;transform:translateY(-50%);z-index:10;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+
+/* WINNER 뱃지 */
+.result-badge{display:inline-block;padding:4px 20px;border-radius:3px;font-family:'Black Han Sans',sans-serif;font-size:14px;font-weight:900;letter-spacing:6px;color:#fff;
+    transform:translateX(100px);opacity:0;animation:badgeIn .3s ease-out .3s forwards}
+
+/* 승리자 이름 (대형) */
+.result-winner-name{font-family:'Black Han Sans',sans-serif;font-size:64px;letter-spacing:6px;z-index:2;
+    transform:translateX(200px) scale(1.3);opacity:0;
+    animation:resultNameIn .5s cubic-bezier(.2,1,.3,1) .4s forwards;
+    -webkit-text-stroke:1px rgba(255,255,255,.2)}
+@keyframes resultNameIn{
+    0%{transform:translateX(200px) scale(1.3);opacity:0}
+    70%{transform:translateX(-10px) scale(1.02);opacity:1}
+    100%{transform:translateX(0) scale(1);opacity:1}
+}
+
+/* YOU WIN / YOU LOSE 타이틀 */
+.result-title-kof{font-family:'Black Han Sans',sans-serif;font-size:100px;letter-spacing:10px;z-index:2;
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 6px 24px rgba(0,0,0,.6));
+    transform:scale(3) rotate(-5deg);opacity:0;
+    animation:kofTitleSlam .5s cubic-bezier(.2,1,.3,1) .6s forwards}
+@keyframes kofTitleSlam{
+    0%{transform:scale(3) rotate(-5deg);opacity:0}
+    60%{transform:scale(.95) rotate(1deg);opacity:1}
+    80%{transform:scale(1.05) rotate(-0.5deg)}
+    100%{transform:scale(1) rotate(0);opacity:1}
+}
+
+/* 설명 텍스트 */
+.result-desc{font-size:18px;color:#c0b8d8;letter-spacing:2px;
+    opacity:0;animation:descFadeIn .4s ease-out .9s forwards}
+@keyframes descFadeIn{to{opacity:1}}
+
+/* 버튼 영역 */
+.result-buttons{display:flex;gap:12px;margin-top:16px;
+    opacity:0;animation:descFadeIn .4s ease-out 1.1s forwards}
+.result-btn{padding:16px 60px;font-family:'Black Han Sans',sans-serif;font-size:20px;border:none;border-radius:8px;cursor:pointer;letter-spacing:4px;transition:all .2s}
 .result-btn.next{background:linear-gradient(180deg,#ffc040,#e08010);color:#1a0800;box-shadow:0 4px 16px rgba(255,192,64,.3)}
 .result-btn.retry{background:linear-gradient(180deg,#606080,#404060);color:#e0e0e0}
 .result-btn:hover{transform:translateY(-3px)}
+
+/* 결과 플래시 */
+.result-flash{position:absolute;inset:0;z-index:50;background:#fff;opacity:0;pointer-events:none}
+.result-flash.flash{animation:resultFlash .3s ease-out forwards}
+@keyframes resultFlash{0%{opacity:.9}100%{opacity:0}}
 
 /* ===== SVG 펫 부위별 애니메이션 ===== */
 /* 기본: SVG 내부 그룹에 transform-box 적용 */
@@ -364,7 +566,7 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
     50%{opacity:1}
 }
 
-/* ===== 공격 포즈 - 주먹 ===== */
+/* ===== 공격 포즈 - 바위 ===== */
 .battle-pet.atk-punch{animation:punchLunge .4s cubic-bezier(.4,0,.2,1) !important}
 .battle-pet.atk-punch .pet-arm-l{animation:punchArmL .4s cubic-bezier(.2,1,.3,1) forwards !important}
 .battle-pet.atk-punch .pet-arm-r{animation:punchArmR .4s ease-out forwards !important}
@@ -388,7 +590,7 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
     0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(12px) rotate(-3deg)}100%{transform:translateX(0) rotate(0deg)}
 }
 
-/* ===== 공격 포즈 - 발차기 ===== */
+/* ===== 공격 포즈 - 가위 ===== */
 .battle-pet.atk-kick{animation:kickLunge .45s cubic-bezier(.4,0,.2,1) !important}
 .battle-pet.atk-kick .pet-leg{animation:kickLeg .45s cubic-bezier(.2,1,.3,1) forwards !important}
 .battle-pet.atk-kick .pet-body{animation:kickBody .45s ease-out forwards !important}
@@ -410,7 +612,7 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
     0%{transform:translateY(0)}30%{transform:translateY(3px)}55%{transform:translateY(-5px) translateX(8px)}100%{transform:translateY(0) translateX(0)}
 }
 
-/* ===== 공격 포즈 - 날라차기 ===== */
+/* ===== 공격 포즈 - 보 ===== */
 .battle-pet.atk-fly{animation:flyKick .5s cubic-bezier(.3,1,.3,1) !important}
 .battle-pet.atk-fly .pet-leg{animation:flyLeg .5s cubic-bezier(.2,1,.3,1) forwards !important}
 .battle-pet.atk-fly .pet-arm-l,.battle-pet.atk-fly .pet-arm-r{animation:flyArms .5s ease-out forwards !important}

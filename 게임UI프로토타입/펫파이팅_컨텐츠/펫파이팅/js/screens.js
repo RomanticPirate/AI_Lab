@@ -6,6 +6,7 @@ const 화면 = {
         const div = document.createElement('div');
         div.className = 'screen';
         div.id = '타이틀화면';
+        div.style.cursor = 'pointer';
         div.innerHTML = `
             <div class="title-bg"></div>
             <div class="title-burst"></div>
@@ -40,16 +41,17 @@ const 화면 = {
         const 오른쪽 = document.getElementById('타이틀오른쪽펫');
         if (!왼쪽 || !오른쪽) return;
 
-        // 왼쪽팀: 불곰(리더 크게), 독사킹(뒤에 작게)
+        // 왼쪽팀: 불곰(리더 크게), 독사킹, 폭탄쥐 - 전투 크기(320) 기준
         const 왼쪽팀 = [
-            { id: 1, 크기: 140, x: 120, y: 0, z: 2 },   // 불곰 - 앞쪽 중심
-            { id: 7, 크기: 100, x: 0, y: 40, z: 1 },     // 독사킹 - 뒤쪽 왼편
+            { id: 1, 크기: 320, x: 80, y: 0, z: 2 },    // 불곰 - 앞쪽 중심
+            { id: 7, 크기: 220, x: -60, y: 20, z: 1 },   // 독사킹 - 뒤쪽 왼편
+            { id: 8, 크기: 200, x: 280, y: 30, z: 1 },   // 폭탄쥐 - 뒤쪽 오른편
         ];
         // 오른쪽팀: 독수리왕(리더 크게), 그림자고양이, 철갑거북(뒤에 작게)
         const 오른쪽팀 = [
-            { id: 4, 크기: 140, x: 120, y: 0, z: 3 },    // 독수리왕 - 앞쪽 중심
-            { id: 5, 크기: 100, x: 0, y: 30, z: 2 },     // 그림자고양이 - 뒤쪽 왼편
-            { id: 6, 크기: 90, x: 250, y: 50, z: 1 },    // 철갑거북 - 뒤쪽 오른편
+            { id: 4, 크기: 320, x: 80, y: 0, z: 3 },     // 독수리왕 - 앞쪽 중심
+            { id: 5, 크기: 220, x: -60, y: 10, z: 2 },   // 그림자고양이 - 뒤쪽 왼편
+            { id: 6, 크기: 200, x: 280, y: 30, z: 1 },   // 철갑거북 - 뒤쪽 오른편
         ];
 
         왼쪽.innerHTML = '';
@@ -280,19 +282,19 @@ const 화면 = {
                 };
                 스탯.innerHTML = `
                     <div class="select-stat">
-                        <div class="select-stat-icon">👊</div>
-                        <div class="select-stat-name">주먹</div>
-                        <div class="select-stat-stars">${대미지값(펫.주먹대미지)}</div>
+                        <div class="select-stat-icon">✊</div>
+                        <div class="select-stat-name">바위</div>
+                        <div class="select-stat-stars">${대미지값(펫.바위대미지)}</div>
                     </div>
                     <div class="select-stat">
-                        <div class="select-stat-icon">🦶</div>
-                        <div class="select-stat-name">발차기</div>
-                        <div class="select-stat-stars">${대미지값(펫.발차기대미지)}</div>
+                        <div class="select-stat-icon">✌️</div>
+                        <div class="select-stat-name">가위</div>
+                        <div class="select-stat-stars">${대미지값(펫.가위대미지)}</div>
                     </div>
                     <div class="select-stat">
-                        <div class="select-stat-icon">💨</div>
-                        <div class="select-stat-name">날라차기</div>
-                        <div class="select-stat-stars">${대미지값(펫.날라차기대미지)}</div>
+                        <div class="select-stat-icon">🖐️</div>
+                        <div class="select-stat-name">보</div>
+                        <div class="select-stat-stars">${대미지값(펫.보대미지)}</div>
                     </div>
                     <div class="select-stat">
                         <div class="select-stat-icon">❤️</div>
@@ -328,6 +330,14 @@ const 화면 = {
         div.id = 'VS화면';
         div.innerHTML = `
             <div class="vs-screen-bg"></div>
+            <!-- 대각선 분할 배경 -->
+            <div class="vs-diagonal-split">
+                <div class="vs-split-left" id="VS분할왼쪽"></div>
+                <div class="vs-split-right" id="VS분할오른쪽"></div>
+                <div class="vs-split-line"></div>
+            </div>
+            <!-- 번개/스파크 이펙트 -->
+            <div class="vs-lightning" id="VS번개"></div>
             <div class="vs-screen-body">
                 <div class="vs-screen-side left">
                     <div class="vs-screen-label">플레이어</div>
@@ -335,8 +345,8 @@ const 화면 = {
                     <div class="vs-screen-name" id="VS왼쪽이름"></div>
                 </div>
                 <div class="vs-center">
-                    <div class="vs-center-text">VS</div>
-                    <button class="vs-fight-btn" id="VS대전버튼">대전 시작!</button>
+                    <div class="vs-center-text" id="VS텍스트">VS</div>
+                    <button class="vs-fight-btn" id="VS대전버튼">FIGHT!</button>
                 </div>
                 <div class="vs-screen-side right">
                     <div class="vs-screen-label">상대</div>
@@ -344,6 +354,8 @@ const 화면 = {
                     <div class="vs-screen-name" id="VS오른쪽이름"></div>
                 </div>
             </div>
+            <!-- 플래시 -->
+            <div class="vs-flash" id="VS플래시"></div>
             <div class="vignette"></div>
             <canvas class="particle-canvas" id="VS파티클"></canvas>
         `;
@@ -356,61 +368,170 @@ const 화면 = {
         const 오른쪽초상화 = document.getElementById('VS오른쪽초상화');
         const 오른쪽이름 = document.getElementById('VS오른쪽이름');
         const 버튼 = document.getElementById('VS대전버튼');
+        const 분할왼 = document.getElementById('VS분할왼쪽');
+        const 분할오 = document.getElementById('VS분할오른쪽');
 
+        // 초상화 세팅
         왼쪽초상화.innerHTML = '';
         왼쪽초상화.style.background = `radial-gradient(ellipse, ${내펫.배경색}, #0a0818)`;
         왼쪽초상화.appendChild(펫렌더러.그리기(내펫, 200));
         왼쪽이름.textContent = 내펫.이름;
         왼쪽이름.style.color = 내펫.색상;
+        왼쪽이름.style.textShadow = `0 0 20px ${내펫.색상}, 0 2px 8px rgba(0,0,0,.8)`;
 
         오른쪽초상화.innerHTML = '';
         오른쪽초상화.style.background = `radial-gradient(ellipse, ${상대펫.배경색}, #0a0818)`;
         오른쪽초상화.appendChild(펫렌더러.그리기(상대펫, 200, true));
         오른쪽이름.textContent = 상대펫.이름;
         오른쪽이름.style.color = 상대펫.색상;
+        오른쪽이름.style.textShadow = `0 0 20px ${상대펫.색상}, 0 2px 8px rgba(0,0,0,.8)`;
+
+        // 대각선 분할 배경 색상
+        분할왼.style.background = `linear-gradient(135deg, ${내펫.색상}15, ${내펫.색상}08 60%, transparent)`;
+        분할오.style.background = `linear-gradient(315deg, ${상대펫.색상}15, ${상대펫.색상}08 60%, transparent)`;
+
+        // 연출 시퀀스
+        this.VS연출시작(내펫, 상대펫);
 
         // VS 파티클
-        this.VS파티클시작();
+        this.VS파티클시작(내펫.색상, 상대펫.색상);
 
         버튼.onclick = () => 대전콜백();
     },
 
-    VS파티클시작() {
+    VS연출시작(내펫, 상대펫) {
+        const VS화면 = document.getElementById('VS화면');
+        const 플래시 = document.getElementById('VS플래시');
+        const 번개 = document.getElementById('VS번개');
+
+        // Phase 1: 초기 임팩트 플래시 (0ms)
+        플래시.classList.add('flash');
+        setTimeout(() => 플래시.classList.remove('flash'), 200);
+
+        // Phase 2: 화면 흔들림 + 두 번째 플래시 (300ms)
+        setTimeout(() => {
+            VS화면.classList.add('vs-shake');
+            setTimeout(() => VS화면.classList.remove('vs-shake'), 300);
+            플래시.classList.add('flash');
+            setTimeout(() => 플래시.classList.remove('flash'), 150);
+        }, 300);
+
+        // Phase 3: 번개 이펙트 깜빡임 (500ms~)
+        const 번개타이머 = setInterval(() => {
+            번개.classList.add('strike');
+            setTimeout(() => 번개.classList.remove('strike'), 100);
+        }, 800 + Math.random() * 400);
+
+        // 화면 벗어나면 정리
+        setTimeout(() => {
+            if (!document.getElementById('VS화면')?.classList.contains('active')) {
+                clearInterval(번개타이머);
+            }
+        }, 10000);
+
+        // Phase 4: 주기적 미세 흔들림 (긴장감)
+        const 흔들림 = setInterval(() => {
+            if (!document.getElementById('VS화면')?.classList.contains('active')) {
+                clearInterval(흔들림);
+                clearInterval(번개타이머);
+                return;
+            }
+            VS화면.classList.add('vs-micro-shake');
+            setTimeout(() => VS화면.classList.remove('vs-micro-shake'), 150);
+        }, 2000);
+    },
+
+    VS파티클시작(왼색, 오색) {
         const canvas = document.getElementById('VS파티클');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         canvas.width = 1280;
         canvas.height = 720;
         const 입자들 = [];
-        for (let i = 0; i < 40; i++) {
+        // 중앙 충돌 스파크
+        for (let i = 0; i < 60; i++) {
+            const 각 = Math.random() * Math.PI * 2;
+            const 속도 = 1 + Math.random() * 5;
             입자들.push({
-                x: 640 + (Math.random() - 0.5) * 100,
-                y: 360 + (Math.random() - 0.5) * 100,
-                vx: (Math.random() - 0.5) * 4,
-                vy: (Math.random() - 0.5) * 4,
-                크기: Math.random() * 2 + 0.5,
-                수명: Math.random(),
-                색: ['#ff4020', '#ffc040', '#ff8020'][Math.floor(Math.random() * 3)]
+                ox: 640, oy: 360,
+                x: 640, y: 360,
+                vx: Math.cos(각) * 속도,
+                vy: Math.sin(각) * 속도,
+                크기: Math.random() * 2.5 + 0.5,
+                수명: 1,
+                감쇠: 0.008 + Math.random() * 0.012,
+                색: [왼색 || '#ff4020', 오색 || '#4080ff', '#fff', '#ffe080'][Math.floor(Math.random() * 4)],
+                종류: 'spark'
             });
         }
+        // 양쪽 대립 에너지 입자
+        for (let i = 0; i < 30; i++) {
+            입자들.push({
+                ox: 0, oy: 0,
+                x: Math.random() * 300, y: Math.random() * 720,
+                vx: 2 + Math.random() * 3, vy: (Math.random() - 0.5) * 2,
+                크기: Math.random() * 3 + 1,
+                수명: 1, 감쇠: 0.003,
+                색: 왼색 || '#ff4020', 종류: 'energy'
+            });
+            입자들.push({
+                ox: 0, oy: 0,
+                x: 980 + Math.random() * 300, y: Math.random() * 720,
+                vx: -(2 + Math.random() * 3), vy: (Math.random() - 0.5) * 2,
+                크기: Math.random() * 3 + 1,
+                수명: 1, 감쇠: 0.003,
+                색: 오색 || '#4080ff', 종류: 'energy'
+            });
+        }
+
         const 그리기 = () => {
             ctx.clearRect(0, 0, 1280, 720);
             입자들.forEach(p => {
                 p.x += p.vx;
                 p.y += p.vy;
-                p.수명 -= 0.005;
-                if (p.수명 <= 0) {
-                    p.x = 640 + (Math.random() - 0.5) * 100;
-                    p.y = 360 + (Math.random() - 0.5) * 100;
-                    p.vx = (Math.random() - 0.5) * 4;
-                    p.vy = (Math.random() - 0.5) * 4;
-                    p.수명 = 1;
+                p.수명 -= p.감쇠;
+
+                if (p.종류 === 'spark') {
+                    if (p.수명 <= 0) {
+                        p.x = 640 + (Math.random() - 0.5) * 80;
+                        p.y = 360 + (Math.random() - 0.5) * 80;
+                        const 각 = Math.random() * Math.PI * 2;
+                        const 속도 = 1 + Math.random() * 5;
+                        p.vx = Math.cos(각) * 속도;
+                        p.vy = Math.sin(각) * 속도;
+                        p.수명 = 1;
+                    }
+                    ctx.globalAlpha = p.수명 * 0.8;
+                    ctx.fillStyle = p.색;
+                    ctx.shadowBlur = 6;
+                    ctx.shadowColor = p.색;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.크기, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                } else {
+                    if (p.x < -20 || p.x > 1300 || p.수명 <= 0) {
+                        p.x = p.vx > 0 ? Math.random() * 200 : 1080 + Math.random() * 200;
+                        p.y = Math.random() * 720;
+                        p.수명 = 1;
+                    }
+                    ctx.globalAlpha = p.수명 * 0.5;
+                    ctx.fillStyle = p.색;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = p.색;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.크기, 0, Math.PI * 2);
+                    ctx.fill();
+                    // 꼬리
+                    ctx.globalAlpha = p.수명 * 0.2;
+                    ctx.strokeStyle = p.색;
+                    ctx.lineWidth = p.크기 * 0.5;
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.x - p.vx * 4, p.y - p.vy * 4);
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
                 }
-                ctx.globalAlpha = p.수명 * 0.6;
-                ctx.fillStyle = p.색;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.크기, 0, Math.PI * 2);
-                ctx.fill();
             });
             ctx.globalAlpha = 1;
             if (document.getElementById('VS화면')?.classList.contains('active')) {
@@ -461,38 +582,38 @@ const 화면 = {
             </div>
             <!-- 왼쪽 하단: 플레이어 액션 버튼 -->
             <div class="battle-actions left" id="전투액션버튼">
-                <div class="battle-action-btn" data-action="주먹">
-                    <div class="icon">👊</div>
-                    <div class="name">주먹</div>
-                    <div class="dmg" id="주먹대미지표시"></div>
+                <div class="battle-action-btn" data-action="바위">
+                    <div class="icon">✊</div>
+                    <div class="name">바위</div>
+                    <div class="dmg" id="바위대미지표시"></div>
                 </div>
-                <div class="battle-action-btn" data-action="발차기">
-                    <div class="icon">🦶</div>
-                    <div class="name">발차기</div>
-                    <div class="dmg" id="발차기대미지표시"></div>
+                <div class="battle-action-btn" data-action="가위">
+                    <div class="icon">✌️</div>
+                    <div class="name">가위</div>
+                    <div class="dmg" id="가위대미지표시"></div>
                 </div>
-                <div class="battle-action-btn" data-action="날라차기">
-                    <div class="icon">💨</div>
-                    <div class="name">날라차기</div>
-                    <div class="dmg" id="날라차기대미지표시"></div>
+                <div class="battle-action-btn" data-action="보">
+                    <div class="icon">🖐️</div>
+                    <div class="name">보</div>
+                    <div class="dmg" id="보대미지표시"></div>
                 </div>
             </div>
             <!-- 오른쪽 하단: 시스템(상대) 버튼 표시 -->
             <div class="battle-actions right" id="시스템선택표시">
-                <div class="battle-sys-btn" data-sys="주먹">
-                    <div class="icon">👊</div>
-                    <div class="name">주먹</div>
-                    <div class="dmg" id="적주먹대미지표시"></div>
+                <div class="battle-sys-btn" data-sys="바위">
+                    <div class="icon">✊</div>
+                    <div class="name">바위</div>
+                    <div class="dmg" id="적바위대미지표시"></div>
                 </div>
-                <div class="battle-sys-btn" data-sys="발차기">
-                    <div class="icon">🦶</div>
-                    <div class="name">발차기</div>
-                    <div class="dmg" id="적발차기대미지표시"></div>
+                <div class="battle-sys-btn" data-sys="가위">
+                    <div class="icon">✌️</div>
+                    <div class="name">가위</div>
+                    <div class="dmg" id="적가위대미지표시"></div>
                 </div>
-                <div class="battle-sys-btn" data-sys="날라차기">
-                    <div class="icon">💨</div>
-                    <div class="name">날라차기</div>
-                    <div class="dmg" id="적날라차기대미지표시"></div>
+                <div class="battle-sys-btn" data-sys="보">
+                    <div class="icon">🖐️</div>
+                    <div class="name">보</div>
+                    <div class="dmg" id="적보대미지표시"></div>
                 </div>
             </div>
             <!-- 공격 선택 완료 메시지 (왼쪽/오른쪽) -->
@@ -510,6 +631,7 @@ const 화면 = {
             <div class="battle-ko" id="KO연출">
                 <div class="battle-ko-text">경기 종료</div>
             </div>
+            <!-- 스킬 미니 연출은 JS에서 동적 생성 (skill-mini-pop) -->
             <!-- 스킬 컷씬 (하이퍼 콤보 스타일) -->
             <div class="skill-cutscene" id="스킬컷씬">
                 <div class="skill-cutscene-bg">
@@ -530,8 +652,10 @@ const 화면 = {
                 <div class="skill-text-area">
                     <div class="skill-badge-display" id="스킬뱃지">ACTIVE SKILL</div>
                     <div class="skill-name-display" id="스킬이름표시"></div>
+                    <div class="skill-desc-display" id="스킬효과표시"></div>
                     <div class="skill-name-shadow" id="스킬이름그림자"></div>
                 </div>
+                <div class="skill-ink-splash" id="스킬잉크"></div>
                 <div class="skill-flash-overlay" id="스킬플래시"></div>
                 <canvas class="skill-spark-canvas" id="스킬스파크캔버스"></canvas>
             </div>
@@ -576,14 +700,14 @@ const 화면 = {
         오른쪽.classList.add('idle');
 
         // 플레이어 대미지 표시
-        document.getElementById('주먹대미지표시').textContent = `대미지: ${내펫.주먹대미지}`;
-        document.getElementById('발차기대미지표시').textContent = `대미지: ${내펫.발차기대미지}`;
-        document.getElementById('날라차기대미지표시').textContent = `대미지: ${내펫.날라차기대미지}`;
+        document.getElementById('바위대미지표시').textContent = `대미지: ${내펫.바위대미지}`;
+        document.getElementById('가위대미지표시').textContent = `대미지: ${내펫.가위대미지}`;
+        document.getElementById('보대미지표시').textContent = `대미지: ${내펫.보대미지}`;
 
         // 적 대미지 표시
-        document.getElementById('적주먹대미지표시').textContent = `대미지: ${상대펫.주먹대미지}`;
-        document.getElementById('적발차기대미지표시').textContent = `대미지: ${상대펫.발차기대미지}`;
-        document.getElementById('적날라차기대미지표시').textContent = `대미지: ${상대펫.날라차기대미지}`;
+        document.getElementById('적바위대미지표시').textContent = `대미지: ${상대펫.바위대미지}`;
+        document.getElementById('적가위대미지표시').textContent = `대미지: ${상대펫.가위대미지}`;
+        document.getElementById('적보대미지표시').textContent = `대미지: ${상대펫.보대미지}`;
 
         // HP 초기화
         this.HP업데이트('왼쪽', 내펫.HP, 내펫.HP);
@@ -665,15 +789,105 @@ const 화면 = {
         });
     },
 
-    // 시스템 3개 버튼 동시 번쩍임 (무엇을 선택했는지 안 보여줌)
-    시스템전체번쩍임() {
+    // 스킬 미니 연출 (패시브/소규모 스킬용 — 어두운 배경 + 큰 텍스트 + 흔들림)
+    스킬미니연출(이름, 설명, 색) {
+        // CSS 클래스 의존 없이 완전 인라인 방식으로 구현
+        const 전투화면 = document.getElementById('전투화면');
+        if (!전투화면) return;
+
+        // 이전 오버레이 제거
+        const 이전 = 전투화면.querySelector('.skill-mini-pop');
+        if (이전) 이전.remove();
+
+        // 새 오버레이 생성 (인라인 스타일만 사용)
+        const 오버레이 = document.createElement('div');
+        오버레이.className = 'skill-mini-pop';
+        Object.assign(오버레이.style, {
+            position: 'absolute', inset: '0', zIndex: '200',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px',
+            background: 'rgba(0,0,0,.65)', pointerEvents: 'none',
+            opacity: '0', transition: 'opacity .1s'
+        });
+
+        // 스킬 이름
+        const 이름el = document.createElement('div');
+        Object.assign(이름el.style, {
+            fontFamily: "'Black Han Sans', sans-serif",
+            fontSize: '64px', letterSpacing: '6px', whiteSpace: 'nowrap',
+            color: '#fff',
+            textShadow: `0 0 30px ${색}, 0 0 60px ${색}80, 0 4px 12px rgba(0,0,0,.9)`,
+            WebkitTextStroke: '1px rgba(255,255,255,.2)',
+            transform: 'scale(2.5) rotate(-3deg)', opacity: '0',
+            transition: 'transform .2s cubic-bezier(.2,1,.3,1), opacity .15s'
+        });
+        이름el.textContent = 이름;
+
+        // 스킬 설명
+        const 설명el = document.createElement('div');
+        Object.assign(설명el.style, {
+            fontFamily: "'Black Han Sans', sans-serif",
+            fontSize: '24px', letterSpacing: '3px', whiteSpace: 'nowrap',
+            color: 색,
+            textShadow: `0 0 15px ${색}80, 0 2px 6px rgba(0,0,0,.9)`,
+            transform: 'translateY(10px)', opacity: '0',
+            transition: 'transform .25s ease-out .1s, opacity .25s ease-out .1s'
+        });
+        설명el.textContent = 설명;
+
+        오버레이.appendChild(이름el);
+        오버레이.appendChild(설명el);
+        전투화면.appendChild(오버레이);
+
+        // 다음 프레임에서 트랜지션 트리거
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                오버레이.style.opacity = '1';
+                이름el.style.transform = 'scale(1) rotate(0)';
+                이름el.style.opacity = '1';
+                설명el.style.transform = 'translateY(0)';
+                설명el.style.opacity = '0.9';
+            });
+        });
+
+        // 플래시 + 흔들림
+        this.전투플래시();
+        this.화면흔들림();
+
+        // 1.1초 후 제거
+        setTimeout(() => {
+            오버레이.style.opacity = '0';
+            setTimeout(() => 오버레이.remove(), 200);
+        }, 1100);
+    },
+
+    // 포커싱 전부 제거 (선택 완료 후 뭘 골랐는지 숨김)
+    시스템포커싱초기화() {
         document.querySelectorAll('.battle-sys-btn').forEach(btn => {
-            btn.style.opacity = '1';
-            btn.classList.add('flash');
-            setTimeout(() => {
-                btn.classList.remove('flash');
-                btn.style.opacity = '0.4';
-            }, 1000);
+            btn.style.opacity = '0.4';
+            btn.style.borderColor = 'rgba(255,255,255,.05)';
+            btn.style.boxShadow = 'none';
+            btn.style.transform = 'scale(1)';
+        });
+    },
+
+    // 판정 시 적군 선택 공개 — 크고 명확하게
+    시스템선택공개(선택) {
+        document.querySelectorAll('.battle-sys-btn').forEach(btn => {
+            if (btn.dataset.sys === 선택) {
+                btn.style.opacity = '1';
+                btn.style.borderColor = 'rgba(255,80,80,.9)';
+                btn.style.boxShadow = '0 0 24px rgba(255,80,80,.6), inset 0 0 12px rgba(255,80,80,.2)';
+                btn.style.transform = 'scale(1.15)';
+                btn.style.transition = 'all .15s ease-out';
+                btn.classList.add('flash');
+                setTimeout(() => btn.classList.remove('flash'), 400);
+            } else {
+                btn.style.opacity = '0.1';
+                btn.style.borderColor = 'rgba(255,255,255,.02)';
+                btn.style.boxShadow = 'none';
+                btn.style.transform = 'scale(0.9)';
+                btn.style.transition = 'all .15s ease-out';
+            }
         });
     },
 
@@ -682,12 +896,18 @@ const 화면 = {
         const 얼굴 = document.getElementById('스킬얼굴');
         const 얼굴플래시 = document.getElementById('스킬얼굴플래시');
         const 이름 = document.getElementById('스킬이름표시');
+        const 효과 = document.getElementById('스킬효과표시');
         const 그림자 = document.getElementById('스킬이름그림자');
         const 뱃지 = document.getElementById('스킬뱃지');
         const 틴트 = document.getElementById('스킬배경틴트');
         const 버스트 = document.getElementById('스킬버스트');
         const 플래시 = document.getElementById('스킬플래시');
         const 캔버스 = document.getElementById('스킬스파크캔버스');
+        const 잉크 = document.getElementById('스킬잉크');
+
+        // 스킬 데이터에서 효과 설명 가져오기
+        const 스킬데이터 = 게임데이터.스킬목록().find(s => s.이름 === 스킬이름);
+        const 스킬설명 = 스킬데이터 ? 스킬데이터.설명 : '';
 
         // 펫 색상 기반 세팅
         const 색 = 펫.색상;
@@ -704,11 +924,19 @@ const 화면 = {
         그림자.textContent = 스킬이름;
         그림자.style.color = 색;
 
+        // 스킬 효과 설명 세팅
+        효과.textContent = 스킬설명;
+        효과.style.color = '#fff';
+        효과.style.textShadow = `0 0 10px ${색}, 0 2px 4px rgba(0,0,0,.9)`;
+
         뱃지.style.background = `linear-gradient(90deg, ${색}cc, ${색}60)`;
         뱃지.style.boxShadow = `0 0 20px ${색}40`;
 
         틴트.style.background = `radial-gradient(ellipse at 30% 50%, ${색}25, transparent 70%)`;
         버스트.style.background = `radial-gradient(circle, ${색}30, ${색}10 30%, transparent 60%)`;
+
+        // 잉크 스플래시 색상 세팅
+        잉크.style.background = `radial-gradient(ellipse at 40% 50%, ${색}50, ${색}20 40%, transparent 70%)`;
 
         // 스파크 파티클 캔버스
         캔버스.width = 1280;
@@ -774,33 +1002,52 @@ const 화면 = {
         };
 
         // 시퀀스 시작
-        컷씬.classList.remove('show', 'phase2');
+        컷씬.classList.remove('show', 'phase2', 'phase-shake', 'phase-fadeout');
+        잉크.classList.remove('splash');
+        효과.classList.remove('shake');
+        이름.classList.remove('shake');
         void 컷씬.offsetWidth;
 
-        // Phase 1: 등장 (0ms)
+        // Phase 1: 히트스톱 + 등장 (0ms) — 길티기어 스타일 임팩트 프리즈
         컷씬.classList.add('show');
         requestAnimationFrame(스파크그리기);
 
-        // 초기 플래시
+        // 강렬한 초기 플래시 (이중)
         플래시.classList.add('flash');
-        setTimeout(() => 플래시.classList.remove('flash'), 200);
+        setTimeout(() => 플래시.classList.remove('flash'), 150);
+        setTimeout(() => { 플래시.classList.add('flash'); setTimeout(() => 플래시.classList.remove('flash'), 100); }, 200);
 
-        // Phase 2: 줌인 강조 (400ms)
+        // 잉크 스플래시 등장
+        setTimeout(() => 잉크.classList.add('splash'), 50);
+
+        // Phase 2: 줌인 + 텍스트 흔들림 (350ms)
         setTimeout(() => {
             컷씬.classList.add('phase2');
-            // 두 번째 플래시
+            // 이름 + 효과 텍스트 0.2초 흔들림
+            이름.classList.add('shake');
+            효과.classList.add('shake');
+            setTimeout(() => { 이름.classList.remove('shake'); 효과.classList.remove('shake'); }, 200);
+            // 세 번째 임팩트 플래시
             플래시.classList.add('flash');
-            setTimeout(() => 플래시.classList.remove('flash'), 150);
-            // 화면 흔들림
+            setTimeout(() => 플래시.classList.remove('flash'), 120);
+            // 강한 화면 흔들림
             this.화면흔들림();
-        }, 400);
+            // 추가 흔들림 (연쇄 임팩트)
+            setTimeout(() => this.화면흔들림(), 200);
+        }, 350);
 
-        // Phase 3: 종료 (1800ms)
+        // Phase 3: 페이드아웃 시작 (3600ms)
         setTimeout(() => {
-            컷씬.classList.remove('show', 'phase2');
+            컷씬.classList.add('phase-fadeout');
+        }, 3600);
+
+        // Phase 4: 종료 (4000ms)
+        setTimeout(() => {
+            컷씬.classList.remove('show', 'phase2', 'phase-shake', 'phase-fadeout');
+            잉크.classList.remove('splash');
             ctx.clearRect(0, 0, 1280, 720);
             if (콜백) 콜백();
-        }, 1800);
+        }, 4000);
     },
 
     // 라운드 시작 연출
@@ -838,6 +1085,26 @@ const 화면 = {
         setTimeout(() => game.classList.remove('screen-shake'), 400);
     },
 
+    // 히트스톱: 슬로우모션 + 줌인 (액티브 스킬 발동 시)
+    히트스톱줌인(방향) {
+        const 전투화면 = document.getElementById('전투화면');
+        // 줌인 방향: left → 피격자(왼쪽)쪽, right → 피격자(오른쪽)쪽
+        const originX = 방향 === 'left' ? '25%' : '75%';
+        전투화면.style.transformOrigin = `${originX} 50%`;
+        전투화면.classList.add('hitstop-zoom');
+        // 모든 애니메이션 슬로우
+        전투화면.classList.add('hitstop-slow');
+    },
+
+    히트스톱해제() {
+        const 전투화면 = document.getElementById('전투화면');
+        전투화면.classList.remove('hitstop-zoom');
+        전투화면.classList.remove('hitstop-slow');
+        // transform 잔여 해제
+        전투화면.style.removeProperty('transform');
+        전투화면.style.removeProperty('transform-origin');
+    },
+
     // 히트 이펙트 (충돌 지점에 SVG 폭발)
     히트이펙트(x, y) {
         const 필드 = document.querySelector('.battle-field');
@@ -860,15 +1127,28 @@ const 화면 = {
         div.id = '결과화면';
         div.innerHTML = `
             <div class="result-bg" id="결과배경"></div>
-            <div class="result-body">
-                <div class="result-title" id="결과타이틀"></div>
-                <div class="result-pet" id="결과펫"></div>
-                <div id="결과설명" style="font-size:16px;color:#c0b8d8;text-align:center"></div>
-                <div style="display:flex;gap:12px">
+            <!-- KOF 스타일 대각선 컬러 배경 -->
+            <div class="result-color-slash" id="결과컬러슬래시"></div>
+            <!-- 집중선 -->
+            <div class="result-speedlines" id="결과집중선"></div>
+            <!-- 승리자 대형 일러스트 (왼쪽) -->
+            <div class="result-winner-area" id="결과승자영역">
+                <div class="result-winner-pet" id="결과승자펫"></div>
+                <div class="result-winner-glow" id="결과승자글로우"></div>
+            </div>
+            <!-- 오른쪽 텍스트 영역 -->
+            <div class="result-text-area">
+                <div class="result-badge" id="결과뱃지">WINNER</div>
+                <div class="result-winner-name" id="결과승자이름"></div>
+                <div class="result-title-kof" id="결과타이틀"></div>
+                <div class="result-desc" id="결과설명"></div>
+                <div class="result-buttons">
                     <button class="result-btn retry" id="결과다시">다시 하기</button>
                     <button class="result-btn next" id="결과타이틀로">타이틀로</button>
                 </div>
             </div>
+            <!-- 플래시 -->
+            <div class="result-flash" id="결과플래시"></div>
             <div class="vignette"></div>
             <canvas class="particle-canvas" id="결과파티클"></canvas>
         `;
@@ -876,64 +1156,185 @@ const 화면 = {
     },
 
     결과표시(승리, 내펫, 상대펫, 다시콜백, 타이틀콜백) {
+        // 승리자 = 이긴 펫, 패배자 = 진 펫
+        const 승자 = 승리 ? 내펫 : 상대펫;
+        const 패자 = 승리 ? 상대펫 : 내펫;
+        const 색 = 승자.색상 || '#ffc040';
+
+        // 배경
         const 배경 = document.getElementById('결과배경');
-        const 타이틀 = document.getElementById('결과타이틀');
-        const 펫영역 = document.getElementById('결과펫');
-        const 설명 = document.getElementById('결과설명');
+        배경.className = 'result-bg';
+        배경.style.background = `radial-gradient(ellipse at 35% 45%, ${색}20, #0a0818 60%, #050410)`;
 
-        배경.className = `result-bg ${승리 ? 'win' : 'lose'}`;
-        타이틀.className = `result-title ${승리 ? 'win' : 'lose'}`;
-        타이틀.textContent = 승리 ? '승리!' : '패배...';
+        // 대각선 컬러 슬래시
+        const 슬래시 = document.getElementById('결과컬러슬래시');
+        슬래시.style.background = `linear-gradient(135deg, transparent 30%, ${색}15 45%, ${색}08 55%, transparent 70%)`;
 
+        // 집중선
+        const 집중선 = document.getElementById('결과집중선');
+        집중선.style.background = `conic-gradient(from 0deg at 30% 50%, transparent 0deg, ${색}08 1.5deg, transparent 3deg, transparent 8deg)`;
+
+        // 승리자 글로우
+        const 글로우 = document.getElementById('결과승자글로우');
+        글로우.style.background = `radial-gradient(circle, ${색}40, ${색}15 40%, transparent 70%)`;
+        글로우.style.boxShadow = `0 0 120px ${색}30`;
+
+        // 승리자 대형 펫 렌더링
+        const 펫영역 = document.getElementById('결과승자펫');
         펫영역.innerHTML = '';
-        펫영역.appendChild(펫렌더러.그리기(내펫, 180));
+        펫영역.appendChild(펫렌더러.그리기(승자, 320));
 
+        // 승리자 이름
+        const 이름 = document.getElementById('결과승자이름');
+        이름.textContent = 승자.이름;
+        이름.style.color = 색;
+        이름.style.textShadow = `0 0 30px ${색}, 0 0 60px ${색}60, 0 4px 12px rgba(0,0,0,.8)`;
+
+        // 뱃지
+        const 뱃지 = document.getElementById('결과뱃지');
+        뱃지.style.background = `linear-gradient(90deg, ${색}cc, ${색}60)`;
+        뱃지.style.boxShadow = `0 0 20px ${색}40`;
+
+        // 타이틀
+        const 타이틀 = document.getElementById('결과타이틀');
         if (승리) {
-            설명.textContent = `${내펫.이름}이(가) ${상대펫.이름}을(를) 쓰러뜨렸습니다!`;
+            타이틀.textContent = 'YOU WIN';
+            타이틀.style.background = `linear-gradient(180deg, #fff, ${색}, ${색}80)`;
         } else {
-            설명.textContent = `${상대펫.이름}에게 패배했습니다...`;
+            타이틀.textContent = 'YOU LOSE';
+            타이틀.style.background = `linear-gradient(180deg, #fff, ${색}, ${색}80)`;
+        }
+        타이틀.style.webkitBackgroundClip = 'text';
+        타이틀.style.webkitTextFillColor = 'transparent';
+
+        // 설명
+        const 설명 = document.getElementById('결과설명');
+        if (승리) {
+            설명.textContent = `${승자.이름}이(가) ${패자.이름}을(를) 쓰러뜨렸다!`;
+        } else {
+            설명.textContent = `${승자.이름}이(가) ${패자.이름}을(를) 쓰러뜨렸다!`;
         }
 
-        document.getElementById('결과다시').onclick = 다시콜백;
-        document.getElementById('결과타이틀로').onclick = 타이틀콜백;
+        // 버튼: 승리 시 자동 다음 상대 / 패배 시 버튼 표시
+        const 다시버튼 = document.getElementById('결과다시');
+        const 타이틀버튼 = document.getElementById('결과타이틀로');
+        if (승리) {
+            다시버튼.style.display = 'none';
+            타이틀버튼.style.display = 'none';
+            // 3초 후 자동으로 다음 상대
+            setTimeout(() => { 다시콜백(); }, 3000);
+        } else {
+            다시버튼.style.display = '';
+            타이틀버튼.style.display = '';
+            다시버튼.onclick = 다시콜백;
+            타이틀버튼.onclick = 타이틀콜백;
+        }
 
-        // 승리 파티클
-        if (승리) this.결과파티클시작();
+        // 등장 시퀀스
+        this.결과연출시작(색);
     },
 
-    결과파티클시작() {
+    결과연출시작(색) {
+        // 초기 플래시
+        const 플래시 = document.getElementById('결과플래시');
+        플래시.classList.add('flash');
+        setTimeout(() => 플래시.classList.remove('flash'), 300);
+
+        // 두 번째 플래시 (임팩트)
+        setTimeout(() => {
+            플래시.classList.add('flash');
+            setTimeout(() => 플래시.classList.remove('flash'), 200);
+        }, 400);
+
+        // 파티클 시작
+        this.결과파티클시작(색);
+    },
+
+    결과파티클시작(색) {
         const canvas = document.getElementById('결과파티클');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         canvas.width = 1280;
         canvas.height = 720;
+
+        // 색상 기반 파티클 팔레트
+        const 팔레트 = [색, '#fff', '#ffe080', 색 + '80', '#ffd060'];
+
         const 입자들 = [];
-        for (let i = 0; i < 80; i++) {
+        // 컨페티 + 스파크 파티클
+        for (let i = 0; i < 100; i++) {
             입자들.push({
                 x: Math.random() * 1280,
-                y: -20 - Math.random() * 200,
-                vx: (Math.random() - 0.5) * 2,
-                vy: Math.random() * 3 + 1,
-                크기: Math.random() * 4 + 2,
-                색: ['#ffc040', '#ff6020', '#ff4020', '#ffe080', '#ffa040'][Math.floor(Math.random() * 5)],
+                y: -20 - Math.random() * 300,
+                vx: (Math.random() - 0.5) * 3,
+                vy: Math.random() * 4 + 1.5,
+                크기: Math.random() * 5 + 2,
+                색: 팔레트[Math.floor(Math.random() * 팔레트.length)],
                 회전: Math.random() * 360,
-                회전속도: (Math.random() - 0.5) * 5
+                회전속도: (Math.random() - 0.5) * 8,
+                종류: Math.random() > 0.3 ? 'rect' : 'spark'
             });
         }
+        // 승리자 주변 방사형 스파크
+        for (let i = 0; i < 30; i++) {
+            const 각 = Math.random() * Math.PI * 2;
+            const 속도 = 2 + Math.random() * 6;
+            입자들.push({
+                x: 380, y: 360,
+                vx: Math.cos(각) * 속도,
+                vy: Math.sin(각) * 속도,
+                크기: Math.random() * 3 + 1,
+                색: 팔레트[Math.floor(Math.random() * 팔레트.length)],
+                회전: 0,
+                회전속도: 0,
+                종류: 'glow',
+                수명: 1.0,
+                감쇠: 0.005 + Math.random() * 0.01
+            });
+        }
+
         const 그리기 = () => {
             ctx.clearRect(0, 0, 1280, 720);
             입자들.forEach(p => {
                 p.x += p.vx;
                 p.y += p.vy;
                 p.회전 += p.회전속도;
-                if (p.y > 740) { p.y = -20; p.x = Math.random() * 1280; }
-                ctx.save();
-                ctx.translate(p.x, p.y);
-                ctx.rotate(p.회전 * Math.PI / 180);
-                ctx.globalAlpha = 0.7;
-                ctx.fillStyle = p.색;
-                ctx.fillRect(-p.크기 / 2, -p.크기 / 2, p.크기, p.크기);
-                ctx.restore();
+
+                if (p.종류 === 'glow') {
+                    p.수명 -= p.감쇠;
+                    if (p.수명 <= 0) return;
+                    ctx.globalAlpha = p.수명;
+                    ctx.fillStyle = p.색;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = p.색;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.크기, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                } else if (p.종류 === 'spark') {
+                    if (p.y > 740) { p.y = -20; p.x = Math.random() * 1280; }
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.회전 * Math.PI / 180);
+                    ctx.globalAlpha = 0.8;
+                    ctx.fillStyle = p.색;
+                    ctx.shadowBlur = 4;
+                    ctx.shadowColor = p.색;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, p.크기 * 0.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.restore();
+                } else {
+                    if (p.y > 740) { p.y = -20; p.x = Math.random() * 1280; }
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.회전 * Math.PI / 180);
+                    ctx.globalAlpha = 0.7;
+                    ctx.fillStyle = p.색;
+                    ctx.fillRect(-p.크기 / 2, -p.크기 / 2, p.크기, p.크기 * 0.6);
+                    ctx.restore();
+                }
             });
             ctx.globalAlpha = 1;
             if (document.getElementById('결과화면')?.classList.contains('active')) {

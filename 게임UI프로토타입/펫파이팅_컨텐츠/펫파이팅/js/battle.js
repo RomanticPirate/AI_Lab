@@ -18,11 +18,11 @@ const 전투시스템 = {
     좀비사용_나: false,
     좀비사용_상대: false,
 
-    // 가위바위보 매핑: 주먹>날라차기, 발차기>주먹, 날라차기>발차기
+    // 가위바위보 상성: 바위>가위, 가위>보, 보>바위
     상성표: {
-        '주먹': '날라차기',
-        '발차기': '주먹',
-        '날라차기': '발차기'
+        '바위': '가위',
+        '가위': '보',
+        '보': '바위'
     },
 
     async 초기화(내펫, 상대펫, 종료콜백) {
@@ -96,19 +96,34 @@ const 전투시스템 = {
         const 최대 = 게임데이터.설정.시스템선택최대시간;
         const 시간 = 최소 + Math.random() * (최대 - 최소);
 
-        let 깜빡임;
-        const 액션들 = ['주먹', '발차기', '날라차기'];
-        let 인덱스 = 0;
-        깜빡임 = setInterval(() => {
-            화면.시스템선택표시(액션들[인덱스 % 3]);
-            인덱스++;
-        }, 200);
+        // 야바위 스타일: 포커싱이 느리게 이동 (눈으로 추적 가능)
+        const 버튼들 = document.querySelectorAll('.battle-sys-btn');
+        let 커서위치 = 0;
+        const 커서속도 = 200; // ms - 눈으로 따라갈 수 있는 속도
+        const 깜빡임 = setInterval(() => {
+            버튼들.forEach((btn, i) => {
+                if (i === 커서위치 % 버튼들.length) {
+                    btn.style.opacity = '1';
+                    btn.style.borderColor = 'rgba(255,200,100,.6)';
+                    btn.style.boxShadow = '0 0 12px rgba(255,200,100,.3)';
+                    btn.style.transform = 'scale(1.05)';
+                } else {
+                    btn.style.opacity = '0.3';
+                    btn.style.borderColor = 'rgba(255,255,255,.03)';
+                    btn.style.boxShadow = 'none';
+                    btn.style.transform = 'scale(1)';
+                }
+            });
+            커서위치++;
+        }, 커서속도);
 
         this.상대타이머 = setTimeout(() => {
             clearInterval(깜빡임);
+            const 액션들 = ['바위', '가위', '보'];
             this.상대선택 = 액션들[Math.floor(Math.random() * 3)];
             this.상대턴완료 = true;
-            화면.시스템전체번쩍임();
+            // 선택 완료 → 포커싱 전부 제거 (뭘 골랐는지 숨김)
+            화면.시스템포커싱초기화();
             this.선택완료메시지('right');
             this.판정체크();
         }, 시간);
@@ -129,12 +144,16 @@ const 전투시스템 = {
     },
 
     // 더블 패시브 매핑: 액션 → 스킬ID
-    _더블스킬: { '주먹': 1, '발차기': 2, '날라차기': 3 },
+    _더블스킬: { '바위': 1, '가위': 2, '보': 3 },
 
     // ========== 판정 실행 ==========
     async 판정실행() {
         const 내 = this.내선택;
         const 상대 = this.상대선택;
+
+        // 적군 선택 공개
+        화면.시스템선택공개(상대);
+        await this.지연(600);
 
         let 결과;
         if (내 === 상대) {
@@ -145,7 +164,7 @@ const 전투시스템 = {
             결과 = 'lose';
         }
 
-        const 결과텍스트 = { win: '승리!', lose: '패배!', draw: '무승부!' };
+        const 결과텍스트 = { win: '때렸다!', lose: '맞았다!', draw: '무승부!' };
         const 결과색 = { win: '#40ff60', lose: '#ff4040', draw: '#ffe080' };
 
         // idle 멈춤
@@ -159,6 +178,14 @@ const 전투시스템 = {
             await this.대미지처리(내, this.내펫, this.상대펫, '상대');
         } else if (결과 === 'lose') {
             await this.대미지처리(상대, this.상대펫, this.내펫, '나');
+        } else {
+            // 무승부: 양쪽 1 대미지 (판이 끝나지 않는 문제 방지)
+            this.내HP = Math.max(0, this.내HP - 1);
+            this.상대HP = Math.max(0, this.상대HP - 1);
+            화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
+            화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
+            화면.대미지팝업('왼쪽', 1, false);
+            화면.대미지팝업('오른쪽', 1, false);
         }
 
         화면.전투메시지표시(결과텍스트[결과], 결과색[결과]);
@@ -179,25 +206,25 @@ const 전투시스템 = {
         // 1) 기본 대미지 산출
         let 대미지;
         switch (액션) {
-            case '주먹': 대미지 = 공격펫.주먹대미지; break;
-            case '발차기': 대미지 = 공격펫.발차기대미지; break;
-            case '날라차기': 대미지 = 공격펫.날라차기대미지; break;
+            case '바위': 대미지 = 공격펫.바위대미지; break;
+            case '가위': 대미지 = 공격펫.가위대미지; break;
+            case '보': 대미지 = 공격펫.보대미지; break;
             default: 대미지 = 1;
         }
 
         let 액티브발동 = false;
         let 발동스킬이름 = '';
 
-        // 2) 패시브: 더블 체크 (주먹더블/발차기더블/날라차기더블)
+        // 2) 패시브: 더블 체크 (바위더블/가위더블/보더블)
         const 더블id = this._더블스킬[액션];
         if (더블id && this._스킬보유(공격펫, 더블id)) {
             대미지 *= 2;
             const 스킬 = 게임데이터.스킬찾기(더블id);
-            화면.전투메시지표시(`${스킬.이름}!`, '#ffe080');
-            await this.지연(600);
+            화면.스킬미니연출(스킬.이름, 스킬.설명, 공격펫.색상);
+            await this.지연(1200);
         }
 
-        // 3) 액티브: 분노 체크 (HP 30% 이하 + 50%)
+        // 3) 액티브: 분노 체크 (HP 30% 이하 + 60%)
         const 공격HP = 피격대상 === '상대' ? this.내HP : this.상대HP;
         const 공격최대HP = 피격대상 === '상대' ? this.내최대HP : this.상대최대HP;
         if (this._스킬보유(공격펫, 7) && 공격HP <= 공격최대HP * 0.3) {
@@ -209,11 +236,22 @@ const 전투시스템 = {
             }
         }
 
+        // 3-1) 액티브: 폭주 체크 (조건 없이 30% 확률 대미지 3배)
+        if (!액티브발동 && this._스킬보유(공격펫, 11)) {
+            const 스킬 = 게임데이터.스킬찾기(11);
+            if (this._확률체크(스킬.확률)) {
+                대미지 *= 스킬.배율;
+                액티브발동 = true;
+                발동스킬이름 = 스킬.이름;
+            }
+        }
+
         // 4) 패시브: 철벽 체크 (방어측)
         if (this._스킬보유(방어펫, 4)) {
             대미지 = Math.max(1, 대미지 - 1);
-            화면.전투메시지표시('철벽!', '#80d0ff');
-            await this.지연(400);
+            const 스킬 = 게임데이터.스킬찾기(4);
+            화면.스킬미니연출(스킬.이름, 스킬.설명, 방어펫.색상);
+            await this.지연(1200);
         }
 
         // 5) 액티브 발동 시 컷씬
@@ -265,8 +303,9 @@ const 전투시스템 = {
                 this.상대HP = Math.min(this.상대최대HP, this.상대HP + 2);
                 화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
             }
-            화면.전투메시지표시('흡혈! HP +2', '#c060ff');
-            await this.지연(400);
+            const 스킬 = 게임데이터.스킬찾기(5);
+            화면.스킬미니연출(스킬.이름, 'HP +2 회복!', 공격펫.색상);
+            await this.지연(1200);
         }
 
         // 8) 액티브: 연속타 (35% 확률로 추가 2 대미지)
@@ -274,17 +313,18 @@ const 전투시스템 = {
             const 스킬 = 게임데이터.스킬찾기(8);
             if (this._확률체크(스킬.확률)) {
                 const 추가대미지 = 스킬.대미지 || 2;
-                화면.전투메시지표시(`연속타! +${추가대미지}`, '#ff8040');
+                화면.스킬미니연출(스킬.이름, `추가 ${추가대미지} 대미지!`, 공격펫.색상);
+                await this.지연(1000);
                 화면.화면흔들림();
-                this.히트스파크(충돌X, 220, false, 공격펫);
+                this.히트스파크(충돌X, 220, true, 공격펫);
                 if (피격대상 === '나') {
                     this.내HP = Math.max(0, this.내HP - 추가대미지);
                     화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
-                    화면.대미지팝업('왼쪽', 추가대미지, false);
+                    화면.대미지팝업('왼쪽', 추가대미지, true);
                 } else {
                     this.상대HP = Math.max(0, this.상대HP - 추가대미지);
                     화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
-                    화면.대미지팝업('오른쪽', 추가대미지, false);
+                    화면.대미지팝업('오른쪽', 추가대미지, true);
                 }
                 await this.지연(400);
             }
@@ -295,18 +335,19 @@ const 전투시스템 = {
             const 스킬 = 게임데이터.스킬찾기(9);
             if (this._확률체크(스킬.확률)) {
                 const 반격대미지 = 스킬.대미지 || 2;
-                화면.전투메시지표시(`카운터! ${반격대미지}대미지!`, '#ff4060');
+                화면.스킬미니연출(스킬.이름, `반격 ${반격대미지} 대미지!`, 방어펫.색상);
+                await this.지연(1000);
                 화면.화면흔들림();
                 const 반격X = 피격대상 === '나' ? 1060 : 180;
-                this.히트스파크(반격X, 220, false, 방어펫);
+                this.히트스파크(반격X, 220, true, 방어펫);
                 if (피격대상 === '나') {
                     this.상대HP = Math.max(0, this.상대HP - 반격대미지);
                     화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
-                    화면.대미지팝업('오른쪽', 반격대미지, false);
+                    화면.대미지팝업('오른쪽', 반격대미지, true);
                 } else {
                     this.내HP = Math.max(0, this.내HP - 반격대미지);
                     화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
-                    화면.대미지팝업('왼쪽', 반격대미지, false);
+                    화면.대미지팝업('왼쪽', 반격대미지, true);
                 }
                 await this.지연(400);
             }
@@ -434,31 +475,36 @@ const 전투시스템 = {
 
     // ========== 다음 라운드 (치유 스킬 포함) ==========
     async 다음라운드() {
-        this.내턴완료 = false;
+        this.라운드수++;
+
+        // 라운드 전환 중에는 입력 차단
+        this.내턴완료 = true;
         this.상대턴완료 = false;
         this.내선택 = null;
         this.상대선택 = null;
-        this.라운드수++;
-
-        // 플레이어 버튼 재활성화
-        document.querySelectorAll('.battle-action-btn').forEach(btn => {
-            btn.classList.remove('selected', 'disabled');
-        });
 
         // 시스템 버튼 초기화
         document.querySelectorAll('.battle-sys-btn').forEach(btn => {
             btn.style.opacity = '0.5';
             btn.style.borderColor = 'rgba(255,255,255,.06)';
+            btn.style.boxShadow = 'none';
+            btn.style.transform = 'scale(1)';
             btn.classList.remove('flash');
         });
 
-        // 라운드 연출
+        // 라운드 연출 (이 동안 버튼 비활성)
         await new Promise(resolve => {
             화면.라운드연출(`ROUND ${this.라운드수}`, resolve);
         });
 
         // 치유 스킬 체크 (양쪽)
         await this.치유체크();
+
+        // 라운드 연출 끝난 후에 입력 허용 + 버튼 재활성화
+        this.내턴완료 = false;
+        document.querySelectorAll('.battle-action-btn').forEach(btn => {
+            btn.classList.remove('selected', 'disabled');
+        });
 
         // 상대 AI 다시 시작
         this.상대AI시작();
@@ -488,7 +534,7 @@ const 전투시스템 = {
     },
 
     // ========== 기존 유틸 ==========
-    _액션클래스: { '주먹': 'atk-punch', '발차기': 'atk-kick', '날라차기': 'atk-fly' },
+    _액션클래스: { '바위': 'atk-punch', '가위': 'atk-kick', '보': 'atk-fly' },
 
     async 공격애니메이션(결과, 내액션, 상대액션) {
         const 왼쪽펫 = document.getElementById('전투왼쪽펫');
