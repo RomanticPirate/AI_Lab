@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>복식 상태 변경 규칙</title>
+<style>
+  :root {
+    --bg:#0b1016;
+    --panel:#121924;
+    --panel2:#0f131a;
+    --line:#243245;
+    --text:#f4f7fb;
+    --muted:#b8c3d1;
+    --accent:#7dd3fc;
+    --yellow:#ffd85a;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; padding:40px 24px 80px;
+    background:linear-gradient(180deg,#0b1016 0%, #0b1016 55%, #0d1420 100%);
+    color:var(--text);
+    font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo",sans-serif;
+    line-height:1.75;
+  }
+  .wrap { max-width:1120px; margin:0 auto; }
+  h1 { margin:0 0 28px; font-size:48px; font-weight:800; letter-spacing:-0.02em; }
+  h2 { margin:64px 0 20px; font-size:32px; font-weight:800; letter-spacing:-0.02em; }
+  h3 { margin:40px 0 16px; font-size:24px; font-weight:800; letter-spacing:-0.02em; }
+  h4 { margin:24px 0 12px; font-size:20px; font-weight:800; }
+  .section { margin-top:18px; }
+  .panel {
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:24px;
+    box-shadow:0 16px 36px rgba(0,0,0,.28);
+  }
+  ul { margin:0; padding-left:24px; }
+  li { margin:6px 0; }
+  li ul { margin-top:6px; }
+  .yellow { color:var(--yellow); font-weight:800; }
+  .muted { color:var(--muted); }
+  .note {
+    margin:18px 0 0; padding:14px 16px;
+    border-radius:14px; border:1px solid #3a2f08;
+    background:rgba(255,216,90,.08); color:#fff5c2;
+  }
+  .diagram { margin-top:14px; }
+  .tight li { margin:2px 0; }
+  .kv-table, .timeline, .ref-table {
+    width:100%; border-collapse:collapse; margin-top:14px;
+    background:#0f131a; border:1px solid var(--line); border-radius:16px; overflow:hidden;
+  }
+  .kv-table th, .kv-table td,
+  .timeline th, .timeline td,
+  .ref-table th, .ref-table td {
+    border:1px solid var(--line); padding:12px 14px; vertical-align:top;
+  }
+  .kv-table th, .timeline th, .ref-table th {
+    background:#172131; color:#ffffff; text-align:left; font-weight:800;
+  }
+  .timeline td { text-align:center; min-width:96px; }
+  .wet { background:rgba(29,155,240,.18); }
+  .drying { background:rgba(255,216,90,.14); }
+  .dry { background:rgba(255,255,255,.04); color:#d5dce6; }
+  .hold { background:rgba(122,211,252,.12); }
+  .small { font-size:14px; color:var(--muted); }
+  a { color:#93d8ff; text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  .ref-card {
+    margin-top:18px; padding:22px; background:var(--panel);
+    border:1px solid var(--line); border-radius:18px;
+  }
+  .ref-card h4 { margin-top:0; }
+
+  .ref-thumb-wrap { margin:14px 0 18px; }
+  .ref-thumb {
+    display:block; width:100%; max-width:720px; height:auto;
+    border:1px solid var(--line); border-radius:14px; background:#0b1016;
+  }
+  .ref-thumb-caption { margin-top:8px; font-size:13px; color:var(--muted); }
+  .subtle-rule {
+    height:1px; background:linear-gradient(90deg,transparent, #334255, transparent);
+    margin:28px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>복식 상태 변경 규칙</h1>
+
+  <h2>1. 개요</h2>
+
+  <div class="panel">
+    <h3>※ (참고) 복식 데미지 전체 흐름</h3>
+    <div class="diagram"><svg viewBox="0 0 920 1180" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
+        <polygon points="0 0, 10 4, 0 8" fill="#7dd3fc"/>
+      </marker>
+    </defs>
+<rect x="0" y="0" width="920" height="1180" rx="16" fill="#0f131a"/><rect x="320" y="40" width="280" height="72" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="460.0" y="78.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">전투 중 특수 공격 피격</text><rect x="320" y="150" width="280" height="72" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="460.0" y="177.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">해당 공격의</text><text x="460.0" y="199.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">CostumeDamagePoint 확인</text><rect x="320" y="260" width="280" height="72" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="460.0" y="298.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">복식 데미지 점수 누적</text><polygon points="460,365.0 590.0,420 460,475.0 330.0,420" fill="#1b2230" stroke="#5a6b84" stroke-width="1.2"/><text x="460" y="412.4" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">다음 복식 상태 변경</text><text x="460" y="432.4" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">기준 도달 여부</text><rect x="80" y="500" width="260" height="78" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="210.0" y="530.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">기준 미도달</text><text x="210.0" y="552.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">현재 비주얼 유지</text><rect x="580" y="500" width="260" height="78" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="710.0" y="530.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">기준 도달</text><text x="710.0" y="552.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">다음 단계 비주얼 반영</text><rect x="320" y="640" width="280" height="78" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="460.0" y="681.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">복식 데미지 상태 유지</text><polygon points="460,735.0 600.0,790 460,845.0 320.0,790" fill="#1b2230" stroke="#5a6b84" stroke-width="1.2"/><text x="460" y="782.4" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">원상 복구 트리거</text><text x="460" y="802.4" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">발생 여부</text><rect x="40" y="900" width="180" height="78" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="130.0" y="941.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">복식 교체</text><rect x="250" y="900" width="180" height="78" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="340.0" y="930.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">지역 이동</text><text x="340.0" y="952.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">(로딩 순간 이동)</text><rect x="460" y="900" width="180" height="78" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="550.0" y="941.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">웨이포인트 휴식</text><rect x="670" y="900" width="210" height="78" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="775.0" y="930.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">컷씬 시작</text><text x="775.0" y="952.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">DT_CutScene.Damage = Reset</text><rect x="320" y="1030" width="280" height="78" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="460.0" y="1071.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">복식 기본 상태 복구</text><line x1="460" y1="112" x2="460" y2="150" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><line x1="460" y1="222" x2="460" y2="260" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><line x1="460" y1="332" x2="460" y2="365" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><polyline points="330,420 210,420 210,500" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><text x="258" y="412" text-anchor="middle" fill="#ffd85a" font-size="14" font-weight="700">아니오</text><polyline points="590,420 710,420 710,500" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><text x="662" y="412" text-anchor="middle" fill="#ffd85a" font-size="14" font-weight="700">예</text><polyline points="210,578 210,640 460,640" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><polyline points="710,578 710,640 600,640" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><line x1="460" y1="718" x2="460" y2="735" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><polyline points="320,790 160,790 160,820 460,820" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><text x="250" y="782" text-anchor="middle" fill="#ffd85a" font-size="14" font-weight="700">아니오</text><polyline points="600,790 775,790 775,900" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><text x="690" y="782" text-anchor="middle" fill="#ffd85a" font-size="14" font-weight="700">예</text><line x1="775" y1="978" x2="775" y2="1010" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><polyline points="775,790 775,860 130,860 130,900" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><polyline points="775,860 340,860 340,900" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><polyline points="775,860 550,860 550,900" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><polyline points="130,978 130,1010 460,1010 460,1030" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><polyline points="340,978 340,1010 460,1010 460,1030" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><polyline points="550,978 550,1010 460,1010 460,1030" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><polyline points="775,978 775,1010 460,1010 460,1030" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><polyline points="460,1108 460,1140 100,1140 100,76 320,76" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><text x="115" y="1160" text-anchor="start" fill="#ffd85a" font-size="13" font-weight="700">복구 후 다시 피격 흐름으로 복귀</text></svg></div>
+  </div>
+
+  <div class="panel" style="margin-top:20px;">
+    <h3>※ (참고) 복식 젖음 전체 흐름</h3>
+    <div class="diagram"><svg viewBox="0 0 920 1200" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
+        <polygon points="0 0, 10 4, 0 8" fill="#7dd3fc"/>
+      </marker>
+    </defs>
+<rect x="0" y="0" width="920" height="1200" rx="16" fill="#0f131a"/><rect x="320" y="40" width="280" height="72" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="460.0" y="78.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">Water Volume 접촉</text><rect x="320" y="150" width="280" height="72" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="460.0" y="188.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">닿은 부위에 젖음 적용</text><polygon points="460,265.0 600.0,320 460,375.0 320.0,320" fill="#1b2230" stroke="#5a6b84" stroke-width="1.2"/><text x="460" y="312.4" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">같은 부위가 다시</text><text x="460" y="332.4" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">젖었는지 확인</text><rect x="80" y="410" width="280" height="82" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="220.0" y="442.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">예</text><text x="220.0" y="464.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">해당 부위 마름 타이머 초기화</text><rect x="560" y="410" width="280" height="82" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="700.0" y="442.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">아니오</text><text x="700.0" y="464.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">현재 젖은 상태 유지</text><rect x="320" y="560" width="280" height="72" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="460.0" y="598.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">Water Volume 이탈</text><rect x="320" y="670" width="280" height="72" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="460.0" y="708.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">해당 부위 마름 타이머 진행</text><polygon points="460,785.0 600.0,840 460,895.0 320.0,840" fill="#1b2230" stroke="#5a6b84" stroke-width="1.2"/><text x="460" y="832.4" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">마름 시간</text><text x="460" y="852.4" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">도달 여부</text><rect x="80" y="930" width="280" height="82" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="220.0" y="962.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">아니오</text><text x="220.0" y="984.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">젖은 상태 유지</text><rect x="560" y="930" width="280" height="82" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="700.0" y="962.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">예</text><text x="700.0" y="984.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">동일 Blend 값으로 서서히 마름</text><rect x="320" y="1080" width="280" height="72" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="1.2"/><text x="460.0" y="1118.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">해당 부위 젖음 해제</text><line x1="460" y1="112" x2="460" y2="150" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><line x1="460" y1="222" x2="460" y2="265" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><polyline points="320,320 220,320 220,410" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><text x="272" y="312" text-anchor="middle" fill="#ffd85a" font-size="14" font-weight="700">예</text><polyline points="600,320 700,320 700,410" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><text x="648" y="312" text-anchor="middle" fill="#ffd85a" font-size="14" font-weight="700">아니오</text><polyline points="220,492 220,560 460,560" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><polyline points="700,492 700,560 600,560" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><line x1="460" y1="632" x2="460" y2="670" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><line x1="460" y1="742" x2="460" y2="785" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><polyline points="320,840 220,840 220,930" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><text x="272" y="832" text-anchor="middle" fill="#ffd85a" font-size="14" font-weight="700">아니오</text><polyline points="600,840 700,840 700,930" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><text x="648" y="832" text-anchor="middle" fill="#ffd85a" font-size="14" font-weight="700">예</text><polyline points="700,1012 700,1080 600,1080" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><polyline points="220,1012 220,1140 460,1140 460,40" fill="none" stroke="#7dd3fc" stroke-width="2.4" marker-end="url(#arrowhead)"/><text x="235" y="1160" text-anchor="start" fill="#ffd85a" font-size="13" font-weight="700">마르지 않았으면 젖은 상태 유지 후 다시 확인</text></svg></div>
+  </div>
+
+  <h2>2. 복식 데미지 시스템 규칙</h2>
+
+  <div class="panel">
+    <h3>(1) 기본 내용</h3>
+    <ul>
+      <li>리더와 동료가 피격한 특수 공격 결과를 기준으로 복식 데미지 진행</li>
+      <li>복식 데미지는 <span class="yellow">특수 공격에 설정된 CostumeDamagePoint가 누적되면서 단계적으로 반영</span></li>
+      <li>복식 데미지 단계는 누적 점수가 다음 상태 변경 기준에 도달했을 때만 변화</li>
+      <li>누적 점수가 다음 기준에 도달하지 못한 경우
+        <ul>
+          <li>복식 데미지 점수만 증가</li>
+          <li>복식 비주얼 단계는 유지</li>
+        </ul>
+      </li>
+      <li>복식 데미지는 원상 복구 이벤트가 발생하기 전까지 유지</li>
+      <li>복식 데미지 상태는 세이브 / 로드 대상</li>
+    </ul>
+
+    <h3>(2) 데이터 구조</h3>
+    <ul>
+      <li>DT_StatusEffect
+        <ul>
+          <li>컬럼 추가
+            <ul>
+              <li>CostumeDamagePoint</li>
+            </ul>
+          </li>
+          <li>의미
+            <ul>
+              <li>해당 StatusEffect Row가 복식 데미지에 부여하는 점수</li>
+            </ul>
+          </li>
+          <li>운영 방식
+            <ul>
+              <li>피격 시 발동한 StatusEffect Row의 CostumeDamagePoint 참조</li>
+              <li>해당 점수를 현재 복식 데미지 점수에 누적</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>DT_CutScene
+        <ul>
+          <li>컬럼 추가
+            <ul>
+              <li>Damage</li>
+            </ul>
+          </li>
+          <li>Enum 값
+            <ul>
+              <li>Keep</li>
+              <li>Reset</li>
+            </ul>
+          </li>
+          <li>의미
+            <ul>
+              <li>Keep
+                <ul>
+                  <li>컷씬 시작 시 현재 복식 데미지 상태 유지</li>
+                </ul>
+              </li>
+              <li>Reset
+                <ul>
+                  <li>컷씬 시작 시 복식 기본 상태로 원상 복구</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+
+    <table class="kv-table">
+      <thead>
+        <tr>
+          <th>※ (예시) DT_StatusEffect 데이터 예시</th>
+          <th>Type</th>
+          <th>CostumeDamagePoint</th>
+          <th>설명</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Stagger_Lv0</td>
+          <td>Stagger</td>
+          <td>1</td>
+          <td>경미한 특수 공격 피격 예시</td>
+        </tr>
+        <tr>
+          <td>Knockdown_Lv1</td>
+          <td>Knockdown</td>
+          <td>2</td>
+          <td>넘어짐을 유발하는 특수 공격 예시</td>
+        </tr>
+        <tr>
+          <td>BreakAttacked</td>
+          <td>Break Attacked</td>
+          <td>2</td>
+          <td>강한 반응을 일으키는 특수 공격 예시</td>
+        </tr>
+        <tr>
+          <td>Dead</td>
+          <td>Dead</td>
+          <td>0</td>
+          <td>복식 데미지 부여 대상이 아닌 예시</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>(3) 진행 규칙</h3>
+    <ul>
+      <li>전투 중 특수 공격 피격 발생</li>
+      <li>발동한 StatusEffect Row 확인</li>
+      <li>해당 Row의 CostumeDamagePoint 누적</li>
+      <li>현재 누적 점수가 다음 복식 데미지 상태 변경 기준에 도달했는지 확인</li>
+      <li>기준 미도달 시
+        <ul>
+          <li>복식 데미지 점수만 갱신</li>
+          <li>현재 복식 비주얼 단계 유지</li>
+        </ul>
+      </li>
+      <li>기준 도달 시
+        <ul>
+          <li>복식 데미지 단계 갱신</li>
+          <li>다음 복식 비주얼 단계 반영</li>
+        </ul>
+      </li>
+      <li>이후 다시 특수 공격 피격이 발생하면 동일 규칙 반복</li>
+    </ul>
+
+    <h3>※ (예시) 복식 데미지 데이터 흐름 순서도</h3>
+    <div class="diagram"><svg viewBox="0 0 1260 960" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
+        <polygon points="0 0, 10 4, 0 8" fill="#7dd3fc"/>
+      </marker>
+      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.35"/>
+      </filter>
+    </defs>
+    <rect x="0" y="0" width="1260" height="960" rx="16" fill="#0f131a"/>
+    <rect x="40" y="40" width="180" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="130.0" y="73.33333333333333" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">현재 상태</text><rect x="260" y="40" width="220" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="370.0" y="64.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">복식 데미지 단계 0</text><text x="370.0" y="86.0" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">누적 점수 0</text><rect x="40" y="140" width="180" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="130.0" y="173.33333333333334" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">1차 피격</text><rect x="260" y="140" width="220" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="370.0" y="164.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">Stagger</text><text x="370.0" y="186.0" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">+1</text><polygon points="620,125.0 735.0,170 620,215.0 505.0,170" fill="#1b2230" stroke="#5a6b84" stroke-width="2"/><text x="620" y="166.25" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">다음 기준값 5</text><text x="620" y="185.0" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">도달 여부</text><rect x="760" y="140" width="180" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="850.0" y="173.33333333333334" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">미도달</text><rect x="980" y="140" width="220" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="1090.0" y="153.6" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">복식 데미지 단계 0</text><text x="1090.0" y="175.2" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">누적 점수 1</text><text x="1090.0" y="196.8" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">비주얼 변화 없음</text><rect x="40" y="270" width="180" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="130.0" y="303.3333333333333" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">2차 피격</text><rect x="260" y="270" width="220" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="370.0" y="294.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">Knockdown</text><text x="370.0" y="316.0" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">+2</text><polygon points="620,255.0 735.0,300 620,345.0 505.0,300" fill="#1b2230" stroke="#5a6b84" stroke-width="2"/><text x="620" y="296.25" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">다음 기준값 5</text><text x="620" y="315.0" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">도달 여부</text><rect x="760" y="270" width="180" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="850.0" y="303.3333333333333" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">미도달</text><rect x="980" y="270" width="220" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="1090.0" y="283.6" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">복식 데미지 단계 0</text><text x="1090.0" y="305.20000000000005" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">누적 점수 3</text><text x="1090.0" y="326.8" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">비주얼 변화 없음</text><rect x="40" y="400" width="180" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="130.0" y="433.3333333333333" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">3차 피격</text><rect x="260" y="400" width="220" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="370.0" y="424.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">Grabbed</text><text x="370.0" y="446.0" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">+2</text><polygon points="620,385.0 735.0,430 620,475.0 505.0,430" fill="#1b2230" stroke="#5a6b84" stroke-width="2"/><text x="620" y="426.25" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">다음 기준값 5</text><text x="620" y="445.0" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">도달 여부</text><rect x="760" y="400" width="180" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="850.0" y="433.3333333333333" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">도달</text><rect x="980" y="400" width="220" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="1090.0" y="413.6" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">복식 데미지 단계 1</text><text x="1090.0" y="435.20000000000005" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">누적 점수 5</text><text x="1090.0" y="456.8" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">다음 단계 비주얼 반영</text><rect x="40" y="550" width="180" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="130.0" y="583.3333333333334" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">4차 피격</text><rect x="260" y="550" width="220" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="370.0" y="574.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">Stagger</text><text x="370.0" y="596.0" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">+1</text><polygon points="620,535.0 735.0,580 620,625.0 505.0,580" fill="#1b2230" stroke="#5a6b84" stroke-width="2"/><text x="620" y="576.25" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">다음 기준값 8</text><text x="620" y="595.0" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">도달 여부</text><rect x="760" y="550" width="180" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="850.0" y="583.3333333333334" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">미도달</text><rect x="980" y="550" width="220" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="1090.0" y="563.6" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">복식 데미지 단계 1</text><text x="1090.0" y="585.2" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">누적 점수 6</text><text x="1090.0" y="606.8000000000001" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">비주얼 변화 없음</text><rect x="40" y="680" width="180" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="130.0" y="713.3333333333334" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">5차 피격</text><rect x="260" y="680" width="220" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="370.0" y="704.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">Break Attacked</text><text x="370.0" y="726.0" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">+2</text><polygon points="620,665.0 735.0,710 620,755.0 505.0,710" fill="#1b2230" stroke="#5a6b84" stroke-width="2"/><text x="620" y="706.25" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">다음 기준값 8</text><text x="620" y="725.0" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">도달 여부</text><rect x="760" y="680" width="180" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="850.0" y="713.3333333333334" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">도달</text><rect x="980" y="680" width="220" height="60" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="1090.0" y="693.6" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">복식 데미지 단계 2</text><text x="1090.0" y="715.2" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">누적 점수 8</text><text x="1090.0" y="736.8000000000001" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">다음 단계 비주얼 반영</text><rect x="480" y="850" width="280" height="70" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="620.0" y="868.6" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">원상 복구 트리거</text><text x="620.0" y="890.2" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">복식 교체 / 지역 이동 / 웨이포인트 휴식 /</text><text x="620.0" y="911.8000000000001" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">컷씬 시작 Reset</text><rect x="860" y="850" width="260" height="70" rx="12" ry="12" fill="#141a22" stroke="#5a6b84" stroke-width="2"/><text x="990.0" y="879.4" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">복식 데미지 단계 기본값 복구</text><text x="990.0" y="901.0" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="600">누적 점수 기본값 복구</text><line x1="220" y1="170" x2="260" y2="170" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><line x1="480" y1="170" x2="505" y2="170" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><line x1="735" y1="170" x2="760" y2="170" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><line x1="220" y1="300" x2="260" y2="300" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><line x1="480" y1="300" x2="505" y2="300" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><line x1="735" y1="300" x2="760" y2="300" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><line x1="220" y1="430" x2="260" y2="430" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><line x1="480" y1="430" x2="505" y2="430" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><line x1="735" y1="430" x2="760" y2="430" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><line x1="220" y1="580" x2="260" y2="580" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><line x1="480" y1="580" x2="505" y2="580" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><line x1="735" y1="580" x2="760" y2="580" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><line x1="220" y1="710" x2="260" y2="710" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><line x1="480" y1="710" x2="505" y2="710" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><line x1="735" y1="710" x2="760" y2="710" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><polyline points="1090,200 1090,245 130,245 130,270" fill="none" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><polyline points="1090,330 1090,375 130,375 130,400" fill="none" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><polyline points="1090,460 1090,525 130,525 130,550" fill="none" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><polyline points="1090,610 1090,655 130,655 130,680" fill="none" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><polyline points="1090,740 1090,790 620,790 620,850" fill="none" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/><line x1="760" y1="885" x2="860" y2="885" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrowhead)"/>
+    </svg></div>
+
+    <h3>(4) 원상 복구 규칙</h3>
+    <ul>
+      <li>원상 복구 의미
+        <ul>
+          <li>복식 데미지 단계와 복식 비주얼을 기본 상태로 되돌리는 처리</li>
+        </ul>
+      </li>
+      <li>원상 복구 트리거
+        <ul>
+          <li>복식 교체</li>
+          <li>지역 이동
+            <ul>
+              <li>로딩을 하는 모든 순간 이동</li>
+            </ul>
+          </li>
+          <li>웨이포인트 휴식</li>
+          <li>컷씬 시작
+            <ul>
+              <li>DT_CutScene.Damage = Reset 인 경우만 적용</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>※ (참고) 컷씬 Reset 사용 의도
+        <ul>
+          <li>컷씬에서 복식 데미지가 그대로 유지되면 연출이 의도한 분위기와 느낌을 해칠 수 있음</li>
+          <li>중요 컷씬만 Reset 적용</li>
+          <li>짧은 지역 진입 컷씬, 경량 시퀀스는 Keep 적용 가능</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h3>(5) 저장 / 로드 규칙</h3>
+    <ul>
+      <li>복식 데미지 상태는 저장 대상</li>
+      <li>세이브 시 현재 복식 데미지 단계 저장</li>
+      <li>로드 시 저장된 복식 데미지 단계 복원</li>
+    </ul>
+  </div>
+
+  <h2>3. 복식 젖음 시스템 규칙</h2>
+
+  <div class="panel">
+    <h3>(1) 기본 내용</h3>
+    <ul>
+      <li>Water Volume과 접촉한 부위에만 복식 젖음 적용</li>
+      <li>젖음은 부위 단위로 관리</li>
+      <li>같은 부위가 다시 젖으면 <span class="yellow">해당 부위의 마름 타이머를 초기화하고 다시 전체 유지 시간부터 진행</span></li>
+      <li>다른 부위가 젖는 경우 각 부위는 서로 독립적으로 젖음 / 마름 진행</li>
+      <li>젖음 시각 Blend 값은 Fade In / Fade Out에 같은 값 사용</li>
+      <li>컷씬 중에도 젖음 유지, 갱신, 마름 진행 적용</li>
+      <li>젖음 상태는 세이브 / 로드 대상 아님</li>
+    </ul>
+
+    <h3>(2) 적용 규칙</h3>
+    <ul>
+      <li>Water Volume 접촉 시
+        <ul>
+          <li>접촉한 부위에 즉시 젖음 시작</li>
+          <li>부위별 시각 Blend 값에 따라 서서히 젖음 반영</li>
+        </ul>
+      </li>
+      <li>Water Volume 이탈 시
+        <ul>
+          <li>해당 부위의 마름 타이머 시작</li>
+        </ul>
+      </li>
+      <li>같은 부위 재접촉 시
+        <ul>
+          <li>해당 부위의 마름 타이머 초기화</li>
+          <li>해당 부위는 다시 전체 유지 시간부터 진행</li>
+        </ul>
+      </li>
+      <li>마름 시간 도달 시
+        <ul>
+          <li>부위별 시각 Blend 값에 따라 서서히 마름</li>
+          <li>완전히 마르면 해당 부위 젖음 해제</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h3>(3) 데이터 운영 개념</h3>
+    <ul>
+      <li>젖음 상태는 부위 단위로 개별 관리</li>
+      <li>부위별로 필요한 정보
+        <ul>
+          <li>현재 젖음 여부</li>
+          <li>마름 타이머 진행 여부</li>
+          <li>남은 마름 시간</li>
+        </ul>
+      </li>
+      <li>부위 분할 수는 프로그램 / 그래픽 협의 영역</li>
+    </ul>
+
+    <h3>※ (예시) 젖음 데이터 흐름 타임라인</h3>
+    <table class="timeline">
+      <thead>
+        <tr>
+          <th>부위 / 시점</th>
+          <th>T0</th>
+          <th>T1</th>
+          <th>T2</th>
+          <th>T3</th>
+          <th>T4</th>
+          <th>T5</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>A</th>
+          <td class="wet">A 젖음 시작</td>
+          <td class="hold">젖음 유지</td>
+          <td class="drying">이탈
+마름 타이머 시작</td>
+          <td class="drying">마름 진행</td>
+          <td class="dry">마름 완료</td>
+          <td class="dry">건조 유지</td>
+        </tr>
+        <tr>
+          <th>B</th>
+          <td class="wet">B 젖음 시작</td>
+          <td class="hold">젖음 유지</td>
+          <td class="drying">이탈
+마름 타이머 시작</td>
+          <td class="wet">B 재접촉
+타이머 초기화</td>
+          <td class="drying">이탈
+새 타이머 진행</td>
+          <td class="dry">마름 완료</td>
+        </tr>
+        <tr>
+          <th>C</th>
+          <td class="dry">건조</td>
+          <td class="dry">건조</td>
+          <td class="dry">건조</td>
+          <td class="wet">C 젖음 시작</td>
+          <td class="hold">젖음 유지</td>
+          <td class="drying">이탈 후
+마름 진행</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <strong>※ (참고)</strong><br/>
+      B는 T2에 마름 타이머가 시작되지만 T3에 다시 젖음이 발생<br/>
+      B의 마름 타이머는 초기화<br/>
+      이후 B는 새 유지 시간과 새 마름 시간을 다시 진행
+    </div>
+
+    <h3>(4) 원상 복구 규칙</h3>
+    <ul>
+      <li>원상 복구 의미
+        <ul>
+          <li>젖은 부위가 모두 마름 완료 상태로 돌아가는 처리</li>
+        </ul>
+      </li>
+      <li>원상 복구 방향
+        <ul>
+          <li>부위별 개별 처리</li>
+          <li>같은 부위 재접촉 시 해당 부위만 타이머 초기화</li>
+          <li>다른 부위는 기존 타이머 유지</li>
+        </ul>
+      </li>
+      <li>세이브 / 로드
+        <ul>
+          <li>젖음 상태 미저장</li>
+          <li>로드 후 기본 건조 상태 시작</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <h2>4. 설정 변수 표</h2>
+
+  <div class="panel">
+    <table class="kv-table">
+      <thead>
+        <tr>
+          <th>항목</th>
+          <th>설명</th>
+          <th>설정 위치</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>CostumeDamagePoint</td>
+          <td>특수 공격이 복식 데미지에 부여하는 점수</td>
+          <td>DT_StatusEffect</td>
+        </tr>
+        <tr>
+          <td>복식 데미지 상태 변경 기준값</td>
+          <td>다음 복식 비주얼 단계로 넘어가는 기준 점수</td>
+          <td>복식 데미지 단계 데이터</td>
+        </tr>
+        <tr>
+          <td>젖음 유지 시간</td>
+          <td>Water Volume 이탈 후 마름 타이머가 모두 진행되기 전까지 유지되는 시간</td>
+          <td>젖음 전역 설정값</td>
+        </tr>
+        <tr>
+          <td>젖음 시각 Blend 값</td>
+          <td>Fade In / Fade Out 공용 전환 시간</td>
+          <td>젖음 전역 설정값</td>
+        </tr>
+        <tr>
+          <td>Damage</td>
+          <td>컷씬 시작 시 복식 데미지 Keep / Reset 제어</td>
+          <td>DT_CutScene</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>5. 레퍼런스 조사</h2>
+
+  <div class="panel">
+    <div class="ref-card">
+      <h3>(1) Far Cry 6</h3>
+      <div class="ref-thumb-wrap">
+        <img class="ref-thumb" src="https://staticctf.ubisoft.com/8aefmxkxpxwl/36TZ8Qahfpnqsgw5loD0M/2b5585af31dbd6395a7ebeb71cbcc728/character-wetness.jpg?w=1920" alt="Far Cry 6 대표 이미지" loading="lazy" referrerpolicy="no-referrer"/>
+        <div class="ref-thumb-caption">대표 이미지 미리보기</div>
+      </div>
+      <ul>
+        <li>확인 가능한 내용
+          <ul>
+            <li>Ubisoft 공식 기술 문서에서 wetness를 정적 / 동적 두 축으로 분리해 설명</li>
+            <li>캐릭터, 무기, 차량은 dynamic wetness 대상으로 분류</li>
+            <li>dynamic wetness는 rain exposure를 위한 ray casts와 local wetness를 함께 사용</li>
+            <li>local wetness는 물 잠김 상황과 직접 접촉 상황을 처리하는 용도로 소개</li>
+          </ul>
+        </li>
+        <li>문서에 주는 시사점
+          <ul>
+            <li>대형 오픈월드 게임도 젖음을 단순 On / Off가 아니라 조건 기반으로 제어</li>
+            <li>다만 본 기획서 본문에는 구현 방법을 넣지 않고, 규칙만 가져가는 것이 적절</li>
+            <li>젖음의 핵심은
+              <ul>
+                <li>접촉 시 시작</li>
+                <li>노출이 끊기면 서서히 마름</li>
+                <li>전환이 즉시 끊기지 않음</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>우리 기획서에 적용할 점
+          <ul>
+            <li>젖음은 부위 단위로 시작 / 유지 / 해제 규칙을 명확히 두는 방향이 자연스러움</li>
+            <li>Fade In / Fade Out 공용 값으로 전환 시간을 통일하는 방식도 무리 없음</li>
+          </ul>
+        </li>
+        <li>출처
+          <ul class="tight">
+            <li><a href="https://www.ubisoft.com/en-us/company/how-we-make-games/technology/articles/simulating-tropical-weather-in-far-cry-6">Ubisoft 공식 기술 문서 — Simulating Tropical Weather in Far Cry 6</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="ref-card">
+      <h3>(2) Ghost of Yōtei</h3>
+      <div class="ref-thumb-wrap">
+        <img class="ref-thumb" src="https://blog.playstation.com/uploads/2024/09/18bcb3eae57654c7b3a259528bf3c4ffcb65ee6a.jpg" alt="Ghost of Yōtei 대표 이미지" loading="lazy" referrerpolicy="no-referrer"/>
+        <div class="ref-thumb-caption">대표 이미지 미리보기</div>
+      </div>
+      <ul>
+        <li>확인 가능한 내용
+          <ul>
+            <li>PlayStation 공식 기술 딥다이브에서 캐릭터가 wet / bloody / muddy / snowy 상태로 레이어링된다고 직접 설명</li>
+            <li>캐릭터 주변의 directional grid에 정보를 splat한 뒤, 그 결과를 캐릭터 표면 효과로 사용한다고 설명</li>
+            <li>즉 젖음, 피, 진흙, 눈이 하나의 상태 표현 체계 안에서 관리되는 방향이 보임</li>
+          </ul>
+        </li>
+        <li>문서에 주는 시사점
+          <ul>
+            <li>상태 표현은 단일 효과가 아니라 여러 외형 상태가 함께 공존하는 체계로 발전할 수 있음</li>
+            <li>현재 기획서 범위는 복식 데미지 / 젖음이지만, 이후 피 / 진흙 / 눈 같은 상태 확장 여지 판단에 참고 가능</li>
+          </ul>
+        </li>
+        <li>우리 기획서에 적용할 점
+          <ul>
+            <li>현재는 젖음만 다루되, 부위별 상태 관리 구조는 다른 상태 표현 확장에도 재사용 가능하도록 정리하는 편이 좋음</li>
+          </ul>
+        </li>
+        <li>출처
+          <ul class="tight">
+            <li><a href="https://blog.playstation.com/2025/10/23/ghost-of-yotei-tech-deep-dive/?smcid=psapp">PlayStation 공식 기술 문서 — Ghost of Yōtei Tech Deep Dive</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="ref-card">
+      <h3>(3) The Last of Us Part II</h3>
+      <div class="ref-thumb-wrap">
+        <img class="ref-thumb" src="https://live.staticflickr.com/65535/49517550436_07dec369d7_h.jpg" alt="The Last of Us Part II 대표 이미지" loading="lazy" referrerpolicy="no-referrer"/>
+        <div class="ref-thumb-caption">대표 이미지 미리보기</div>
+      </div>
+      <ul>
+        <li>확인 가능한 내용
+          <ul>
+            <li>GDC Vault와 SIGGRAPH 인터뷰에서 moving character 위에 water drips, blood, snow 같은 동적 효과를 올리는 기술을 설명</li>
+            <li>character UV space와 render target을 활용해 움직이는 캐릭터 표면에 동적 효과를 안정적으로 기록하는 방향을 소개</li>
+            <li>cloth와 skin에 다른 반응을 주는 내용도 확인 가능</li>
+          </ul>
+        </li>
+        <li>문서에 주는 시사점
+          <ul>
+            <li>젖음과 피 같은 표면 상태는 컷씬과 근접 카메라에서도 설득력이 중요</li>
+            <li>특히 cloth / skin 구분이나 surface behavior 차별화는 아트 / 프로그래머 구현 레벨 참고점이 큼</li>
+          </ul>
+        </li>
+        <li>우리 기획서에 적용할 점
+          <ul>
+            <li>본문에는 구현 기술을 넣지 않음</li>
+            <li>대신 젖음이 컷씬 중에도 유지 / 변화 / 건조 진행된다는 정책은 충분히 정당화 가능</li>
+          </ul>
+        </li>
+        <li>출처
+          <ul class="tight">
+            <li><a href="https://www.gdcvault.com/play/1027356/Enhancement-of-Particle-Simulation-Using">GDC Vault — Enhancement of Particle Simulation Using Screen Space Techniques in The Last of Us Part II</a></li>
+            <li><a href="https://blog.siggraph.org/2021/02/creating-the-highly-anticipated-the-last-of-us-part-ii.html/">SIGGRAPH Blog — Creating the Highly Anticipated The Last of Us Part II</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="ref-card">
+      <h3>(4) Red Dead Redemption 2</h3>
+      <div class="ref-thumb-wrap">
+        <img class="ref-thumb" src="https://image.api.playstation.com/cdn/UP1004/CUSA03041_00/FREE_CONTENTvJKvL7yfxIr782YEPFC1/PREVIEW_SCREENSHOT10_166081.jpg" alt="Red Dead Redemption 2 대표 이미지" loading="lazy" referrerpolicy="no-referrer"/>
+        <div class="ref-thumb-caption">대표 이미지 미리보기</div>
+      </div>
+      <ul>
+        <li>확인 가능한 내용
+          <ul>
+            <li>DigiPen 인터뷰에서 Arthur가 진흙탕에 넘어지면 옷이 젖고 더러워지며, 사냥한 동물의 피가 재킷에 묻고, 총에 맞아 날아간 모자에는 탄흔이 남는다고 설명</li>
+            <li>즉 피, 진흙, 물, 탄흔처럼 외형 상태 변화가 복장에 직접 남는 구조가 확인 가능</li>
+          </ul>
+        </li>
+        <li>문서에 주는 시사점
+          <ul>
+            <li>복장 상태 변화는 단순 연출이 아니라 캐릭터를 세계에 붙여두는 역할을 함</li>
+            <li>다만 RDR2 사례는 복식 파손 단계 시스템보다 현실 반응형 표면 상태 누적에 더 가까움</li>
+          </ul>
+        </li>
+        <li>우리 기획서에 적용할 점
+          <ul>
+            <li>복식 데미지를 과하게 시스템화하지 않고, 전투와 연동된 누적형 비주얼 변화로 두는 방향이 설득력 있음</li>
+            <li>원상 복구 트리거를 명시적으로 제한해 두는 것도 현실감 유지에 도움이 됨</li>
+          </ul>
+        </li>
+        <li>출처
+          <ul class="tight">
+            <li><a href="https://www.digipen.edu/showcase/news/digipen-grad-andy-kibler-puts-the-clothes-on-the-cowboy-in-red-dead-redemption-2">DigiPen — Andy Kibler Puts the Clothes on the Cowboy in Red Dead Redemption 2</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="ref-card">
+      <h3>(5) Baldur's Gate 3</h3>
+      <div class="ref-thumb-wrap">
+        <img class="ref-thumb" src="https://i.ytimg.com/vi_webp/UgTFtD2sHdE/maxresdefault.webp" alt="Baldur's Gate 3 대표 이미지" loading="lazy" referrerpolicy="no-referrer"/>
+        <div class="ref-thumb-caption">대표 이미지 미리보기</div>
+      </div>
+      <ul>
+        <li>확인 가능한 내용
+          <ul>
+            <li>공개 패치 / 보도 기준으로 캐릭터가 dirty, sweaty, bloodied, bruised 상태가 누적된다고 확인 가능</li>
+            <li>Patch 4 이후에는 sponges와 soap으로 grime, blood, bad odours를 제거할 수 있게 됨</li>
+            <li>물이 닿는 것만으로도 blood / dirt가 정리되는 플레이 패턴이 알려져 있음</li>
+          </ul>
+        </li>
+        <li>문서에 주는 시사점
+          <ul>
+            <li>복장 외형 상태는 전투 후에도 남아 있다가, 특정 행위로 해제되는 구조가 충분히 유효</li>
+            <li>컷씬 직전 정리하고 싶어지는 플레이 욕구가 실제로 존재함</li>
+          </ul>
+        </li>
+        <li>우리 기획서에 적용할 점
+          <ul>
+            <li>복식 데미지는 저장 대상</li>
+            <li>젖음은 미저장 대상</li>
+            <li>원상 복구 이벤트를 명확하게 두는 기획 방향에 참고 가능</li>
+          </ul>
+        </li>
+        <li>출처
+          <ul class="tight">
+            <li><a href="https://www.gamesradar.com/baldurs-gate-3-patch-lets-your-characters-get-literally-battered-and-bruised/">GamesRadar — Baldur's Gate 3 patch lets your characters get battered and bruised</a></li>
+            <li><a href="https://www.gamesradar.com/the-most-important-change-in-the-new-baldurs-gate-3-patch-is-the-ability-to-take-a-nice-sponge-bath/">GamesRadar — Patch 4 soap / sponge cleanup summary</a></li>
+            <li><a href="https://screenrant.com/baldurs-gate-3-cutscenes-blood-use-soap-sponges/">ScreenRant — Cutscenes become awkward when blood stays on characters</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="ref-card">
+      <h3>(6) Marvel's Spider-Man 2</h3>
+      <div class="ref-thumb-wrap">
+        <img class="ref-thumb" src="https://i.ytimg.com/vi_webp/bgqGdIoa52s/maxresdefault.webp" alt="Marvel's Spider-Man 2 대표 이미지" loading="lazy" referrerpolicy="no-referrer"/>
+        <div class="ref-thumb-caption">대표 이미지 미리보기</div>
+      </div>
+      <ul>
+        <li>확인 가능한 내용
+          <ul>
+            <li>공식 기술 문서보다는 프리뷰 / 가이드 / 플레이 관찰 자료 비중이 높음</li>
+            <li>전투를 반복하면 suit damage가 쌓이고, 작은 scuff에서 큰 찢어짐까지 단계적으로 심해지는 사례가 다수 보도됨</li>
+            <li>일부 가이드는 일반 전투, 강한 피격, 낙하 피해가 손상 원인으로 작동한다고 설명</li>
+            <li>수트 손상이 일정 시간 탐험 중에도 유지된다는 관찰도 존재</li>
+          </ul>
+        </li>
+        <li>문서에 주는 시사점
+          <ul>
+            <li>전투 피격 → 외형 손상 누적 → 시간이 지나도 유지되는 패턴은 플레이어가 쉽게 이해함</li>
+            <li>다만 Spider-Man 2는 정확한 내부 규칙이 공개되지 않았기 때문에, TAL에는 관찰 가능한 현상만 참고하는 편이 안전</li>
+          </ul>
+        </li>
+        <li>우리 기획서에 적용할 점
+          <ul>
+            <li>복식 데미지는 전투 기반 누적형 외형 상태로 정의</li>
+            <li>누적 점수와 상태 변경 기준을 별도로 두는 현재 기획 구조가 더 관리하기 쉬움</li>
+          </ul>
+        </li>
+        <li>출처
+          <ul class="tight">
+            <li><a href="https://playerassist.com/does-marvels-spider-man-2-have-suit-damage-answered/">Player Assist — Does Marvel's Spider-Man 2 have suit damage?</a></li>
+            <li><a href="https://www.gameskinny.com/tips/how-to-repair-suits-in-spider-man-2/">GameSkinny — How to Repair Suits in Spider-Man 2</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="ref-card">
+      <h3>(7) Dragon's Dogma 계열</h3>
+      <div class="ref-thumb-wrap">
+        <img class="ref-thumb" src="https://i.ytimg.com/vi_webp/cT0rIgaiPWA/maxresdefault.webp" alt="Dragon's Dogma 2 대표 이미지" loading="lazy" referrerpolicy="no-referrer"/>
+        <div class="ref-thumb-caption">대표 이미지 미리보기</div>
+      </div>
+      <ul>
+        <li>확인 가능한 내용
+          <ul>
+            <li>공개 가이드 기준으로 Drenched 상태는 물 접촉, 강, 비 등의 환경 노출로 발생</li>
+            <li>드래곤즈 도그마 계열은 젖음이 단순 외형 변화가 아니라 속성 반응까지 연결되는 디버프 성격이 강함</li>
+          </ul>
+        </li>
+        <li>문서에 주는 시사점
+          <ul>
+            <li>현재 TAL 기획서는 외형 상태 표현 중심</li>
+            <li>다만 장기적으로는 젖음 상태를 전투 속성 반응과 연결할 확장 가능성 검토 가능</li>
+          </ul>
+        </li>
+        <li>우리 기획서에 적용할 점
+          <ul>
+            <li>현재 범위에서는 외형 상태 표현까지만 확정</li>
+            <li>전투 효과 연계는 추후 별도 시스템으로 분리 검토하는 편이 적절</li>
+          </ul>
+        </li>
+        <li>출처
+          <ul class="tight">
+            <li><a href="https://dragonsdogma2.wiki.fextralife.com/Drenched">Dragon's Dogma 2 Wiki — Drenched</a></li>
+            <li><a href="https://dragonsdogma.fandom.com/wiki/Drenched">Dragon's Dogma Wiki — Drenched</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+</body>
+</html>
