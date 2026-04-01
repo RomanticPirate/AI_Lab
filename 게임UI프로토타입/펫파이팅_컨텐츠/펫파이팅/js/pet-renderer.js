@@ -394,63 +394,63 @@ const 펫렌더러 = {
                 ${이펙트}
                 <!-- 꼬리 (길고 가는) -->
                 <g class="pet-tail" style="transform-box:fill-box;transform-origin:5% 50%">
-                    <path d="M60 180 Q30 170 20 145 Q15 130 25 120" fill="none" stroke="${색}" stroke-width="4" stroke-linecap="round" opacity=".7"/>
+                    <path d="M65 165 Q35 155 25 135 Q18 118 28 108" fill="none" stroke="${색}" stroke-width="4" stroke-linecap="round" opacity=".7"/>
                 </g>
                 <!-- 다리 -->
                 <g class="pet-leg">
-                    <ellipse cx="82" cy="192" rx="12" ry="7" fill="${색}"/>
-                    <ellipse cx="118" cy="192" rx="12" ry="7" fill="${색}"/>
+                    <ellipse cx="82" cy="178" rx="12" ry="7" fill="${색}"/>
+                    <ellipse cx="118" cy="178" rx="12" ry="7" fill="${색}"/>
                 </g>
-                <!-- 몸통 (작고 둥근) -->
+                <!-- 몸통 (머리에 붙어있게 위로) -->
                 <g class="pet-body" filter="url(#그림자${uid})">
-                    <ellipse cx="100" cy="168" rx="32" ry="28" fill="url(#몸g${uid})"/>
-                    <ellipse cx="100" cy="162" rx="20" ry="16" fill="${보조}" opacity=".12"/>
-                    <ellipse cx="100" cy="155" rx="22" ry="12" fill="url(#하이g${uid})"/>
+                    <ellipse cx="100" cy="155" rx="32" ry="30" fill="url(#몸g${uid})"/>
+                    <ellipse cx="100" cy="148" rx="20" ry="16" fill="${보조}" opacity=".12"/>
+                    <ellipse cx="100" cy="142" rx="22" ry="12" fill="url(#하이g${uid})"/>
                     <!-- 배 -->
-                    <ellipse cx="100" cy="174" rx="18" ry="14" fill="${보조}" opacity=".15"/>
+                    <ellipse cx="100" cy="162" rx="18" ry="14" fill="${보조}" opacity=".15"/>
                 </g>
                 <!-- 왼팔 (작고 짧은) -->
                 <g class="pet-arm-l" style="transform-box:fill-box;transform-origin:50% 15%">
-                    <ellipse cx="68" cy="162" rx="10" ry="16" fill="${색}" transform="rotate(-10,68,162)"/>
+                    <ellipse cx="68" cy="148" rx="10" ry="16" fill="${색}" transform="rotate(-10,68,148)"/>
                 </g>
                 <!-- 오른팔 -->
                 <g class="pet-arm-r" style="transform-box:fill-box;transform-origin:50% 15%">
-                    <ellipse cx="132" cy="162" rx="10" ry="16" fill="${색}" transform="rotate(10,132,162)"/>
+                    <ellipse cx="132" cy="148" rx="10" ry="16" fill="${색}" transform="rotate(10,132,148)"/>
                 </g>
-                <!-- 머리 (큰 머리 + 거대 귀) -->
+                <!-- 머리 (큰 머리 + 거대 귀, 몸에 붙임) -->
                 <g class="pet-head" style="transform-box:fill-box;transform-origin:50% 85%">
                     <!-- 귀 (크고 둥근) -->
-                    <ellipse cx="62" cy="50" rx="22" ry="28" fill="${색}" transform="rotate(-15,62,50)"/>
-                    <ellipse cx="62" cy="48" rx="14" ry="20" fill="${보조}" opacity=".2" transform="rotate(-15,62,48)"/>
-                    <ellipse cx="62" cy="46" rx="10" ry="14" fill="#ffa0a0" opacity=".3" transform="rotate(-15,62,46)"/>
-                    <ellipse cx="138" cy="50" rx="22" ry="28" fill="${색}" transform="rotate(15,138,50)"/>
-                    <ellipse cx="138" cy="48" rx="14" ry="20" fill="${보조}" opacity=".2" transform="rotate(15,138,48)"/>
-                    <ellipse cx="138" cy="46" rx="10" ry="14" fill="#ffa0a0" opacity=".3" transform="rotate(15,138,46)"/>
-                    <!-- 얼굴 -->
-                    <ellipse cx="100" cy="88" rx="32" ry="28" fill="url(#몸g${uid})" filter="url(#그림자${uid})"/>
-                    <ellipse cx="100" cy="78" rx="22" ry="14" fill="url(#하이g${uid})"/>
+                    <ellipse cx="62" cy="62" rx="22" ry="28" fill="${색}" transform="rotate(-15,62,62)"/>
+                    <ellipse cx="62" cy="60" rx="14" ry="20" fill="${보조}" opacity=".2" transform="rotate(-15,62,60)"/>
+                    <ellipse cx="62" cy="58" rx="10" ry="14" fill="#ffa0a0" opacity=".3" transform="rotate(-15,62,58)"/>
+                    <ellipse cx="138" cy="62" rx="22" ry="28" fill="${색}" transform="rotate(15,138,62)"/>
+                    <ellipse cx="138" cy="60" rx="14" ry="20" fill="${보조}" opacity=".2" transform="rotate(15,138,60)"/>
+                    <ellipse cx="138" cy="58" rx="10" ry="14" fill="#ffa0a0" opacity=".3" transform="rotate(15,138,58)"/>
+                    <!-- 얼굴 (몸통 위에 바로 얹힘) -->
+                    <ellipse cx="100" cy="100" rx="32" ry="28" fill="url(#몸g${uid})" filter="url(#그림자${uid})"/>
+                    <ellipse cx="100" cy="90" rx="22" ry="14" fill="url(#하이g${uid})"/>
                     <!-- 눈 (크고 빛나는 — 광기) -->
-                    <ellipse cx="86" cy="82" rx="10" ry="11" fill="#ffe860"/>
-                    <ellipse cx="114" cy="82" rx="10" ry="11" fill="#ffe860"/>
-                    <ellipse cx="86" cy="82" rx="4" ry="5" fill="#1a1020"/>
-                    <ellipse cx="114" cy="82" rx="4" ry="5" fill="#1a1020"/>
-                    <circle cx="84" cy="79" r="3" fill="#fff" opacity=".8"/>
-                    <circle cx="112" cy="79" r="3" fill="#fff" opacity=".8"/>
+                    <ellipse cx="86" cy="94" rx="10" ry="11" fill="#ffe860"/>
+                    <ellipse cx="114" cy="94" rx="10" ry="11" fill="#ffe860"/>
+                    <ellipse cx="86" cy="94" rx="4" ry="5" fill="#1a1020"/>
+                    <ellipse cx="114" cy="94" rx="4" ry="5" fill="#1a1020"/>
+                    <circle cx="84" cy="91" r="3" fill="#fff" opacity=".8"/>
+                    <circle cx="112" cy="91" r="3" fill="#fff" opacity=".8"/>
                     <!-- 눈 글로우 (광기 효과) -->
-                    <ellipse cx="86" cy="82" rx="12" ry="13" fill="#ffe860" opacity=".15" filter="url(#눈빛${uid})"/>
-                    <ellipse cx="114" cy="82" rx="12" ry="13" fill="#ffe860" opacity=".15" filter="url(#눈빛${uid})"/>
+                    <ellipse cx="86" cy="94" rx="12" ry="13" fill="#ffe860" opacity=".15" filter="url(#눈빛${uid})"/>
+                    <ellipse cx="114" cy="94" rx="12" ry="13" fill="#ffe860" opacity=".15" filter="url(#눈빛${uid})"/>
                     <!-- 코 -->
-                    <ellipse cx="100" cy="94" rx="5" ry="3.5" fill="#ff8080"/>
+                    <ellipse cx="100" cy="106" rx="5" ry="3.5" fill="#ff8080"/>
                     <!-- 수염 -->
-                    <line x1="60" y1="90" x2="82" y2="92" stroke="${보조}" stroke-width="1" opacity=".4"/>
-                    <line x1="58" y1="96" x2="82" y2="95" stroke="${보조}" stroke-width="1" opacity=".4"/>
-                    <line x1="118" y1="92" x2="140" y2="90" stroke="${보조}" stroke-width="1" opacity=".4"/>
-                    <line x1="118" y1="95" x2="142" y2="96" stroke="${보조}" stroke-width="1" opacity=".4"/>
+                    <line x1="60" y1="102" x2="82" y2="104" stroke="${보조}" stroke-width="1" opacity=".4"/>
+                    <line x1="58" y1="108" x2="82" y2="107" stroke="${보조}" stroke-width="1" opacity=".4"/>
+                    <line x1="118" y1="104" x2="140" y2="102" stroke="${보조}" stroke-width="1" opacity=".4"/>
+                    <line x1="118" y1="107" x2="142" y2="108" stroke="${보조}" stroke-width="1" opacity=".4"/>
                     <!-- 이빨 (앞니 2개 — 설치류 특징) -->
-                    <rect x="95" y="100" width="4" height="7" rx="1" fill="#ffe8e0"/>
-                    <rect x="101" y="100" width="4" height="7" rx="1" fill="#ffe8e0"/>
+                    <rect x="95" y="112" width="4" height="7" rx="1" fill="#ffe8e0"/>
+                    <rect x="101" y="112" width="4" height="7" rx="1" fill="#ffe8e0"/>
                     <!-- 입 -->
-                    <path d="M94 100 Q100 104 106 100" fill="none" stroke="#1a1020" stroke-width="1.5"/>
+                    <path d="M94 112 Q100 116 106 112" fill="none" stroke="#1a1020" stroke-width="1.5"/>
                 </g>`;
         },
 

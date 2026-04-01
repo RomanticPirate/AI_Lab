@@ -215,13 +215,15 @@ const 전투시스템 = {
         let 액티브발동 = false;
         let 발동스킬이름 = '';
 
-        // 2) 패시브: 더블 체크 (바위더블/가위더블/보더블)
+        // 2) 패시브: 더블 체크 (바위더블/가위더블/보더블) - 확률 적용
         const 더블id = this._더블스킬[액션];
         if (더블id && this._스킬보유(공격펫, 더블id)) {
-            대미지 *= 2;
             const 스킬 = 게임데이터.스킬찾기(더블id);
-            화면.스킬미니연출(스킬.이름, 스킬.설명, 공격펫.색상);
-            await this.지연(1200);
+            if (this._확률체크(스킬.확률)) {
+                대미지 *= 2;
+                화면.스킬미니연출(스킬.이름, 스킬.설명, 공격펫.색상);
+                await this.지연(1200);
+            }
         }
 
         // 3) 액티브: 분노 체크 (HP 30% 이하 + 60%)
@@ -246,12 +248,38 @@ const 전투시스템 = {
             }
         }
 
-        // 4) 패시브: 철벽 체크 (방어측)
-        if (this._스킬보유(방어펫, 4)) {
-            대미지 = Math.max(1, 대미지 - 1);
+        // 3-2) 액티브: 급강하 체크 (30% 확률 대미지 2배)
+        if (!액티브발동 && this._스킬보유(공격펫, 13)) {
+            const 스킬 = 게임데이터.스킬찾기(13);
+            if (this._확률체크(스킬.확률)) {
+                대미지 *= 스킬.배율;
+                액티브발동 = true;
+                발동스킬이름 = 스킬.이름;
+            }
+        }
+
+        // 3-3) 액티브: 회피 체크 (방어측 30% 확률 대미지 0)
+        let 회피발동 = false;
+        if (this._스킬보유(방어펫, 14)) {
+            const 스킬 = 게임데이터.스킬찾기(14);
+            if (this._확률체크(스킬.확률)) {
+                대미지 = 0;
+                회피발동 = true;
+                this.오라활성화(피격대상 === '나' ? 'left' : 'right');
+                await new Promise(resolve => {
+                    화면.스킬컷씬표시(방어펫, 스킬.이름, resolve);
+                });
+            }
+        }
+
+        // 4) 패시브: 철벽 체크 (방어측, 회피 시 스킵) - 확률 적용
+        if (!회피발동 && this._스킬보유(방어펫, 4)) {
             const 스킬 = 게임데이터.스킬찾기(4);
-            화면.스킬미니연출(스킬.이름, 스킬.설명, 방어펫.색상);
-            await this.지연(1200);
+            if (this._확률체크(스킬.확률)) {
+                대미지 = Math.max(1, 대미지 - 1);
+                화면.스킬미니연출(스킬.이름, 스킬.설명, 방어펫.색상);
+                await this.지연(1200);
+            }
         }
 
         // 5) 액티브 발동 시 컷씬
@@ -294,18 +322,20 @@ const 전투시스템 = {
 
         await this.지연(300);
 
-        // 7) 패시브: 흡혈 (공격측 HP 2 회복)
+        // 7) 패시브: 흡혈 (공격측 HP 2 회복) - 확률 적용
         if (this._스킬보유(공격펫, 5)) {
-            if (피격대상 === '상대') {
-                this.내HP = Math.min(this.내최대HP, this.내HP + 2);
-                화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
-            } else {
-                this.상대HP = Math.min(this.상대최대HP, this.상대HP + 2);
-                화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
-            }
             const 스킬 = 게임데이터.스킬찾기(5);
-            화면.스킬미니연출(스킬.이름, 'HP +2 회복!', 공격펫.색상);
-            await this.지연(1200);
+            if (this._확률체크(스킬.확률)) {
+                if (피격대상 === '상대') {
+                    this.내HP = Math.min(this.내최대HP, this.내HP + 2);
+                    화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
+                } else {
+                    this.상대HP = Math.min(this.상대최대HP, this.상대HP + 2);
+                    화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
+                }
+                화면.스킬미니연출(스킬.이름, 'HP +2 회복!', 공격펫.색상);
+                await this.지연(1200);
+            }
         }
 
         // 8) 액티브: 연속타 (35% 확률로 추가 2 대미지)
@@ -349,6 +379,74 @@ const 전투시스템 = {
                     화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
                     화면.대미지팝업('왼쪽', 반격대미지, true);
                 }
+                await this.지연(400);
+            }
+        }
+
+        // 10) 액티브: 불굴 (방어측 40% 확률 HP 3 회복)
+        if (!회피발동 && this._스킬보유(방어펫, 12)) {
+            const 스킬 = 게임데이터.스킬찾기(12);
+            if (this._확률체크(스킬.확률)) {
+                const 회복량 = 스킬.회복량 || 3;
+                this.오라활성화(피격대상 === '나' ? 'left' : 'right');
+                await new Promise(resolve => {
+                    화면.스킬컷씬표시(방어펫, 스킬.이름, resolve);
+                });
+                if (피격대상 === '나') {
+                    this.내HP = Math.min(this.내최대HP, this.내HP + 회복량);
+                    화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
+                } else {
+                    this.상대HP = Math.min(this.상대최대HP, this.상대HP + 회복량);
+                    화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
+                }
+                setTimeout(() => this.오라비활성화(), 800);
+                await this.지연(400);
+            }
+        }
+
+        // 11) 액티브: 반사 (방어측 25% 확률 받은 대미지 반격)
+        if (!회피발동 && 대미지 > 0 && this._스킬보유(방어펫, 15)) {
+            const 스킬 = 게임데이터.스킬찾기(15);
+            if (this._확률체크(스킬.확률)) {
+                const 반사대미지 = 대미지;
+                this.오라활성화(피격대상 === '나' ? 'left' : 'right');
+                await new Promise(resolve => {
+                    화면.스킬컷씬표시(방어펫, 스킬.이름, resolve);
+                });
+                화면.화면흔들림();
+                const 반격X = 피격대상 === '나' ? 1060 : 180;
+                this.히트스파크(반격X, 220, true, 방어펫);
+                if (피격대상 === '나') {
+                    this.상대HP = Math.max(0, this.상대HP - 반사대미지);
+                    화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
+                    화면.대미지팝업('오른쪽', 반사대미지, true);
+                } else {
+                    this.내HP = Math.max(0, this.내HP - 반사대미지);
+                    화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
+                    화면.대미지팝업('왼쪽', 반사대미지, true);
+                }
+                setTimeout(() => this.오라비활성화(), 800);
+                await this.지연(400);
+            }
+        }
+
+        // 12) 액티브: 탈피 (방어측 35% 확률 HP 2 회복)
+        if (!회피발동 && this._스킬보유(방어펫, 16)) {
+            const 스킬 = 게임데이터.스킬찾기(16);
+            if (this._확률체크(스킬.확률)) {
+                const 회복량 = 스킬.회복량 || 2;
+                this.오라활성화(피격대상 === '나' ? 'left' : 'right');
+                await new Promise(resolve => {
+                    화면.스킬컷씬표시(방어펫, 스킬.이름, resolve);
+                });
+                if (피격대상 === '나') {
+                    this.내HP = Math.min(this.내최대HP, this.내HP + 회복량);
+                    화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
+                } else {
+                    this.상대HP = Math.min(this.상대최대HP, this.상대HP + 회복량);
+                    화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
+                }
+                setTimeout(() => this.오라비활성화(), 800);
                 await this.지연(400);
             }
         }
@@ -531,6 +629,44 @@ const 전투시스템 = {
                 await this.지연(800);
             }
         }
+        // 내 펫 기습 (id 17) - 라운드 시작 시 상대에게 선제 대미지
+        if (this._스킬보유(this.내펫, 17)) {
+            const 스킬 = 게임데이터.스킬찾기(17);
+            if (this._확률체크(스킬.확률)) {
+                const 기습대미지 = 스킬.대미지 || 2;
+                this.오라활성화('left');
+                await new Promise(resolve => {
+                    화면.스킬컷씬표시(this.내펫, 스킬.이름, resolve);
+                });
+                화면.화면흔들림();
+                this.히트스파크(1060, 220, true, this.내펫);
+                this.상대HP = Math.max(0, this.상대HP - 기습대미지);
+                화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
+                화면.대미지팝업('오른쪽', 기습대미지, true);
+                setTimeout(() => this.오라비활성화(), 800);
+                await this.지연(600);
+                if (await this.종료체크()) return;
+            }
+        }
+        // 상대 펫 기습
+        if (this._스킬보유(this.상대펫, 17)) {
+            const 스킬 = 게임데이터.스킬찾기(17);
+            if (this._확률체크(스킬.확률)) {
+                const 기습대미지 = 스킬.대미지 || 2;
+                this.오라활성화('right');
+                await new Promise(resolve => {
+                    화면.스킬컷씬표시(this.상대펫, 스킬.이름, resolve);
+                });
+                화면.화면흔들림();
+                this.히트스파크(180, 220, true, this.상대펫);
+                this.내HP = Math.max(0, this.내HP - 기습대미지);
+                화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
+                화면.대미지팝업('왼쪽', 기습대미지, true);
+                setTimeout(() => this.오라비활성화(), 800);
+                await this.지연(600);
+                if (await this.종료체크()) return;
+            }
+        }
     },
 
     // ========== 기존 유틸 ==========
@@ -580,20 +716,31 @@ const 전투시스템 = {
             오른쪽펫.classList.remove('move-center-r', 상대클래스);
             왼쪽펫.classList.remove('hit-react', 'hit-flash');
         } else {
-            // 무승부 - 양쪽 돌진 후 충돌
-            왼쪽펫.classList.add(내클래스, 'move-center-l');
-            오른쪽펫.classList.add(상대클래스, 'move-center-r');
-            await this.지연(250);
+            // 무승부 - 가운데로 빠르게 돌진 → 충돌 → 튕겨나감
+            왼쪽펫.classList.remove('idle');
+            오른쪽펫.classList.remove('idle');
+            왼쪽펫.classList.add(내클래스, 'draw-rush-l');
+            오른쪽펫.classList.add(상대클래스, 'draw-rush-r');
+            await this.지연(200);
+            // 충돌 순간
             화면.전투플래시();
             화면.화면흔들림();
             화면.히트이펙트(640, 220);
             this.히트스파크(640, 220, false);
-            // 양쪽 모두 약한 리코일
             왼쪽펫.classList.add('hit-flash');
             오른쪽펫.classList.add('hit-flash');
+            await this.지연(100);
+            // 튕겨나감
+            왼쪽펫.classList.remove('draw-rush-l');
+            오른쪽펫.classList.remove('draw-rush-r');
+            왼쪽펫.classList.add('draw-bounce-l');
+            오른쪽펫.classList.add('draw-bounce-r');
             await this.지연(400);
-            왼쪽펫.classList.remove('move-center-l', 내클래스, 'hit-flash');
-            오른쪽펫.classList.remove('move-center-r', 상대클래스, 'hit-flash');
+            // 원래 위치로 복귀
+            왼쪽펫.classList.remove('draw-bounce-l', 내클래스, 'hit-flash');
+            오른쪽펫.classList.remove('draw-bounce-r', 상대클래스, 'hit-flash');
+            왼쪽펫.classList.add('idle');
+            오른쪽펫.classList.add('idle');
         }
     },
 
@@ -659,6 +806,8 @@ const 전투시스템 = {
             const el = document.getElementById(id);
             if (el) el.classList.remove('defeat-stagger', 'defeat-fall', 'defeat-bounce', 'defeat-final', 'victory', 'hit-react', 'hit-heavy', 'hit-flash');
         });
+        // 스테이지 배경 정리
+        스테이지.중지();
     },
 
     지연(ms) {

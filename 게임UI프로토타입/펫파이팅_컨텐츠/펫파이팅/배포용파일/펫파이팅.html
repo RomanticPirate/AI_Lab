@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>펫 파이팅</title>
-    <style>@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>펫 파이팅</title>
+<style>@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
     --bg:#080410;--gold:#ffc040;--gold-d:#a07020;
@@ -24,41 +24,156 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 @keyframes flashAnim{0%{opacity:.8}100%{opacity:0}}
 
 /* ===== 타이틀 화면 ===== */
-.title-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,#2a1860,#140828 40%,#080410)}
-.title-burst{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:900px;height:900px;background:conic-gradient(from 0deg,rgba(255,200,60,.06) 0deg,transparent 15deg,rgba(255,80,40,.04) 30deg,transparent 45deg);animation:spin 20s linear infinite;filter:blur(10px)}
+/* 레이어 0: 깊은 배경 */
+.title-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%,#1a0a30,#0c0418 50%,#040208)}
+/* 레이어 1: 느린 성운 */
+.title-nebula{position:absolute;inset:-100px;background:
+    radial-gradient(ellipse at 20% 30%,rgba(255,40,20,.08),transparent 40%),
+    radial-gradient(ellipse at 80% 70%,rgba(20,60,255,.08),transparent 40%),
+    radial-gradient(ellipse at 50% 50%,rgba(160,40,200,.06),transparent 50%);
+    animation:titleNebulaDrift 30s ease-in-out infinite alternate;filter:blur(20px)}
+@keyframes titleNebulaDrift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(30px,-20px) scale(1.05)}}
+/* 레이어 2: 빠른 방사형 버스트 */
+.title-burst{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:1400px;height:1400px;
+    background:conic-gradient(from 0deg,rgba(255,180,40,.05) 0deg,transparent 10deg,rgba(255,60,20,.04) 20deg,transparent 30deg,rgba(40,80,255,.03) 40deg,transparent 50deg);
+    animation:spin 12s linear infinite;filter:blur(6px)}
 @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
-.title-glow-l{position:absolute;left:0;top:0;width:50%;height:100%;background:radial-gradient(ellipse at 20% 60%,rgba(255,40,20,.12),transparent 60%)}
-.title-glow-r{position:absolute;right:0;top:0;width:50%;height:100%;background:radial-gradient(ellipse at 80% 60%,rgba(20,80,255,.12),transparent 60%)}
-.title-floor{position:absolute;bottom:0;width:100%;height:2px;background:linear-gradient(90deg,rgba(255,60,30,.3),rgba(255,200,60,.5),rgba(30,100,255,.3));filter:blur(1px);box-shadow:0 0 20px rgba(255,200,60,.2)}
-.title-text-area{position:absolute;top:50px;left:50%;transform:translateX(-50%);text-align:center;z-index:20;animation:titleDrop .6s cubic-bezier(.34,1.56,.64,1)}
-@keyframes titleDrop{0%{transform:translateX(-50%) translateY(-60px) scale(1.3);opacity:0}100%{transform:translateX(-50%) translateY(0) scale(1);opacity:1}}
-.title-badge{display:inline-block;padding:4px 20px;background:linear-gradient(90deg,#ff4020,#ff8020);color:#fff;font-size:12px;font-weight:900;letter-spacing:3px;border-radius:20px;margin-bottom:8px;box-shadow:0 2px 12px rgba(255,64,32,.4)}
-.title-name{font-family:'Black Han Sans',sans-serif;font-size:110px;line-height:1;position:relative}
-.title-name .shadow{position:absolute;left:0;top:0;color:#1a0000;transform:translate(5px,7px)}
-.title-name .stroke{position:absolute;left:0;top:0;-webkit-text-stroke:4px #c02000;color:transparent}
-.title-name .fill{position:relative;background:linear-gradient(180deg,#fff8a0,#ffc020 20%,#ff6010 50%,#d02000 75%,#800800);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.title-name .shine{position:absolute;left:0;top:0;background:linear-gradient(180deg,rgba(255,255,255,.8),transparent 35%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.title-glow-bg{position:absolute;inset:-60px -120px;background:radial-gradient(ellipse,rgba(255,180,40,.2),transparent 60%);filter:blur(30px);animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
-.title-sub{margin-top:6px;font-size:18px;font-weight:900;letter-spacing:8px;color:rgba(255,200,100,.8);text-shadow:0 0 20px rgba(255,160,40,.4)}
-.title-press{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);text-align:center;z-index:20;cursor:pointer}
-.title-press-text{font-size:20px;font-weight:900;color:#ffe8c0;letter-spacing:6px;text-shadow:0 0 20px rgba(255,200,100,.5);animation:blink 2s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.title-pets{position:absolute;bottom:20px;z-index:10;width:500px;height:400px}
-.title-pets.left{left:0px}
-.title-pets.right{right:0px}
-.title-pet-svg{filter:drop-shadow(0 6px 20px rgba(0,0,0,.6))}
+/* 레이어 3: 좌우 에너지 글로우 */
+.title-glow-l{position:absolute;left:-50px;top:0;width:55%;height:100%;
+    background:radial-gradient(ellipse at 30% 55%,rgba(255,60,20,.18),transparent 55%);animation:titleGlowPulseL 3s ease-in-out infinite}
+.title-glow-r{position:absolute;right:-50px;top:0;width:55%;height:100%;
+    background:radial-gradient(ellipse at 70% 55%,rgba(20,80,255,.18),transparent 55%);animation:titleGlowPulseR 3s ease-in-out infinite .5s}
+@keyframes titleGlowPulseL{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.04)}}
+@keyframes titleGlowPulseR{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.04)}}
+/* 레이어 4: 중앙 격돌 에너지 */
+.title-clash{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);width:200px;height:600px;
+    background:linear-gradient(180deg,transparent,rgba(255,200,60,.06) 30%,rgba(255,200,60,.12) 50%,rgba(255,200,60,.06) 70%,transparent);
+    animation:titleClashPulse 2s ease-in-out infinite;filter:blur(15px)}
+@keyframes titleClashPulse{0%,100%{opacity:.4;transform:translate(-50%,-50%) scaleX(1)}50%{opacity:1;transform:translate(-50%,-50%) scaleX(1.8)}}
+/* 레이어 5: 투기장 바닥 */
+.title-floor{position:absolute;bottom:0;width:100%;height:120px;
+    background:linear-gradient(180deg,transparent,rgba(30,15,5,.6) 30%,rgba(60,30,10,.8) 70%,rgba(40,20,8,1));
+    border-top:1px solid rgba(255,160,40,.15)}
+.title-floor::after{content:'';position:absolute;bottom:0;width:100%;height:3px;
+    background:linear-gradient(90deg,rgba(255,60,30,.4),rgba(255,200,60,.7) 50%,rgba(30,100,255,.4));filter:blur(2px);box-shadow:0 0 30px rgba(255,200,60,.3)}
+/* 레이어 6: 스피드라인 */
+.title-speedlines{position:absolute;inset:0;overflow:hidden;opacity:0;pointer-events:none}
+.title-speedlines.show{animation:titleSpeedIn .6s ease-out forwards}
+@keyframes titleSpeedIn{0%{opacity:.6}100%{opacity:0}}
+.title-speedline{position:absolute;height:2px;background:linear-gradient(90deg,transparent,rgba(255,200,100,.5),transparent);animation:titleSpeedDash .4s linear forwards}
+@keyframes titleSpeedDash{0%{transform:scaleX(0);opacity:1}100%{transform:scaleX(1);opacity:0}}
 
-/* ===== 인트로 화면 ===== */
-.intro-bg{position:absolute;inset:0;background:linear-gradient(180deg,#0a0818,#1a1030)}
-.intro-panel{position:absolute;inset:60px;background:rgba(20,16,40,.9);border:2px solid rgba(255,200,100,.15);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;z-index:10;opacity:0;transition:opacity .8s}
-.intro-panel.show{opacity:1}
-.intro-counter{position:absolute;top:20px;right:30px;font-size:14px;color:rgba(255,200,100,.4);z-index:20}
-.intro-skip{position:absolute;bottom:20px;right:30px;font-size:13px;color:rgba(255,255,255,.3);cursor:pointer;z-index:20;padding:6px 16px;border:1px solid rgba(255,255,255,.1);border-radius:4px}
-.intro-skip:hover{color:#fff;border-color:rgba(255,255,255,.3)}
-.intro-title{font-family:'Black Han Sans',sans-serif;font-size:36px;color:var(--gold);margin-bottom:20px}
-.intro-img{width:500px;height:280px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;position:relative;overflow:hidden}
-.intro-desc{font-size:16px;color:#c0b8d8;text-align:center;line-height:1.8;min-height:50px}
+/* 텍스트 영역 - 초기 숨김, JS로 연출 */
+.title-text-area{position:absolute;top:30px;left:50%;transform:translateX(-50%);text-align:center;z-index:20;opacity:0;pointer-events:none}
+.title-text-area.show{opacity:1;pointer-events:auto}
+/* 타이틀 등장 연출 */
+.title-text-area.entrance{animation:titleSlam .5s cubic-bezier(.2,1,.3,1) forwards}
+@keyframes titleSlam{
+    0%{opacity:0;transform:translateX(-50%) translateY(-120px) scale(2.5)}
+    60%{opacity:1;transform:translateX(-50%) translateY(10px) scale(.95)}
+    80%{transform:translateX(-50%) translateY(-5px) scale(1.02)}
+    100%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+}
+.title-impact-flash{position:absolute;inset:0;background:rgba(255,220,100,.8);z-index:99;opacity:0;pointer-events:none}
+.title-impact-flash.show{animation:titleFlash .4s ease-out forwards}
+@keyframes titleFlash{0%{opacity:.9}100%{opacity:0}}
+.title-impact-ring{position:absolute;left:50%;top:120px;transform:translate(-50%,-50%);width:60px;height:60px;border:3px solid rgba(255,200,60,.6);border-radius:50%;opacity:0;pointer-events:none;z-index:21}
+.title-impact-ring.show{animation:titleRing .6s ease-out forwards}
+@keyframes titleRing{0%{opacity:1;width:60px;height:60px;border-width:3px}100%{opacity:0;width:600px;height:600px;border-width:1px}}
+
+.title-badge{display:inline-block;padding:5px 24px;background:linear-gradient(90deg,#ff4020,#ff8020);color:#fff;font-size:13px;font-weight:900;letter-spacing:4px;border-radius:20px;margin-bottom:10px;box-shadow:0 2px 16px rgba(255,64,32,.5);text-transform:uppercase}
+.title-name{font-family:'Black Han Sans',sans-serif;font-size:120px;line-height:1;position:relative;filter:drop-shadow(0 0 40px rgba(255,100,20,.3))}
+.title-name .shadow{position:absolute;left:0;top:0;color:#1a0000;transform:translate(6px,8px)}
+.title-name .stroke{position:absolute;left:0;top:0;-webkit-text-stroke:5px #c02000;color:transparent}
+.title-name .fill{position:relative;background:linear-gradient(180deg,#fff8a0,#ffc020 20%,#ff6010 50%,#d02000 75%,#800800);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.title-name .shine{position:absolute;left:0;top:0;background:linear-gradient(180deg,rgba(255,255,255,.9),transparent 30%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:titleShineMove 3s ease-in-out infinite}
+@keyframes titleShineMove{0%,100%{clip-path:inset(0 100% 0 0)}50%{clip-path:inset(0 0 0 0)}}
+.title-glow-bg{position:absolute;inset:-80px -160px;background:radial-gradient(ellipse,rgba(255,180,40,.25),transparent 55%);filter:blur(40px);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+.title-sub{margin-top:8px;font-size:20px;font-weight:900;letter-spacing:10px;color:rgba(255,200,100,.9);text-shadow:0 0 20px rgba(255,160,40,.5)}
+.title-vs-spark{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);font-family:'Black Han Sans',sans-serif;font-size:80px;color:transparent;
+    -webkit-text-stroke:2px rgba(255,200,60,.3);z-index:15;opacity:0;pointer-events:none}
+.title-vs-spark.show{animation:titleVsSpark 1.5s ease-out forwards}
+@keyframes titleVsSpark{0%{opacity:0;transform:translate(-50%,-50%) scale(3)}30%{opacity:.8;transform:translate(-50%,-50%) scale(1)}100%{opacity:.2;transform:translate(-50%,-50%) scale(1)}}
+
+/* PRESS START */
+.title-press{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);text-align:center;z-index:20;cursor:pointer;opacity:0;pointer-events:none}
+.title-press.show{opacity:1;pointer-events:auto;animation:titlePressIn .5s ease-out}
+@keyframes titlePressIn{0%{opacity:0;transform:translateX(-50%) translateY(20px)}100%{opacity:1;transform:translateX(-50%) translateY(0)}}
+.title-press-text{font-size:22px;font-weight:900;color:#ffe8c0;letter-spacing:8px;text-shadow:0 0 20px rgba(255,200,100,.5),0 0 60px rgba(255,160,40,.2);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* 펫 영역 - 슬라이드 인 */
+.title-pets{position:absolute;bottom:0;z-index:10;width:520px;height:420px;pointer-events:none}
+.title-pets.left{left:-20px}
+.title-pets.right{right:-20px}
+.title-pet-wrap{position:absolute;opacity:0;transform:translateX(0)}
+.title-pet-wrap.slide-in-l{animation:titlePetSlideL var(--dur,.6s) var(--delay,0s) cubic-bezier(.2,1,.3,1) forwards}
+.title-pet-wrap.slide-in-r{animation:titlePetSlideR var(--dur,.6s) var(--delay,0s) cubic-bezier(.2,1,.3,1) forwards}
+@keyframes titlePetSlideL{0%{opacity:0;transform:translateX(-300px) scale(.8)}70%{opacity:1;transform:translateX(20px) scale(1.02)}100%{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes titlePetSlideR{0%{opacity:0;transform:translateX(300px) scale(.8)}70%{opacity:1;transform:translateX(-20px) scale(1.02)}100%{opacity:1;transform:translateX(0) scale(1)}}
+.title-pet-svg{filter:drop-shadow(0 8px 25px rgba(0,0,0,.7))}
+/* 펫 idle 숨쉬기 */
+.title-pet-wrap.idle{animation:titlePetIdle 2.5s ease-in-out infinite}
+@keyframes titlePetIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+/* 리더 펫 더 크게 숨쉬기 */
+.title-pet-wrap.idle-leader{animation:titlePetIdleLeader 2.2s ease-in-out infinite}
+@keyframes titlePetIdleLeader{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.02)}}
+/* 펫 아래 그림자 */
+.title-pet-shadow{position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:80%;height:15px;background:radial-gradient(ellipse,rgba(0,0,0,.5),transparent 70%);border-radius:50%}
+
+/* ===== 인트로 씬 ===== */
+.intro-scene{position:absolute;inset:0;overflow:hidden;background:#000}
+/* 시네마틱 레터박스 */
+.intro-letterbox-top,.intro-letterbox-bot{position:absolute;left:0;width:100%;height:60px;background:#000;z-index:50;transition:height .6s}
+.intro-letterbox-top{top:0}
+.intro-letterbox-bot{bottom:0}
+/* 캔버스 배경 */
+.intro-canvas{position:absolute;inset:0;z-index:1}
+/* 컷 컨테이너 */
+.intro-cut{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;z-index:10;transition:opacity .6s;pointer-events:none}
+.intro-cut.active{opacity:1}
+/* 내레이션 텍스트 */
+.intro-narr{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);text-align:center;z-index:30;
+    font-size:20px;font-weight:700;color:#e0d8f0;letter-spacing:1px;line-height:1.8;
+    text-shadow:0 2px 20px rgba(0,0,0,.8);white-space:nowrap;opacity:0;transition:opacity .3s}
+.intro-narr.show{opacity:1}
+/* 건너뛰기 */
+.intro-skip{position:absolute;bottom:18px;right:30px;font-size:13px;color:rgba(255,255,255,.3);cursor:pointer;z-index:60;padding:6px 16px;border:1px solid rgba(255,255,255,.15);border-radius:4px;transition:all .2s}
+.intro-skip:hover{color:#fff;border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.05)}
+/* 플래시 */
+.intro-flash{position:absolute;inset:0;background:#fff;z-index:40;opacity:0;pointer-events:none}
+.intro-flash.show{animation:introFlash .5s ease-out forwards}
+@keyframes introFlash{0%{opacity:.9}100%{opacity:0}}
+/* CUT2: 속성 아이콘 */
+.intro-elem{position:absolute;font-size:60px;opacity:0;transform:scale(0);z-index:15;filter:drop-shadow(0 0 20px currentColor)}
+.intro-elem.pop{animation:introElemPop .5s cubic-bezier(.2,1.5,.4,1) forwards}
+@keyframes introElemPop{0%{opacity:0;transform:scale(0) rotate(-20deg)}60%{opacity:1;transform:scale(1.3) rotate(5deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+.intro-elem-ring{position:absolute;width:100px;height:100px;border-radius:50%;border:2px solid;opacity:0;z-index:14}
+.intro-elem-ring.expand{animation:introRingExpand .6s ease-out forwards}
+@keyframes introRingExpand{0%{opacity:.8;transform:scale(.5)}100%{opacity:0;transform:scale(2.5)}}
+/* CUT2: 실루엣 돌진 */
+.intro-sil{position:absolute;top:50%;z-index:16;opacity:0;filter:brightness(0) drop-shadow(0 0 30px rgba(255,200,60,.5))}
+.intro-sil.left{left:-200px;transform:translateY(-50%)}
+.intro-sil.right{right:-200px;transform:translateY(-50%) scaleX(-1)}
+.intro-sil.rush-l{animation:introRushL .4s cubic-bezier(.4,0,.2,1) forwards}
+.intro-sil.rush-r{animation:introRushR .4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes introRushL{0%{left:-200px;opacity:0}100%{left:440px;opacity:1}}
+@keyframes introRushR{0%{right:-200px;opacity:0}100%{right:440px;opacity:1}}
+/* CUT3: 투기장 */
+.intro-arena{position:absolute;bottom:-300px;left:50%;transform:translateX(-50%);z-index:12;opacity:0;transition:all 1.2s cubic-bezier(.2,1,.3,1)}
+.intro-arena.rise{bottom:80px;opacity:1}
+.intro-spotlight{position:absolute;top:0;width:200px;height:100%;z-index:13;opacity:0}
+.intro-spotlight.on{animation:introSpotlight 1s .5s ease-out forwards}
+@keyframes introSpotlight{0%{opacity:0}100%{opacity:.6}}
+/* CUT4: 펫 등장 */
+.intro-lineup{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;gap:16px;z-index:15}
+.intro-pet-reveal{opacity:0;transform:translateY(60px) scale(.8);transition:all .4s cubic-bezier(.2,1,.3,1);text-align:center}
+.intro-pet-reveal.show{opacity:1;transform:translateY(0) scale(1)}
+.intro-pet-reveal .pet-name{margin-top:8px;font-size:16px;font-weight:900;color:#ffe080;letter-spacing:2px;opacity:0;transition:opacity .3s .2s;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+.intro-pet-reveal.show .pet-name{opacity:1}
+.intro-pet-sil{filter:brightness(0) drop-shadow(0 0 20px rgba(255,200,60,.5));transition:filter .3s}
+.intro-pet-reveal.color .intro-pet-sil{filter:brightness(1) drop-shadow(0 0 20px rgba(255,200,60,.4))}
 
 /* ===== 캐릭터 선택 ===== */
 .select-bg{position:absolute;inset:0;background:linear-gradient(180deg,#0a0818,#14102a)}
@@ -67,6 +182,84 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 /* 상세 정보 영역 (상단~중앙) */
 .select-detail{position:absolute;top:60px;left:24px;right:24px;bottom:140px;display:flex;gap:16px;z-index:10}
 .select-portrait-big{width:400px;flex-shrink:0;border:2px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+/* ── 펫별 초상화 등장 연출 ── */
+/* 불곰: 왼쪽에서 주먹 돌진 → 쿵 착지 */
+.select-portrait-big .portrait-pet-1{animation:pEnter1 .55s cubic-bezier(.15,1.2,.35,1) both}
+@keyframes pEnter1{
+    0%{opacity:0;transform:translateX(-200px) scale(1.3) rotate(-10deg)}
+    45%{opacity:1;transform:translateX(20px) scale(1.1) rotate(3deg)}
+    70%{transform:translateX(-5px) scale(.95) rotate(-1deg)}
+    100%{opacity:1;transform:translateX(0) scale(1) rotate(0)}
+}
+/* 독수리왕: 위에서 급강하 → 날개 착지 */
+.select-portrait-big .portrait-pet-4{animation:pEnter4 .6s cubic-bezier(.2,1,.3,1) both}
+@keyframes pEnter4{
+    0%{opacity:0;transform:translateY(-250px) translateX(60px) scale(.7) rotate(15deg)}
+    50%{opacity:1;transform:translateY(15px) translateX(-5px) scale(1.1) rotate(-3deg)}
+    75%{transform:translateY(-8px) scale(.97) rotate(1deg)}
+    100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}
+}
+/* 그림자고양이: 투명→실체화 (깜빡+흔들림) */
+.select-portrait-big .portrait-pet-5{animation:pEnter5 .7s ease-out both}
+@keyframes pEnter5{
+    0%{opacity:0;transform:scale(1.1);filter:blur(8px) brightness(2)}
+    30%{opacity:.4;transform:scale(.98) translateX(8px);filter:blur(4px) brightness(1.5)}
+    50%{opacity:.2;transform:scale(1.02) translateX(-6px);filter:blur(6px) brightness(1.8)}
+    70%{opacity:.8;transform:scale(.99) translateX(3px);filter:blur(1px) brightness(1.1)}
+    100%{opacity:1;transform:scale(1) translateX(0);filter:blur(0) brightness(1)}
+}
+/* 철갑거북: 아래에서 땅 뚫고 올라옴 */
+.select-portrait-big .portrait-pet-6{animation:pEnter6 .6s cubic-bezier(.2,1.3,.35,1) both}
+@keyframes pEnter6{
+    0%{opacity:0;transform:translateY(200px) scale(.85)}
+    50%{opacity:1;transform:translateY(-20px) scale(1.05)}
+    75%{transform:translateY(8px) scale(.98)}
+    100%{opacity:1;transform:translateY(0) scale(1)}
+}
+/* 독사킹: 지그재그 사행 진입 */
+.select-portrait-big .portrait-pet-7{animation:pEnter7 .7s cubic-bezier(.25,1,.35,1) both}
+@keyframes pEnter7{
+    0%{opacity:0;transform:translateX(200px) translateY(0) scale(.9)}
+    15%{opacity:.5;transform:translateX(120px) translateY(-35px) rotate(-6deg) scale(.95)}
+    30%{opacity:.7;transform:translateX(60px) translateY(30px) rotate(5deg) scale(.98)}
+    45%{opacity:.85;transform:translateX(10px) translateY(-20px) rotate(-4deg) scale(1.02)}
+    60%{opacity:.95;transform:translateX(-15px) translateY(12px) rotate(3deg) scale(1.01)}
+    80%{transform:translateX(6px) translateY(-5px) rotate(-1deg) scale(.99)}
+    100%{opacity:1;transform:translateX(0) translateY(0) rotate(0) scale(1)}
+}
+/* 폭탄쥐: 폭탄 POP (클로즈업→축소 복귀) */
+.select-portrait-big .portrait-pet-8{animation:pEnter8 .65s cubic-bezier(.2,1,.3,1) both}
+@keyframes pEnter8{
+    0%{opacity:0;transform:scale(0.3)}
+    20%{opacity:1;transform:scale(2.8) translateY(15%)}
+    40%{transform:scale(2.5) translateY(12%)}
+    55%{transform:scale(1.1) translateY(0)}
+    70%{transform:scale(.92)}
+    85%{transform:scale(1.04)}
+    100%{opacity:1;transform:scale(1)}
+}
+/* 등장 후 idle 숨쉬기 */
+.select-portrait-big .portrait-idle{animation:portraitIdle 2.5s ease-in-out infinite}
+@keyframes portraitIdle{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.015)}}
+/* 착지 흔들림 (불곰/철갑거북) */
+@keyframes portraitShake{0%{transform:translateY(0)}20%{transform:translateY(4px)}40%{transform:translateY(-3px)}60%{transform:translateY(2px)}80%{transform:translateY(-1px)}100%{transform:translateY(0)}}
+/* 플래시 */
+.select-portrait-flash{position:absolute;inset:0;background:rgba(255,200,100,.2);opacity:0;pointer-events:none;z-index:5}
+.select-portrait-flash.show{animation:portraitFlash .4s ease-out forwards}
+@keyframes portraitFlash{0%{opacity:1}100%{opacity:0}}
+/* 임팩트 링 */
+.select-portrait-ring{position:absolute;top:50%;left:50%;width:40px;height:40px;border-radius:50%;border:2px solid rgba(255,200,100,.5);opacity:0;pointer-events:none;z-index:4;transform:translate(-50%,-50%)}
+.select-portrait-ring.show{animation:portraitRing .5s ease-out forwards}
+@keyframes portraitRing{0%{opacity:.8;width:40px;height:40px;border-width:3px}100%{opacity:0;width:350px;height:350px;border-width:1px}}
+/* 배경 오라 펄스 */
+.select-portrait-aura{position:absolute;inset:0;opacity:0;pointer-events:none;z-index:1;border-radius:8px}
+.select-portrait-aura.show{animation:portraitAura .7s ease-out forwards}
+@keyframes portraitAura{0%{opacity:.6;transform:scale(.85)}100%{opacity:0;transform:scale(1.15)}}
+/* 스피드라인 */
+.select-portrait-lines{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:3;opacity:0}
+.select-portrait-lines.show{animation:portraitLinesIn .4s ease-out forwards}
+@keyframes portraitLinesIn{0%{opacity:.7}100%{opacity:0}}
+.portrait-line{position:absolute;height:2px;background:linear-gradient(90deg,transparent,rgba(255,200,100,.6),transparent)}
 .select-empty-prompt{font-family:'Black Han Sans',sans-serif;font-size:20px;color:rgba(255,200,100,.4);letter-spacing:3px;text-align:center;animation:promptPulse 2s ease-in-out infinite}
 @keyframes promptPulse{0%,100%{opacity:.4}50%{opacity:.8}}
 .select-info{flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto;transition:opacity .3s ease-out}
@@ -199,36 +392,49 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 /* ============================================= */
 
 /* 배경 + 무대 */
-.battle-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,#1a1040,#0c0820 50%,#060410)}
-.battle-arena{position:absolute;bottom:0;width:100%;height:220px;background:linear-gradient(180deg,transparent 0%,rgba(20,10,50,.6) 30%,rgba(10,5,30,.9));border-top:2px solid rgba(255,200,100,.06)}
-/* 무대 바닥 라인 */
-.battle-arena::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,200,100,.15),rgba(255,100,50,.2),rgba(255,200,100,.15),transparent)}
-.battle-arena::after{content:'';position:absolute;top:40px;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,200,100,.04),transparent)}
+.battle-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,#1a1040,#0c0820 50%,#060410);transition:background 1s ease}
+.battle-stage-canvas{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.85}
+.battle-arena{position:absolute;bottom:0;width:100%;height:180px;background:linear-gradient(180deg,rgba(40,25,15,.0) 0%,rgba(50,30,18,.5) 20%,rgba(60,35,20,.8) 50%,rgba(45,28,15,.95));border-top:none}
+/* 무대 바닥 표면 */
+.battle-arena::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent 5%,rgba(120,80,40,.4) 20%,rgba(160,100,50,.5) 50%,rgba(120,80,40,.4) 80%,transparent 95%);filter:blur(1px)}
+.battle-arena::after{content:'';position:absolute;top:10px;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 0%,rgba(80,50,25,.3),transparent 70%);pointer-events:none}
 /* 에너지 기둥 배경 */
 .battle-energy-left{position:absolute;left:0;bottom:0;width:50%;height:100%;background:radial-gradient(ellipse at 25% 70%,rgba(255,40,20,.06),transparent 50%);pointer-events:none}
 .battle-energy-right{position:absolute;right:0;bottom:0;width:50%;height:100%;background:radial-gradient(ellipse at 75% 70%,rgba(20,80,255,.06),transparent 50%);pointer-events:none}
 /* 스캔라인 */
 .battle-scanlines{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:88}
 
-/* HUD 상단 */
-.battle-hud{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 20px;z-index:15;position:relative}
-.battle-hud-side{display:flex;flex-direction:column;gap:3px;width:480px}
+/* HUD 상단 - HP바 가운데 맞닿는 구조 */
+.battle-hud{display:flex;justify-content:center;align-items:center;padding:10px 20px;z-index:15;position:relative;gap:0}
+.battle-hud-side{display:flex;flex-direction:column;gap:4px;flex:1}
 .battle-hud-side.right{align-items:flex-end}
-.battle-pet-name{font-family:'Black Han Sans',sans-serif;font-size:22px;letter-spacing:1px;text-shadow:0 2px 8px rgba(0,0,0,.5)}
-/* HP 바 - 게임 스타일 */
-.battle-hp-bar{height:28px;background:linear-gradient(180deg,rgba(0,0,0,.7),rgba(0,0,0,.5));border-radius:4px;overflow:visible;border:2px solid rgba(255,255,255,.15);position:relative;width:100%;box-shadow:0 2px 8px rgba(0,0,0,.4),inset 0 1px 2px rgba(0,0,0,.6)}
-.battle-hp-bar::after{content:'';position:absolute;top:1px;left:2px;right:2px;height:4px;background:linear-gradient(180deg,rgba(255,255,255,.1),transparent);border-radius:2px;pointer-events:none}
-.battle-hp-fill{height:100%;border-radius:2px;transition:width .5s ease-out;overflow:hidden;position:relative}
+.battle-pet-name{font-family:'Black Han Sans',sans-serif;font-size:28px;letter-spacing:2px;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+/* HP 바 - 크게 */
+.battle-hp-bar{height:44px;background:linear-gradient(180deg,rgba(0,0,0,.7),rgba(0,0,0,.5));overflow:hidden;border:2px solid rgba(255,255,255,.15);position:relative;width:100%;box-shadow:0 2px 8px rgba(0,0,0,.4),inset 0 1px 2px rgba(0,0,0,.6)}
+.battle-hud-side.left .battle-hp-bar{border-radius:4px 0 0 4px;border-right:none}
+.battle-hud-side.right .battle-hp-bar{border-radius:0 4px 4px 0;border-left:none}
+.battle-hp-bar::after{content:'';position:absolute;top:1px;left:2px;right:2px;height:6px;background:linear-gradient(180deg,rgba(255,255,255,.1),transparent);border-radius:2px;pointer-events:none;z-index:4}
+/* 오른쪽(적): 게이지가 왼쪽에서 오른쪽으로 줄어듦 → direction:rtl */
+.battle-hud-side.right .battle-hp-bar{direction:rtl}
+.battle-hud-side.right .battle-hp-bar>*{direction:ltr}
+/* 잔상 게이지 (뒤쪽 레이어) */
+.battle-hp-trail{position:absolute;top:0;height:100%;transition:width .8s ease-out;z-index:1}
+.battle-hud-side.left .battle-hp-trail{left:0}
+.battle-hud-side.right .battle-hp-trail{right:0}
+.battle-hp-trail.red-trail{background:linear-gradient(180deg,#882020,#661515,#551010)}
+.battle-hp-trail.blue-trail{background:linear-gradient(180deg,#1a4080,#153060,#102050)}
+.battle-hp-fill{height:100%;border-radius:0;transition:width .5s ease-out;overflow:hidden;position:relative;z-index:2}
 .battle-hp-fill::after{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,.25),transparent);pointer-events:none}
 .battle-hp-fill.red{background:linear-gradient(180deg,#ff5040,#cc2020,#aa1818);box-shadow:0 0 12px rgba(255,40,20,.3)}
 .battle-hp-fill.blue{background:linear-gradient(180deg,#40a0ff,#2060cc,#1848aa);box-shadow:0 0 12px rgba(40,100,255,.3)}
 .battle-hp-fill.low{animation:hpLowPulse 0.5s ease-in-out infinite}
 @keyframes hpLowPulse{0%,100%{opacity:1}50%{opacity:.6}}
-.battle-hp-text{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:13px;font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.7);white-space:nowrap;z-index:3;letter-spacing:1px}
-.battle-vs{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-family:'Black Han Sans',sans-serif;font-size:32px;z-index:15;background:linear-gradient(180deg,rgba(255,220,100,.6),rgba(255,160,40,.3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+.battle-hp-text{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.7);white-space:nowrap;z-index:3;letter-spacing:1px}
+/* VS 뱃지 - HP바 중앙 접합부 */
+.battle-vs{font-family:'Black Han Sans',sans-serif;font-size:38px;z-index:20;color:#fff;text-shadow:0 0 15px rgba(255,200,100,.6),0 0 30px rgba(255,160,40,.3),0 2px 4px rgba(0,0,0,.8);letter-spacing:3px;line-height:1;align-self:flex-end;padding:0 4px;margin-bottom:2px}
 
 /* 중앙 필드 */
-.battle-field{position:absolute;top:80px;bottom:130px;left:0;right:0;z-index:5}
+.battle-field{position:absolute;top:80px;bottom:180px;left:0;right:0;z-index:5}
 .battle-pet{position:absolute;bottom:0;transition:all .3s;filter:drop-shadow(0 8px 20px rgba(0,0,0,.5))}
 .battle-pet.left{left:60px}
 .battle-pet.right{right:60px}
@@ -238,12 +444,18 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 /* 공격 이동 - 상대 쪽으로 돌진 */
 .battle-pet.move-center-l{left:700px !important;transition:left .3s cubic-bezier(.4,0,.2,1)}
 .battle-pet.move-center-r{right:700px !important;transition:right .3s cubic-bezier(.4,0,.2,1)}
+/* 무승부 - 가운데로 빠르게 돌진 */
+.battle-pet.draw-rush-l{left:420px !important;transition:left .2s cubic-bezier(.4,0,.2,1)}
+.battle-pet.draw-rush-r{right:420px !important;transition:right .2s cubic-bezier(.4,0,.2,1)}
+/* 무승부 - 튕겨나감 */
+.battle-pet.draw-bounce-l{left:0px !important;transition:left .4s cubic-bezier(.2,0,.6,1)}
+.battle-pet.draw-bounce-r{right:0px !important;transition:right .4s cubic-bezier(.2,0,.6,1)}
 /* 오라 이펙트 */
 .battle-pet-aura{position:absolute;inset:-20px;border-radius:50%;opacity:0;pointer-events:none;filter:blur(20px);transition:opacity .3s}
 .battle-pet-aura.active{opacity:.4;animation:auraPulse 1s ease-in-out infinite}
 @keyframes auraPulse{0%,100%{transform:scale(1);opacity:.3}50%{transform:scale(1.15);opacity:.5}}
-/* 바닥 그림자 */
-.battle-pet-shadow{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:120px;height:20px;background:radial-gradient(ellipse,rgba(0,0,0,.4),transparent);border-radius:50%;pointer-events:none}
+/* 바닥 그림자 (타원) */
+.battle-pet-shadow{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);width:200px;height:40px;background:radial-gradient(ellipse,rgba(0,0,0,.5) 0%,rgba(0,0,0,.2) 40%,transparent 70%);border-radius:50%;pointer-events:none}
 
 /* 하단 액션 버튼 */
 .battle-actions{position:absolute;bottom:14px;z-index:20;display:flex;gap:8px}
@@ -256,16 +468,16 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 .battle-action-btn.selected{border-color:var(--gold);background:linear-gradient(180deg,rgba(80,60,20,.9),rgba(40,30,10,.9));box-shadow:0 0 20px rgba(255,192,64,.4),inset 0 0 20px rgba(255,192,64,.1)}
 .battle-action-btn.disabled{opacity:.35;cursor:default;pointer-events:none;filter:grayscale(.5)}
 .battle-action-btn .icon{font-size:34px;margin-bottom:2px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))}
-.battle-action-btn .name{font-size:13px;font-weight:900;color:#e0d8f0;text-shadow:0 1px 2px rgba(0,0,0,.5);letter-spacing:1px}
-.battle-action-btn .dmg{font-size:11px;color:var(--gold);margin-top:2px;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.battle-action-btn .name{font-size:26px;font-weight:900;color:#e0d8f0;text-shadow:0 1px 2px rgba(0,0,0,.5);letter-spacing:1px}
+.battle-action-btn .dmg{font-size:22px;color:var(--gold);margin-top:2px;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 /* 시스템(적) 버튼 */
-.battle-sys-btn{width:128px;padding:10px 8px;border:2px solid rgba(80,130,255,.12);background:linear-gradient(180deg,rgba(10,12,30,.9),rgba(5,8,20,.9));border-radius:8px;text-align:center;opacity:.5;transition:all .12s;position:relative;overflow:hidden}
-.battle-sys-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(80,130,255,.15),transparent)}
-.battle-sys-btn.flash{animation:sysFlash .3s ease-out 3;border-color:rgba(100,160,255,.5)}
-@keyframes sysFlash{0%,100%{background:linear-gradient(180deg,rgba(10,12,30,.9),rgba(5,8,20,.9))}50%{background:linear-gradient(180deg,rgba(30,40,80,.9),rgba(15,20,50,.9))}}
+.battle-sys-btn{width:128px;padding:10px 8px;border:2px solid rgba(255,200,100,.08);background:linear-gradient(180deg,rgba(10,12,30,.9),rgba(5,8,20,.9));border-radius:8px;text-align:center;opacity:.5;transition:all .12s;position:relative;overflow:hidden}
+.battle-sys-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,200,100,.1),transparent)}
+.battle-sys-btn.flash{animation:sysFlash .3s ease-out 3;border-color:rgba(255,200,100,.3)}
+@keyframes sysFlash{0%,100%{background:linear-gradient(180deg,rgba(10,12,30,.9),rgba(5,8,20,.9))}50%{background:linear-gradient(180deg,rgba(50,40,20,.9),rgba(30,25,10,.9))}}
 .battle-sys-btn .icon{font-size:34px;margin-bottom:2px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))}
-.battle-sys-btn .name{font-size:13px;font-weight:900;color:#7080a0;letter-spacing:1px}
-.battle-sys-btn .dmg{font-size:11px;color:rgba(100,160,255,.4);margin-top:2px}
+.battle-sys-btn .name{font-size:26px;font-weight:900;color:#7080a0;letter-spacing:1px}
+.battle-sys-btn .dmg{font-size:22px;color:rgba(100,160,255,.4);margin-top:2px}
 
 /* 메시지 팝업 */
 .battle-msg{position:absolute;z-index:30;font-family:'Black Han Sans',sans-serif;pointer-events:none;opacity:0}
@@ -471,18 +683,14 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 @keyframes resultSpeedSpin{to{transform:rotate(360deg)}}
 
 /* 승리자 영역 (왼쪽 대형) */
-.result-winner-area{position:absolute;left:40px;top:50%;transform:translateY(-50%);z-index:10;width:400px;height:400px;display:flex;align-items:center;justify-content:center}
-.result-winner-pet{position:relative;z-index:2;
-    transform:translateX(-500px) scale(1.2);opacity:0;
-    animation:winnerSlideIn .6s cubic-bezier(.2,1,.3,1) .1s forwards}
-@keyframes winnerSlideIn{
-    0%{transform:translateX(-500px) scale(1.2);opacity:0}
-    60%{transform:translateX(30px) scale(1.02);opacity:1}
-    100%{transform:translateX(0) scale(1);opacity:1}
-}
+.result-winner-area{position:absolute;left:40px;top:50%;transform:translateY(-50%);z-index:10;width:400px;height:400px;display:flex;align-items:center;justify-content:center;transform-origin:center center}
+.result-winner-pet{position:relative;z-index:2}
 .result-winner-glow{position:absolute;inset:-80px;z-index:1;border-radius:50%;
     opacity:0;animation:glowPulse 2s ease-in-out .3s infinite}
 @keyframes glowPulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.6;transform:scale(1.1)}}
+/* 패배자 쓰러진 상태 */
+.result-loser-area{position:absolute;left:100px;bottom:60px;z-index:5;width:200px;height:200px;display:flex;align-items:center;justify-content:center;opacity:0;animation:loserAppear .5s ease-out .8s forwards}
+@keyframes loserAppear{to{opacity:1}}
 
 /* 오른쪽 텍스트 영역 */
 .result-text-area{position:absolute;right:80px;top:50%;transform:translateY(-50%);z-index:10;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
@@ -789,8 +997,7 @@ body{background:#000;overflow:hidden;height:100vh;display:flex;justify-content:c
 </head>
 <body>
 <div class="game" id="game">
-    <!-- 모든 화면은 JS로 동적 생성 -->
-    <div class="loading" id="loading">로딩 중...</div>
+<div class="loading" id="loading">로딩 중...</div>
 </div>
 <script>// data.js - 펫 데이터 시스템 (엑셀 테이블 호환 구조)
 //
@@ -815,6 +1022,7 @@ const _펫스키마 = {
     보대미지: 2,
     스킬1: 0,
     스킬2: 0,
+    스킬3: 0,
     배경스토리: ''
 };
 
@@ -823,25 +1031,31 @@ const _설정스키마 = {
     기본바위대미지: 2,
     기본가위대미지: 2,
     기본보대미지: 2,
-    시스템선택최소시간: 500,
-    시스템선택최대시간: 2000
+    시스템선택최소시간: 100,
+    시스템선택최대시간: 1000
 };
 
 // ===== 스킬 테이블 =====
 const _스킬테이블 = [
     // 패시브 (항상 적용)
-    { id: 1, 이름: '바위 더블', 종류: '패시브', 설명: '바위 승리 시 대미지 2배' },
-    { id: 2, 이름: '가위 더블', 종류: '패시브', 설명: '가위 승리 시 대미지 2배' },
-    { id: 3, 이름: '보 더블', 종류: '패시브', 설명: '보 승리 시 대미지 2배' },
-    { id: 4, 이름: '철벽', 종류: '패시브', 설명: '피격 시 받는 대미지 1 감소 (최소 1)' },
-    { id: 5, 이름: '흡혈', 종류: '패시브', 설명: '공격 성공 시 HP 2 회복' },
+    { id: 1, 이름: '바위 더블', 종류: '패시브', 설명: '바위 승리 시 60% 확률로 대미지 2배', 확률: 60 },
+    { id: 2, 이름: '가위 더블', 종류: '패시브', 설명: '가위 승리 시 60% 확률로 대미지 2배', 확률: 60 },
+    { id: 3, 이름: '보 더블', 종류: '패시브', 설명: '보 승리 시 60% 확률로 대미지 2배', 확률: 60 },
+    { id: 4, 이름: '철벽', 종류: '패시브', 설명: '피격 시 60% 확률로 대미지 1 감소 (최소 1)', 확률: 60 },
+    { id: 5, 이름: '흡혈', 종류: '패시브', 설명: '공격 성공 시 60% 확률로 HP 2 회복', 확률: 60 },
     // 액티브 (조건 + 확률)
     { id: 6, 이름: '좀비', 종류: '액티브', 설명: 'HP 0 시 60% 확률로 HP 3 부활 (1회)', 확률: 60, 회복량: 3 },
     { id: 7, 이름: '분노', 종류: '액티브', 설명: 'HP 30% 이하 시 60% 확률로 대미지 3배', 확률: 60, 배율: 3 },
     { id: 8, 이름: '연속타', 종류: '액티브', 설명: '공격 성공 시 35% 확률로 추가 2 대미지', 확률: 35, 대미지: 2 },
     { id: 9, 이름: '카운터', 종류: '액티브', 설명: '피격 시 40% 확률로 2 대미지 반격', 확률: 40, 대미지: 2 },
     { id: 10, 이름: '치유', 종류: '액티브', 설명: '라운드 시작 시 20% 확률로 HP 2 회복', 확률: 20, 회복량: 2 },
-    { id: 11, 이름: '폭주', 종류: '액티브', 설명: '공격 시 30% 확률로 대미지 3배', 확률: 30, 배율: 3 }
+    { id: 11, 이름: '폭주', 종류: '액티브', 설명: '공격 시 30% 확률로 대미지 3배', 확률: 30, 배율: 3 },
+    { id: 12, 이름: '불굴', 종류: '액티브', 설명: '피격 시 40% 확률로 HP 3 회복', 확률: 40, 회복량: 3 },
+    { id: 13, 이름: '급강하', 종류: '액티브', 설명: '공격 성공 시 30% 확률로 대미지 2배', 확률: 30, 배율: 2 },
+    { id: 14, 이름: '회피', 종류: '액티브', 설명: '피격 시 30% 확률로 대미지 완전 회피', 확률: 30 },
+    { id: 15, 이름: '반사', 종류: '액티브', 설명: '피격 시 25% 확률로 받은 대미지 반격', 확률: 25 },
+    { id: 16, 이름: '탈피', 종류: '액티브', 설명: '피격 시 35% 확률로 HP 2 회복', 확률: 35, 회복량: 2 },
+    { id: 17, 이름: '기습', 종류: '액티브', 설명: '라운드 시작 시 30% 확률로 선제 2 대미지', 확률: 30, 대미지: 2 }
 ];
 
 // ===== 속성별 시각 효과 =====
@@ -861,50 +1075,50 @@ const _펫원본데이터 = {
         "기본바위대미지": 2,
         "기본가위대미지": 2,
         "기본보대미지": 2,
-        "시스템선택최소시간": 500,
-        "시스템선택최대시간": 2000
+        "시스템선택최소시간": 100,
+        "시스템선택최대시간": 1000
     },
     "펫목록": [
         {
             "id": 1, "이름": "불곰", "종류": "곰", "속성": "불",
             "색상": "#e04030", "보조색상": "#ff8060", "배경색": "#3a1010",
-            "HP": 12, "바위대미지": 3, "가위대미지": 2, "보대미지": 2,
-            "스킬1": 1, "스킬2": 7,
+            "HP": 10, "바위대미지": 3, "가위대미지": 2, "보대미지": 2,
+            "스킬1": 1, "스킬2": 7, "스킬3": 12,
             "배경스토리": "화산 근처에서 태어난 불곰. 뜨거운 성격만큼 강력한 주먹을 자랑한다."
         },
         {
             "id": 4, "이름": "독수리왕", "종류": "독수리", "속성": "전기",
             "색상": "#a08030", "보조색상": "#d4b060", "배경색": "#1a1808",
-            "HP": 9, "바위대미지": 2, "가위대미지": 2, "보대미지": 3,
-            "스킬1": 3, "스킬2": 9,
+            "HP": 11, "바위대미지": 2, "가위대미지": 2, "보대미지": 3,
+            "스킬1": 3, "스킬2": 9, "스킬3": 13,
             "배경스토리": "하늘의 왕. 높은 곳에서 급강하하는 공격은 누구도 막을 수 없다."
         },
         {
             "id": 5, "이름": "그림자고양이", "종류": "고양이", "속성": "독",
             "색상": "#7040b0", "보조색상": "#a070e0", "배경색": "#180828",
-            "HP": 11, "바위대미지": 2, "가위대미지": 2, "보대미지": 2,
-            "스킬1": 5, "스킬2": 8,
+            "HP": 10, "바위대미지": 2, "가위대미지": 2, "보대미지": 2,
+            "스킬1": 5, "스킬2": 8, "스킬3": 14,
             "배경스토리": "어둠 속에서 나타나는 신비한 고양이. 날카로운 발톱이 무기다."
         },
         {
             "id": 6, "이름": "철갑거북", "종류": "거북", "속성": "금속",
             "색상": "#788090", "보조색상": "#a0b0c0", "배경색": "#101418",
             "HP": 11, "바위대미지": 2, "가위대미지": 2, "보대미지": 2,
-            "스킬1": 4, "스킬2": 10,
+            "스킬1": 4, "스킬2": 10, "스킬3": 15,
             "배경스토리": "단단한 등딱지를 가진 거북. 느리지만 한 방이 무겁다."
         },
         {
             "id": 7, "이름": "독사킹", "종류": "뱀", "속성": "독",
             "색상": "#40a060", "보조색상": "#70d090", "배경색": "#082010",
-            "HP": 9, "바위대미지": 2, "가위대미지": 3, "보대미지": 2,
-            "스킬1": 2, "스킬2": 6,
+            "HP": 10, "바위대미지": 2, "가위대미지": 3, "보대미지": 2,
+            "스킬1": 2, "스킬2": 6, "스킬3": 16,
             "배경스토리": "치명적인 독을 가진 뱀의 왕. 한 번 물리면 끝이다."
         },
         {
             "id": 8, "이름": "폭탄쥐", "종류": "쥐", "속성": "불",
             "색상": "#e0a020", "보조색상": "#ffe060", "배경색": "#2a1a08",
-            "HP": 5, "바위대미지": 1, "가위대미지": 4, "보대미지": 1,
-            "스킬1": 2, "스킬2": 11,
+            "HP": 8, "바위대미지": 2, "가위대미지": 4, "보대미지": 1,
+            "스킬1": 2, "스킬2": 11, "스킬3": 17,
             "배경스토리": "작은 몸에 폭발적인 공격력을 숨긴 도박꾼. 가위 한 방에 모든 걸 건다."
         }
     ]
@@ -977,14 +1191,14 @@ const 게임데이터 = {
         return _스킬테이블.find(s => s.id === id) || null;
     },
 
-    // 펫의 스킬 2개 가져오기
+    // 펫의 스킬 가져오기
     펫스킬(펫) {
-        return [this.스킬찾기(펫.스킬1), this.스킬찾기(펫.스킬2)].filter(Boolean);
+        return [this.스킬찾기(펫.스킬1), this.스킬찾기(펫.스킬2), this.스킬찾기(펫.스킬3)].filter(Boolean);
     },
 
     // 펫이 특정 스킬ID를 보유하는지
     스킬보유(펫, 스킬id) {
-        return 펫.스킬1 === 스킬id || 펫.스킬2 === 스킬id;
+        return 펫.스킬1 === 스킬id || 펫.스킬2 === 스킬id || 펫.스킬3 === 스킬id;
     },
 
     펫찾기(id) {
@@ -996,8 +1210,8 @@ const 게임데이터 = {
         return 후보[Math.floor(Math.random() * 후보.length)];
     }
 };
-</script>
-<script>// pet-renderer.js - SVG 펫 캐릭터 렌더러 (부위별 애니메이션 + 속성 이펙트)
+
+// pet-renderer.js - SVG 펫 캐릭터 렌더러 (부위별 애니메이션 + 속성 이펙트)
 let _렌더ID = 0; // SVG ID 충돌 방지용 카운터
 
 const 펫렌더러 = {
@@ -1393,63 +1607,63 @@ const 펫렌더러 = {
                 ${이펙트}
                 <!-- 꼬리 (길고 가는) -->
                 <g class="pet-tail" style="transform-box:fill-box;transform-origin:5% 50%">
-                    <path d="M60 180 Q30 170 20 145 Q15 130 25 120" fill="none" stroke="${색}" stroke-width="4" stroke-linecap="round" opacity=".7"/>
+                    <path d="M65 165 Q35 155 25 135 Q18 118 28 108" fill="none" stroke="${색}" stroke-width="4" stroke-linecap="round" opacity=".7"/>
                 </g>
                 <!-- 다리 -->
                 <g class="pet-leg">
-                    <ellipse cx="82" cy="192" rx="12" ry="7" fill="${색}"/>
-                    <ellipse cx="118" cy="192" rx="12" ry="7" fill="${색}"/>
+                    <ellipse cx="82" cy="178" rx="12" ry="7" fill="${색}"/>
+                    <ellipse cx="118" cy="178" rx="12" ry="7" fill="${색}"/>
                 </g>
-                <!-- 몸통 (작고 둥근) -->
+                <!-- 몸통 (머리에 붙어있게 위로) -->
                 <g class="pet-body" filter="url(#그림자${uid})">
-                    <ellipse cx="100" cy="168" rx="32" ry="28" fill="url(#몸g${uid})"/>
-                    <ellipse cx="100" cy="162" rx="20" ry="16" fill="${보조}" opacity=".12"/>
-                    <ellipse cx="100" cy="155" rx="22" ry="12" fill="url(#하이g${uid})"/>
+                    <ellipse cx="100" cy="155" rx="32" ry="30" fill="url(#몸g${uid})"/>
+                    <ellipse cx="100" cy="148" rx="20" ry="16" fill="${보조}" opacity=".12"/>
+                    <ellipse cx="100" cy="142" rx="22" ry="12" fill="url(#하이g${uid})"/>
                     <!-- 배 -->
-                    <ellipse cx="100" cy="174" rx="18" ry="14" fill="${보조}" opacity=".15"/>
+                    <ellipse cx="100" cy="162" rx="18" ry="14" fill="${보조}" opacity=".15"/>
                 </g>
                 <!-- 왼팔 (작고 짧은) -->
                 <g class="pet-arm-l" style="transform-box:fill-box;transform-origin:50% 15%">
-                    <ellipse cx="68" cy="162" rx="10" ry="16" fill="${색}" transform="rotate(-10,68,162)"/>
+                    <ellipse cx="68" cy="148" rx="10" ry="16" fill="${색}" transform="rotate(-10,68,148)"/>
                 </g>
                 <!-- 오른팔 -->
                 <g class="pet-arm-r" style="transform-box:fill-box;transform-origin:50% 15%">
-                    <ellipse cx="132" cy="162" rx="10" ry="16" fill="${색}" transform="rotate(10,132,162)"/>
+                    <ellipse cx="132" cy="148" rx="10" ry="16" fill="${색}" transform="rotate(10,132,148)"/>
                 </g>
-                <!-- 머리 (큰 머리 + 거대 귀) -->
+                <!-- 머리 (큰 머리 + 거대 귀, 몸에 붙임) -->
                 <g class="pet-head" style="transform-box:fill-box;transform-origin:50% 85%">
                     <!-- 귀 (크고 둥근) -->
-                    <ellipse cx="62" cy="50" rx="22" ry="28" fill="${색}" transform="rotate(-15,62,50)"/>
-                    <ellipse cx="62" cy="48" rx="14" ry="20" fill="${보조}" opacity=".2" transform="rotate(-15,62,48)"/>
-                    <ellipse cx="62" cy="46" rx="10" ry="14" fill="#ffa0a0" opacity=".3" transform="rotate(-15,62,46)"/>
-                    <ellipse cx="138" cy="50" rx="22" ry="28" fill="${색}" transform="rotate(15,138,50)"/>
-                    <ellipse cx="138" cy="48" rx="14" ry="20" fill="${보조}" opacity=".2" transform="rotate(15,138,48)"/>
-                    <ellipse cx="138" cy="46" rx="10" ry="14" fill="#ffa0a0" opacity=".3" transform="rotate(15,138,46)"/>
-                    <!-- 얼굴 -->
-                    <ellipse cx="100" cy="88" rx="32" ry="28" fill="url(#몸g${uid})" filter="url(#그림자${uid})"/>
-                    <ellipse cx="100" cy="78" rx="22" ry="14" fill="url(#하이g${uid})"/>
+                    <ellipse cx="62" cy="62" rx="22" ry="28" fill="${색}" transform="rotate(-15,62,62)"/>
+                    <ellipse cx="62" cy="60" rx="14" ry="20" fill="${보조}" opacity=".2" transform="rotate(-15,62,60)"/>
+                    <ellipse cx="62" cy="58" rx="10" ry="14" fill="#ffa0a0" opacity=".3" transform="rotate(-15,62,58)"/>
+                    <ellipse cx="138" cy="62" rx="22" ry="28" fill="${색}" transform="rotate(15,138,62)"/>
+                    <ellipse cx="138" cy="60" rx="14" ry="20" fill="${보조}" opacity=".2" transform="rotate(15,138,60)"/>
+                    <ellipse cx="138" cy="58" rx="10" ry="14" fill="#ffa0a0" opacity=".3" transform="rotate(15,138,58)"/>
+                    <!-- 얼굴 (몸통 위에 바로 얹힘) -->
+                    <ellipse cx="100" cy="100" rx="32" ry="28" fill="url(#몸g${uid})" filter="url(#그림자${uid})"/>
+                    <ellipse cx="100" cy="90" rx="22" ry="14" fill="url(#하이g${uid})"/>
                     <!-- 눈 (크고 빛나는 — 광기) -->
-                    <ellipse cx="86" cy="82" rx="10" ry="11" fill="#ffe860"/>
-                    <ellipse cx="114" cy="82" rx="10" ry="11" fill="#ffe860"/>
-                    <ellipse cx="86" cy="82" rx="4" ry="5" fill="#1a1020"/>
-                    <ellipse cx="114" cy="82" rx="4" ry="5" fill="#1a1020"/>
-                    <circle cx="84" cy="79" r="3" fill="#fff" opacity=".8"/>
-                    <circle cx="112" cy="79" r="3" fill="#fff" opacity=".8"/>
+                    <ellipse cx="86" cy="94" rx="10" ry="11" fill="#ffe860"/>
+                    <ellipse cx="114" cy="94" rx="10" ry="11" fill="#ffe860"/>
+                    <ellipse cx="86" cy="94" rx="4" ry="5" fill="#1a1020"/>
+                    <ellipse cx="114" cy="94" rx="4" ry="5" fill="#1a1020"/>
+                    <circle cx="84" cy="91" r="3" fill="#fff" opacity=".8"/>
+                    <circle cx="112" cy="91" r="3" fill="#fff" opacity=".8"/>
                     <!-- 눈 글로우 (광기 효과) -->
-                    <ellipse cx="86" cy="82" rx="12" ry="13" fill="#ffe860" opacity=".15" filter="url(#눈빛${uid})"/>
-                    <ellipse cx="114" cy="82" rx="12" ry="13" fill="#ffe860" opacity=".15" filter="url(#눈빛${uid})"/>
+                    <ellipse cx="86" cy="94" rx="12" ry="13" fill="#ffe860" opacity=".15" filter="url(#눈빛${uid})"/>
+                    <ellipse cx="114" cy="94" rx="12" ry="13" fill="#ffe860" opacity=".15" filter="url(#눈빛${uid})"/>
                     <!-- 코 -->
-                    <ellipse cx="100" cy="94" rx="5" ry="3.5" fill="#ff8080"/>
+                    <ellipse cx="100" cy="106" rx="5" ry="3.5" fill="#ff8080"/>
                     <!-- 수염 -->
-                    <line x1="60" y1="90" x2="82" y2="92" stroke="${보조}" stroke-width="1" opacity=".4"/>
-                    <line x1="58" y1="96" x2="82" y2="95" stroke="${보조}" stroke-width="1" opacity=".4"/>
-                    <line x1="118" y1="92" x2="140" y2="90" stroke="${보조}" stroke-width="1" opacity=".4"/>
-                    <line x1="118" y1="95" x2="142" y2="96" stroke="${보조}" stroke-width="1" opacity=".4"/>
+                    <line x1="60" y1="102" x2="82" y2="104" stroke="${보조}" stroke-width="1" opacity=".4"/>
+                    <line x1="58" y1="108" x2="82" y2="107" stroke="${보조}" stroke-width="1" opacity=".4"/>
+                    <line x1="118" y1="104" x2="140" y2="102" stroke="${보조}" stroke-width="1" opacity=".4"/>
+                    <line x1="118" y1="107" x2="142" y2="108" stroke="${보조}" stroke-width="1" opacity=".4"/>
                     <!-- 이빨 (앞니 2개 — 설치류 특징) -->
-                    <rect x="95" y="100" width="4" height="7" rx="1" fill="#ffe8e0"/>
-                    <rect x="101" y="100" width="4" height="7" rx="1" fill="#ffe8e0"/>
+                    <rect x="95" y="112" width="4" height="7" rx="1" fill="#ffe8e0"/>
+                    <rect x="101" y="112" width="4" height="7" rx="1" fill="#ffe8e0"/>
                     <!-- 입 -->
-                    <path d="M94 100 Q100 104 106 100" fill="none" stroke="#1a1020" stroke-width="1.5"/>
+                    <path d="M94 112 Q100 116 106 112" fill="none" stroke="#1a1020" stroke-width="1.5"/>
                 </g>`;
         },
 
@@ -1528,8 +1742,8 @@ const 펫렌더러 = {
         return this.그리기(펫, 180, 반전);
     }
 };
-</script>
-<script>// screens.js - 화면 렌더링
+
+// screens.js - 화면 렌더링
 const 화면 = {
 
     // ===== 타이틀 화면 =====
@@ -1540,13 +1754,17 @@ const 화면 = {
         div.style.cursor = 'pointer';
         div.innerHTML = `
             <div class="title-bg"></div>
+            <div class="title-nebula"></div>
             <div class="title-burst"></div>
             <div class="title-glow-l"></div>
             <div class="title-glow-r"></div>
+            <div class="title-clash"></div>
             <div class="title-floor"></div>
+            <div class="title-speedlines" id="타이틀스피드라인"></div>
             <div class="title-pets left" id="타이틀왼쪽펫"></div>
             <div class="title-pets right" id="타이틀오른쪽펫"></div>
-            <div class="title-text-area">
+            <div class="title-vs-spark" id="타이틀VS">VS</div>
+            <div class="title-text-area" id="타이틀텍스트">
                 <div class="title-glow-bg"></div>
                 <div class="title-badge">대전 격투 액션</div>
                 <div class="title-name">
@@ -1557,6 +1775,8 @@ const 화면 = {
                 </div>
                 <div class="title-sub">PET FIGHTING</div>
             </div>
+            <div class="title-impact-flash" id="타이틀임팩트"></div>
+            <div class="title-impact-ring" id="타이틀링"></div>
             <div class="title-press" id="타이틀시작">
                 <div class="title-press-text">PRESS START</div>
             </div>
@@ -1572,17 +1792,17 @@ const 화면 = {
         const 오른쪽 = document.getElementById('타이틀오른쪽펫');
         if (!왼쪽 || !오른쪽) return;
 
-        // 왼쪽팀: 불곰(리더 크게), 독사킹, 폭탄쥐 - 전투 크기(320) 기준
+        // V자 대형: 리더가 앞쪽 중앙, 나머지가 뒤쪽에 펼쳐짐
+        // 리더는 기울임(transform)으로 돌진 자세
         const 왼쪽팀 = [
-            { id: 1, 크기: 320, x: 80, y: 0, z: 2 },    // 불곰 - 앞쪽 중심
-            { id: 7, 크기: 220, x: -60, y: 20, z: 1 },   // 독사킹 - 뒤쪽 왼편
-            { id: 8, 크기: 200, x: 280, y: 30, z: 1 },   // 폭탄쥐 - 뒤쪽 오른편
+            { id: 1, 크기: 340, x: 140, y: 10, z: 3, 리더: true, 딜레이: 0.6 },   // 불곰 - 앞쪽
+            { id: 7, 크기: 230, x: -20, y: 50, z: 2, 리더: false, 딜레이: 0.9 },  // 독사킹 - 뒤 왼쪽
+            { id: 8, 크기: 200, x: 320, y: 60, z: 1, 리더: false, 딜레이: 1.1 },  // 폭탄쥐 - 뒤 오른쪽
         ];
-        // 오른쪽팀: 독수리왕(리더 크게), 그림자고양이, 철갑거북(뒤에 작게)
         const 오른쪽팀 = [
-            { id: 4, 크기: 320, x: 80, y: 0, z: 3 },     // 독수리왕 - 앞쪽 중심
-            { id: 5, 크기: 220, x: -60, y: 10, z: 2 },   // 그림자고양이 - 뒤쪽 왼편
-            { id: 6, 크기: 200, x: 280, y: 30, z: 1 },   // 철갑거북 - 뒤쪽 오른편
+            { id: 4, 크기: 340, x: 140, y: 10, z: 3, 리더: true, 딜레이: 0.7 },   // 독수리왕 - 앞쪽
+            { id: 5, 크기: 230, x: -20, y: 40, z: 2, 리더: false, 딜레이: 1.0 },  // 그림자고양이 - 뒤 왼쪽
+            { id: 6, 크기: 200, x: 320, y: 60, z: 1, 리더: false, 딜레이: 1.2 },  // 철갑거북 - 뒤 오른쪽
         ];
 
         왼쪽.innerHTML = '';
@@ -1591,26 +1811,126 @@ const 화면 = {
         왼쪽팀.forEach(cfg => {
             const 펫 = 게임데이터.펫찾기(cfg.id);
             if (!펫) return;
+            const wrap = document.createElement('div');
+            wrap.className = 'title-pet-wrap';
+            wrap.style.position = 'absolute';
+            wrap.style.bottom = cfg.y + 'px';
+            wrap.style.left = cfg.x + 'px';
+            wrap.style.zIndex = cfg.z;
+            wrap.style.setProperty('--delay', cfg.딜레이 + 's');
+            wrap.style.setProperty('--dur', cfg.리더 ? '.7s' : '.5s');
+            // 리더는 앞으로 살짝 기울임 (돌진 느낌)
+            if (cfg.리더) wrap.style.transform = 'rotate(3deg)';
+
             const el = 펫렌더러.그리기(펫, cfg.크기, false);
             el.classList.add('title-pet-svg');
-            el.style.position = 'absolute';
-            el.style.bottom = cfg.y + 'px';
-            el.style.left = cfg.x + 'px';
-            el.style.zIndex = cfg.z;
-            왼쪽.appendChild(el);
+            wrap.appendChild(el);
+            // 바닥 그림자
+            const shadow = document.createElement('div');
+            shadow.className = 'title-pet-shadow';
+            wrap.appendChild(shadow);
+            왼쪽.appendChild(wrap);
         });
 
         오른쪽팀.forEach(cfg => {
             const 펫 = 게임데이터.펫찾기(cfg.id);
             if (!펫) return;
+            const wrap = document.createElement('div');
+            wrap.className = 'title-pet-wrap';
+            wrap.style.position = 'absolute';
+            wrap.style.bottom = cfg.y + 'px';
+            wrap.style.right = cfg.x + 'px';
+            wrap.style.zIndex = cfg.z;
+            wrap.style.setProperty('--delay', cfg.딜레이 + 's');
+            wrap.style.setProperty('--dur', cfg.리더 ? '.7s' : '.5s');
+            if (cfg.리더) wrap.style.transform = 'rotate(-3deg)';
+
             const el = 펫렌더러.그리기(펫, cfg.크기, true);
             el.classList.add('title-pet-svg');
-            el.style.position = 'absolute';
-            el.style.bottom = cfg.y + 'px';
-            el.style.right = cfg.x + 'px';
-            el.style.zIndex = cfg.z;
-            오른쪽.appendChild(el);
+            wrap.appendChild(el);
+            const shadow = document.createElement('div');
+            shadow.className = 'title-pet-shadow';
+            wrap.appendChild(shadow);
+            오른쪽.appendChild(wrap);
         });
+    },
+
+    // 타이틀 입장 연출 시퀀스
+    async 타이틀연출시작() {
+        const 텍스트 = document.getElementById('타이틀텍스트');
+        const 임팩트 = document.getElementById('타이틀임팩트');
+        const 링 = document.getElementById('타이틀링');
+        const 프레스 = document.getElementById('타이틀시작');
+        const vs = document.getElementById('타이틀VS');
+        const 왼쪽펫들 = document.querySelectorAll('#타이틀왼쪽펫 .title-pet-wrap');
+        const 오른쪽펫들 = document.querySelectorAll('#타이틀오른쪽펫 .title-pet-wrap');
+
+        // 초기화
+        텍스트.classList.remove('show', 'entrance');
+        프레스.classList.remove('show');
+        vs.classList.remove('show');
+        임팩트.classList.remove('show');
+        링.classList.remove('show');
+        왼쪽펫들.forEach(el => { el.classList.remove('slide-in-l', 'idle', 'idle-leader'); el.style.opacity = '0'; });
+        오른쪽펫들.forEach(el => { el.classList.remove('slide-in-r', 'idle', 'idle-leader'); el.style.opacity = '0'; });
+
+        // 0.3초 대기 (배경만 보임)
+        await new Promise(r => setTimeout(r, 300));
+
+        // 1) 타이틀 슬램 등장 + 임팩트 플래시
+        텍스트.classList.add('show', 'entrance');
+        setTimeout(() => {
+            임팩트.classList.add('show');
+            링.classList.add('show');
+            // 스피드라인 생성
+            this._타이틀스피드라인();
+        }, 350);
+
+        // 2) 펫들 시차 슬라이드 (타이틀 0.6초 후부터)
+        왼쪽펫들.forEach((el, i) => {
+            el.classList.add('slide-in-l');
+        });
+        오른쪽펫들.forEach((el, i) => {
+            el.classList.add('slide-in-r');
+        });
+
+        // 3) VS 등장 (1.2초 후)
+        setTimeout(() => vs.classList.add('show'), 1200);
+
+        // 4) 모든 펫 등장 완료 후 idle 시작 + PRESS START (1.8초 후)
+        setTimeout(() => {
+            왼쪽펫들.forEach((el, i) => {
+                el.style.opacity = '1';
+                el.classList.remove('slide-in-l');
+                el.classList.add(i === 0 ? 'idle-leader' : 'idle');
+                el.style.animationDelay = (i * 0.3) + 's';
+            });
+            오른쪽펫들.forEach((el, i) => {
+                el.style.opacity = '1';
+                el.classList.remove('slide-in-r');
+                el.classList.add(i === 0 ? 'idle-leader' : 'idle');
+                el.style.animationDelay = (i * 0.3 + 0.15) + 's';
+            });
+            프레스.classList.add('show');
+        }, 1800);
+    },
+
+    _타이틀스피드라인() {
+        const container = document.getElementById('타이틀스피드라인');
+        if (!container) return;
+        container.innerHTML = '';
+        container.classList.remove('show');
+        void container.offsetWidth;
+        container.classList.add('show');
+        for (let i = 0; i < 20; i++) {
+            const line = document.createElement('div');
+            line.className = 'title-speedline';
+            line.style.top = (Math.random() * 720) + 'px';
+            line.style.left = (Math.random() * 400 + 440) + 'px';
+            line.style.width = (Math.random() * 200 + 100) + 'px';
+            line.style.animationDelay = (Math.random() * 0.2) + 's';
+            container.appendChild(line);
+        }
     },
 
     타이틀파티클시작() {
@@ -1621,15 +1941,34 @@ const 화면 = {
         canvas.height = 720;
 
         const 입자들 = [];
-        for (let i = 0; i < 60; i++) {
+        // 불꽃 파티클 (위로 올라감)
+        for (let i = 0; i < 40; i++) {
             입자들.push({
-                x: Math.random() * 1280,
-                y: Math.random() * 720,
-                vx: (Math.random() - 0.5) * 0.5,
-                vy: -Math.random() * 1.5 - 0.3,
-                크기: Math.random() * 3 + 1,
-                투명: Math.random() * 0.5 + 0.1,
-                색: ['#ff6030', '#ffc040', '#ff4020', '#3080ff', '#a060e0'][Math.floor(Math.random() * 5)]
+                x: Math.random() * 1280, y: Math.random() * 720,
+                vx: (Math.random() - 0.5) * 0.3, vy: -Math.random() * 1.2 - 0.3,
+                크기: Math.random() * 2.5 + 0.5, 투명: Math.random() * 0.4 + 0.1,
+                색: ['#ff6030', '#ffc040', '#ff4020'][Math.floor(Math.random() * 3)],
+                타입: 'fire'
+            });
+        }
+        // 먼지 파티클 (바닥에서 천천히)
+        for (let i = 0; i < 20; i++) {
+            입자들.push({
+                x: Math.random() * 1280, y: 600 + Math.random() * 120,
+                vx: (Math.random() - 0.5) * 0.8, vy: -Math.random() * 0.5 - 0.1,
+                크기: Math.random() * 2 + 1, 투명: Math.random() * 0.15 + 0.05,
+                색: '#c0a060', 타입: 'dust'
+            });
+        }
+        // 에너지 스파크 (빠르게 흩날림)
+        for (let i = 0; i < 15; i++) {
+            const 쪽 = Math.random() < 0.5 ? -1 : 1;
+            입자들.push({
+                x: 640 + 쪽 * (Math.random() * 100), y: 300 + Math.random() * 200,
+                vx: 쪽 * (Math.random() * 2 + 1), vy: (Math.random() - 0.5) * 2,
+                크기: Math.random() * 1.5 + 0.5, 투명: Math.random() * 0.6 + 0.2,
+                색: ['#ffc040', '#fff', '#80c0ff'][Math.floor(Math.random() * 3)],
+                타입: 'spark', 수명: Math.random()
             });
         }
 
@@ -1638,7 +1977,22 @@ const 화면 = {
             입자들.forEach(p => {
                 p.x += p.vx;
                 p.y += p.vy;
-                if (p.y < -10) { p.y = 730; p.x = Math.random() * 1280; }
+                if (p.타입 === 'fire') {
+                    if (p.y < -10) { p.y = 730; p.x = Math.random() * 1280; }
+                } else if (p.타입 === 'dust') {
+                    if (p.y < 550) { p.y = 650 + Math.random() * 70; p.x = Math.random() * 1280; }
+                } else if (p.타입 === 'spark') {
+                    p.수명 -= 0.008;
+                    if (p.수명 <= 0) {
+                        const 쪽 = Math.random() < 0.5 ? -1 : 1;
+                        p.x = 640 + 쪽 * (Math.random() * 100);
+                        p.y = 300 + Math.random() * 200;
+                        p.vx = 쪽 * (Math.random() * 2 + 1);
+                        p.vy = (Math.random() - 0.5) * 2;
+                        p.수명 = Math.random();
+                    }
+                    p.투명 = p.수명 * 0.6;
+                }
                 if (p.x < -10) p.x = 1290;
                 if (p.x > 1290) p.x = -10;
                 ctx.globalAlpha = p.투명;
@@ -1655,81 +2009,209 @@ const 화면 = {
         그리기();
     },
 
-    // ===== 인트로 화면 =====
+    // ===== 인트로 씬 =====
     인트로생성() {
         const div = document.createElement('div');
         div.className = 'screen';
         div.id = '인트로화면';
         div.innerHTML = `
-            <div class="intro-bg"></div>
-            <div class="intro-counter" id="인트로카운터"></div>
-            <div class="intro-skip" id="인트로스킵">건너뛰기 ▶</div>
-            <div class="intro-panel" id="인트로패널">
-                <div class="intro-title" id="인트로제목"></div>
-                <div class="intro-img" id="인트로이미지"></div>
-                <div class="intro-desc" id="인트로설명"></div>
+            <div class="intro-scene">
+                <div class="intro-letterbox-top"></div>
+                <div class="intro-letterbox-bot"></div>
+                <canvas class="intro-canvas" id="인트로캔버스" width="1280" height="720"></canvas>
+                <div class="intro-cut" id="인트로컷1"></div>
+                <div class="intro-cut" id="인트로컷2"></div>
+                <div class="intro-cut" id="인트로컷3"></div>
+                <div class="intro-cut" id="인트로컷4"></div>
+                <div class="intro-narr" id="인트로내레이션"></div>
+                <div class="intro-flash" id="인트로플래시"></div>
+                <div class="intro-skip" id="인트로스킵">건너뛰기 ▶</div>
             </div>
-            <div class="vignette"></div>
         `;
         return div;
     },
 
     인트로표시(펫목록, 콜백) {
-        const 패널 = document.getElementById('인트로패널');
-        const 제목 = document.getElementById('인트로제목');
-        const 이미지 = document.getElementById('인트로이미지');
-        const 설명 = document.getElementById('인트로설명');
-        const 카운터 = document.getElementById('인트로카운터');
-        const 스킵 = document.getElementById('인트로스킵');
-        let 현재 = 0;
+        let 중단됨 = false;
+        let 애니프레임 = null;
+        let 현재컷 = 0;
+        let 컷스킵 = null; // 현재 컷의 resolve 함수
 
-        const 보여주기 = () => {
-            if (현재 >= 펫목록.length) {
-                콜백();
-                return;
+        const 플래시 = () => { const el = document.getElementById('인트로플래시'); el.classList.remove('show'); void el.offsetWidth; el.classList.add('show'); };
+        const 내레이션 = (텍스트) => {
+            const el = document.getElementById('인트로내레이션');
+            el.classList.remove('show');
+            el.textContent = 텍스트;
+            setTimeout(() => el.classList.add('show'), 50);
+        };
+        const 내레이션숨김 = () => { document.getElementById('인트로내레이션').classList.remove('show'); };
+        const 컷전환 = (번호) => {
+            현재컷 = 번호;
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById('인트로컷' + i);
+                if (el) { el.classList.toggle('active', i === 번호); if (i !== 번호) el.innerHTML = ''; }
             }
-            const 펫 = 펫목록[현재];
-            패널.classList.remove('show');
+            내레이션숨김();
+        };
+        // 컷이 끝날 때까지 대기 (클릭하면 즉시 resolve)
+        const 컷대기 = () => new Promise(r => { 컷스킵 = r; });
 
+        // 캔버스 배경
+        const canvas = document.getElementById('인트로캔버스');
+        const ctx = canvas.getContext('2d');
+        const 별들 = [];
+        for (let i = 0; i < 120; i++) {
+            별들.push({ x: Math.random() * 1280, y: Math.random() * 720, 크기: Math.random() * 2 + 0.5,
+                밝기: Math.random(), 속도: Math.random() * 0.01 + 0.003, 위상: Math.random() * Math.PI * 2 });
+        }
+        let 배경밝기 = 0;
+        let 프레임 = 0;
+        const 캔버스그리기 = () => {
+            프레임++;
+            ctx.fillStyle = 'rgba(4,2,8,1)';
+            ctx.fillRect(0, 0, 1280, 720);
+            별들.forEach(s => {
+                ctx.globalAlpha = Math.min(1, s.밝기 * (Math.sin(프레임 * s.속도 + s.위상) * 0.4 + 0.6) * 배경밝기);
+                ctx.fillStyle = '#fff';
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.크기, 0, Math.PI * 2); ctx.fill();
+            });
+            ctx.globalAlpha = 배경밝기 * 0.15;
+            const grd = ctx.createRadialGradient(640, 360, 0, 640, 360, 500);
+            grd.addColorStop(0, '#2a1860'); grd.addColorStop(1, 'transparent');
+            ctx.fillStyle = grd; ctx.fillRect(0, 0, 1280, 720);
+            ctx.globalAlpha = 1;
+            if (!중단됨) 애니프레임 = requestAnimationFrame(캔버스그리기);
+        };
+        캔버스그리기();
+
+        // 화면 클릭 → 다음 컷
+        const 화면 = document.getElementById('인트로화면');
+        const 클릭핸들러 = (e) => {
+            if (e.target.closest('.intro-skip')) return; // 건너뛰기 버튼 제외
+            if (컷스킵) { const fn = 컷스킵; 컷스킵 = null; fn(); }
+        };
+        화면.addEventListener('click', 클릭핸들러);
+
+        // 건너뛰기 (전체 스킵)
+        document.getElementById('인트로스킵').onclick = () => { 중단됨 = true; 콜백(); };
+
+        // === 각 컷을 함수로 분리 ===
+        const 컷1 = async () => {
+            컷전환(1);
+            배경밝기 = 0;
+            const 밝기업 = setInterval(() => { 배경밝기 = Math.min(1, 배경밝기 + 0.02); }, 50);
+            setTimeout(() => 내레이션('오래전부터... 이 세계의 동물들에게는 특별한 힘이 깃들어 있었다'), 500);
+            await 컷대기(); // 자동 or 클릭
+            clearInterval(밝기업); 배경밝기 = 1;
+        };
+        // CUT1 자동 진행 (3.5초)
+        const 컷1자동 = () => setTimeout(() => { if (현재컷 === 1 && 컷스킵) 컷스킵(); }, 3500);
+
+        const 컷2 = async () => {
+            컷전환(2);
+            const 컷el = document.getElementById('인트로컷2');
+            내레이션('불, 전기, 금속, 독... 서로 다른 힘은 충돌을 부른다');
+            // 속성 아이콘 한꺼번에 빠르게
+            const 속성들 = [
+                { 글자: '🔥', 색: '#ff4020', x: 320, y: 280 },
+                { 글자: '⚡', 색: '#40a0ff', x: 540, y: 240 },
+                { 글자: '⚙️', 색: '#c0a030', x: 740, y: 280 },
+                { 글자: '☠️', 색: '#50b060', x: 960, y: 240 },
+            ];
+            속성들.forEach((a, i) => {
+                setTimeout(() => {
+                    if (현재컷 !== 2) return;
+                    const el = document.createElement('div');
+                    el.className = 'intro-elem';
+                    el.textContent = a.글자; el.style.left = a.x + 'px'; el.style.top = a.y + 'px'; el.style.color = a.색;
+                    컷el.appendChild(el);
+                    const ring = document.createElement('div');
+                    ring.className = 'intro-elem-ring';
+                    ring.style.left = (a.x - 20) + 'px'; ring.style.top = (a.y - 20) + 'px'; ring.style.borderColor = a.색;
+                    컷el.appendChild(ring);
+                    requestAnimationFrame(() => { el.classList.add('pop'); ring.classList.add('expand'); });
+                    플래시();
+                }, i * 400);
+            });
+            // 실루엣 돌진 (1.8초 후)
             setTimeout(() => {
-                제목.textContent = 펫.이름;
-                제목.style.color = 펫.색상;
-                이미지.innerHTML = '';
-                이미지.style.background = `radial-gradient(ellipse, ${펫.배경색}, #0a0818)`;
-                이미지.appendChild(펫렌더러.그리기(펫, 200));
-                설명.textContent = 펫.배경스토리;
-                카운터.textContent = `${현재 + 1} / ${펫목록.length}`;
-                패널.classList.add('show');
-                현재++;
-            }, 300);
+                if (현재컷 !== 2) return;
+                const 왼 = document.createElement('div'); 왼.className = 'intro-sil left';
+                왼.appendChild(펫렌더러.그리기(펫목록[0], 250, false)); 컷el.appendChild(왼);
+                const 오 = document.createElement('div'); 오.className = 'intro-sil right';
+                오.appendChild(펫렌더러.그리기(펫목록[1], 250, false)); 컷el.appendChild(오);
+                requestAnimationFrame(() => { 왼.classList.add('rush-l'); 오.classList.add('rush-r'); });
+                setTimeout(() => { if (현재컷 === 2) 플래시(); }, 400);
+            }, 1800);
+            await 컷대기();
         };
+        const 컷2자동 = () => setTimeout(() => { if (현재컷 === 2 && 컷스킵) 컷스킵(); }, 3500);
 
-        // 클릭으로 다음
-        const 클릭핸들러 = () => {
-            보여주기();
+        const 컷3 = async () => {
+            컷전환(3); 배경밝기 = 0.3;
+            const 컷el = document.getElementById('인트로컷3');
+            const arena = document.createElement('div'); arena.className = 'intro-arena';
+            arena.innerHTML = `<svg width="500" height="200" viewBox="0 0 500 200">
+                <ellipse cx="250" cy="160" rx="240" ry="40" fill="none" stroke="rgba(255,200,100,.4)" stroke-width="2"/>
+                <ellipse cx="250" cy="160" rx="200" ry="30" fill="none" stroke="rgba(255,200,100,.2)" stroke-width="1"/>
+                <rect x="50" y="80" width="400" height="80" rx="8" fill="rgba(40,20,10,.6)" stroke="rgba(255,160,40,.3)" stroke-width="1"/>
+                <line x1="50" y1="80" x2="10" y2="40" stroke="rgba(255,160,40,.2)" stroke-width="1"/>
+                <line x1="450" y1="80" x2="490" y2="40" stroke="rgba(255,160,40,.2)" stroke-width="1"/>
+                <rect x="10" y="40" width="480" height="40" rx="4" fill="rgba(30,15,8,.5)" stroke="rgba(255,160,40,.25)" stroke-width="1"/>
+                <text x="250" y="130" text-anchor="middle" fill="rgba(255,200,100,.5)" font-size="16" font-weight="bold" letter-spacing="8">ARENA</text>
+            </svg>`; 컷el.appendChild(arena);
+            const spotL = document.createElement('div'); spotL.className = 'intro-spotlight';
+            spotL.style.left = '100px'; spotL.style.background = 'linear-gradient(180deg, rgba(255,200,60,.3), transparent 60%)'; 컷el.appendChild(spotL);
+            const spotR = document.createElement('div'); spotR.className = 'intro-spotlight';
+            spotR.style.right = '100px'; spotR.style.background = 'linear-gradient(180deg, rgba(255,200,60,.3), transparent 60%)'; 컷el.appendChild(spotR);
+            setTimeout(() => { if (현재컷 === 3) { arena.classList.add('rise'); 내레이션('그래서 탄생한 전설의 대회—'); } }, 200);
+            setTimeout(() => { if (현재컷 === 3) { spotL.classList.add('on'); spotR.classList.add('on'); 배경밝기 = 0.7; } }, 1000);
+            await 컷대기();
+            플래시();
         };
-        패널.addEventListener('click', 클릭핸들러);
+        const 컷3자동 = () => setTimeout(() => { if (현재컷 === 3 && 컷스킵) 컷스킵(); }, 3000);
 
-        // 자동 진행
-        let 자동;
-        const 자동시작 = () => {
-            자동 = setInterval(() => {
-                보여주기();
-            }, 3000);
+        const 컷4 = async () => {
+            컷전환(4); 배경밝기 = 0.5;
+            const 컷el = document.getElementById('인트로컷4');
+            const lineup = document.createElement('div'); lineup.className = 'intro-lineup'; 컷el.appendChild(lineup);
+            const petEls = [];
+            펫목록.forEach(펫 => {
+                const wrap = document.createElement('div'); wrap.className = 'intro-pet-reveal';
+                const svg = 펫렌더러.그리기(펫, 200, false); svg.classList.add('intro-pet-sil'); wrap.appendChild(svg);
+                const name = document.createElement('div'); name.className = 'pet-name';
+                name.textContent = 펫.이름; name.style.color = 펫.색상; wrap.appendChild(name);
+                lineup.appendChild(wrap); petEls.push(wrap);
+            });
+            내레이션('최후의 챔피언은... 누구인가?');
+            // 순차 등장
+            petEls.forEach((el, i) => {
+                setTimeout(() => {
+                    if (현재컷 !== 4) return;
+                    el.classList.add('show');
+                    setTimeout(() => { if (현재컷 === 4) { el.classList.add('color'); 플래시(); } }, 250);
+                }, i * 500);
+            });
+            await 컷대기();
         };
+        const 컷4자동 = () => setTimeout(() => { if (현재컷 === 4 && 컷스킵) 컷스킵(); }, 4500);
 
-        스킵.onclick = () => {
-            clearInterval(자동);
-            패널.removeEventListener('click', 클릭핸들러);
+        // === 시퀀스 실행 ===
+        const 실행 = async () => {
+            컷1자동(); await 컷1(); if (중단됨) return;
+            컷2자동(); await 컷2(); if (중단됨) return;
+            컷3자동(); await 컷3(); if (중단됨) return;
+            컷4자동(); await 컷4(); if (중단됨) return;
+            내레이션숨김();
+            화면.removeEventListener('click', 클릭핸들러);
             콜백();
         };
-
-        보여주기();
-        자동시작();
+        실행();
 
         return () => {
-            clearInterval(자동);
-            패널.removeEventListener('click', 클릭핸들러);
+            중단됨 = true;
+            화면.removeEventListener('click', 클릭핸들러);
+            if (애니프레임) cancelAnimationFrame(애니프레임);
         };
     },
 
@@ -1743,6 +2225,10 @@ const 화면 = {
             <div class="select-header">캐릭터 선택</div>
             <div class="select-detail" id="선택상세">
                 <div class="select-portrait-big" id="선택큰초상화">
+                    <div class="select-portrait-aura" id="선택오라"></div>
+                    <div class="select-portrait-ring" id="선택링"></div>
+                    <div class="select-portrait-lines" id="선택라인"></div>
+                    <div class="select-portrait-flash" id="선택플래시"></div>
                     <div class="select-empty-prompt">캐릭터를 선택하세요</div>
                 </div>
                 <div class="select-info" id="선택정보" style="opacity:0">
@@ -1794,12 +2280,55 @@ const 화면 = {
                 if (안내) 안내.style.display = 'none';
                 정보.style.opacity = '1';
 
-                // 정보 업데이트
+                // 정보 업데이트 + 등장 연출
                 큰초상화.style.background = `radial-gradient(ellipse, ${펫.배경색}, #0a0818)`;
-                // 기존 SVG만 제거 (안내 텍스트는 이미 숨김)
-                const 기존SVG = 큰초상화.querySelector('.pet-svg');
-                if (기존SVG) 기존SVG.remove();
-                큰초상화.appendChild(펫렌더러.그리기(펫, 340));
+                // 기존 펫 제거
+                const 기존펫 = 큰초상화.querySelector('.pet-wrap');
+                if (기존펫) 기존펫.remove();
+                const 새SVG = 펫렌더러.그리기(펫, 340);
+                큰초상화.appendChild(새SVG);
+
+                // 펫별 고유 등장 애니메이션
+                const 등장클래스 = 'portrait-pet-' + 펫.id;
+                const 등장시간 = { 1: 550, 4: 600, 5: 700, 6: 600, 7: 700, 8: 650 };
+                requestAnimationFrame(() => 새SVG.classList.add(등장클래스));
+                // 등장 끝나면 idle 숨쉬기로 전환
+                setTimeout(() => {
+                    새SVG.classList.remove(등장클래스);
+                    새SVG.classList.add('portrait-idle');
+                }, 등장시간[펫.id] || 600);
+
+                // 플래시
+                const 플래시 = document.getElementById('선택플래시');
+                플래시.classList.remove('show'); void 플래시.offsetWidth; 플래시.classList.add('show');
+                // 임팩트 링
+                const 링 = document.getElementById('선택링');
+                링.classList.remove('show'); void 링.offsetWidth; 링.classList.add('show');
+                // 불곰/철갑거북: 착지 흔들림, 폭탄쥐: 이중 플래시
+                if (펫.id === 1 || 펫.id === 6) {
+                    setTimeout(() => { 큰초상화.style.animation = 'none'; void 큰초상화.offsetWidth;
+                        큰초상화.style.animation = 'portraitShake .3s ease-out'; }, 펫.id === 1 ? 250 : 300);
+                }
+                if (펫.id === 8) {
+                    setTimeout(() => { 플래시.classList.remove('show'); void 플래시.offsetWidth; 플래시.classList.add('show'); }, 200);
+                }
+                // 스피드라인
+                const 라인컨테이너 = document.getElementById('선택라인');
+                라인컨테이너.innerHTML = '';
+                for (let i = 0; i < 8; i++) {
+                    const line = document.createElement('div');
+                    line.className = 'portrait-line';
+                    line.style.top = (80 + Math.random() * 340) + 'px';
+                    line.style.left = '0';
+                    line.style.width = (100 + Math.random() * 200) + 'px';
+                    line.style.transform = `rotate(${(Math.random()-0.5)*10}deg)`;
+                    라인컨테이너.appendChild(line);
+                }
+                라인컨테이너.classList.remove('show'); void 라인컨테이너.offsetWidth; 라인컨테이너.classList.add('show');
+                // 오라 (펫 색상)
+                const 오라 = document.getElementById('선택오라');
+                오라.style.background = `radial-gradient(ellipse, ${펫.색상}50, transparent 65%)`;
+                오라.classList.remove('show'); void 오라.offsetWidth; 오라.classList.add('show');
 
                 이름.textContent = 펫.이름;
                 이름.style.color = 펫.색상;
@@ -2079,14 +2608,16 @@ const 화면 = {
         div.id = '전투화면';
         div.innerHTML = `
             <div class="battle-bg"></div>
+            <canvas class="battle-stage-canvas" id="스테이지캔버스" width="1280" height="720"></canvas>
             <div class="battle-arena"></div>
             <div class="battle-energy-left"></div>
             <div class="battle-energy-right"></div>
-            <!-- 상단 HUD: HP 게이지 + 이름 -->
+            <!-- 상단 HUD: HP 게이지 + 이름 + VS -->
             <div class="battle-hud">
                 <div class="battle-hud-side left">
                     <div class="battle-pet-name" id="전투왼쪽이름"></div>
                     <div class="battle-hp-bar">
+                        <div class="battle-hp-trail red-trail" id="전투왼쪽HP잔상" style="width:100%"></div>
                         <div class="battle-hp-fill red" id="전투왼쪽HP" style="width:100%"></div>
                         <span class="battle-hp-text" id="전투왼쪽HP텍스트"></span>
                     </div>
@@ -2095,6 +2626,7 @@ const 화면 = {
                 <div class="battle-hud-side right">
                     <div class="battle-pet-name" id="전투오른쪽이름" style="text-align:right"></div>
                     <div class="battle-hp-bar">
+                        <div class="battle-hp-trail blue-trail" id="전투오른쪽HP잔상" style="width:100%"></div>
                         <div class="battle-hp-fill blue" id="전투오른쪽HP" style="width:100%"></div>
                         <span class="battle-hp-text" id="전투오른쪽HP텍스트"></span>
                     </div>
@@ -2255,6 +2787,9 @@ const 화면 = {
             btn.style.borderColor = 'rgba(255,255,255,.06)';
         });
 
+        // 스테이지 배경 시작 (상대 펫 기준)
+        스테이지.시작(상대펫);
+
         // 연출 요소 리셋
         document.getElementById('KO연출')?.classList.remove('show');
         document.getElementById('라운드연출')?.classList.remove('show');
@@ -2265,10 +2800,18 @@ const 화면 = {
 
     HP업데이트(쪽, 현재HP, 최대HP) {
         const 바 = document.getElementById(`전투${쪽}HP`);
+        const 잔상 = document.getElementById(`전투${쪽}HP잔상`);
         const 텍스트 = document.getElementById(`전투${쪽}HP텍스트`);
         const 비율 = Math.max(0, 현재HP / 최대HP * 100);
+        // 메인 게이지 즉시 감소
         바.style.width = 비율 + '%';
         텍스트.textContent = `${Math.max(0, 현재HP)} / ${최대HP}`;
+        // 잔상 게이지 - 0.4초 딜레이 후 0.8초에 걸쳐 천천히 감소
+        if (잔상) {
+            setTimeout(() => {
+                잔상.style.width = 비율 + '%';
+            }, 400);
+        }
         // low HP 깜빡임
         if (비율 <= 30 && 비율 > 0) {
             바.classList.add('low');
@@ -2310,7 +2853,7 @@ const 화면 = {
         document.querySelectorAll('.battle-sys-btn').forEach(btn => {
             if (btn.dataset.sys === 선택) {
                 btn.style.opacity = '1';
-                btn.style.borderColor = 'rgba(255,255,255,.4)';
+                btn.style.borderColor = 'rgba(255,200,100,.4)';
                 btn.classList.add('flash');
                 setTimeout(() => btn.classList.remove('flash'), 1000);
             } else {
@@ -2567,18 +3110,18 @@ const 화면 = {
             setTimeout(() => this.화면흔들림(), 200);
         }, 350);
 
-        // Phase 3: 페이드아웃 시작 (3600ms)
+        // Phase 3: 페이드아웃 시작 (1500ms)
         setTimeout(() => {
             컷씬.classList.add('phase-fadeout');
-        }, 3600);
+        }, 1500);
 
-        // Phase 4: 종료 (4000ms)
+        // Phase 4: 종료 (1900ms)
         setTimeout(() => {
             컷씬.classList.remove('show', 'phase2', 'phase-shake', 'phase-fadeout');
             잉크.classList.remove('splash');
             ctx.clearRect(0, 0, 1280, 720);
             if (콜백) 콜백();
-        }, 4000);
+        }, 1900);
     },
 
     // 라운드 시작 연출
@@ -2662,6 +3205,10 @@ const 화면 = {
             <div class="result-color-slash" id="결과컬러슬래시"></div>
             <!-- 집중선 -->
             <div class="result-speedlines" id="결과집중선"></div>
+            <!-- 패배자 (쓰러진 상태, 바닥) -->
+            <div class="result-loser-area" id="결과패자영역">
+                <div class="result-loser-pet" id="결과패자펫"></div>
+            </div>
             <!-- 승리자 대형 일러스트 (왼쪽) -->
             <div class="result-winner-area" id="결과승자영역">
                 <div class="result-winner-pet" id="결과승자펫"></div>
@@ -2709,6 +3256,14 @@ const 화면 = {
         const 글로우 = document.getElementById('결과승자글로우');
         글로우.style.background = `radial-gradient(circle, ${색}40, ${색}15 40%, transparent 70%)`;
         글로우.style.boxShadow = `0 0 120px ${색}30`;
+
+        // 패배자 쓰러진 상태로 렌더링
+        const 패자영역 = document.getElementById('결과패자펫');
+        패자영역.innerHTML = '';
+        패자영역.appendChild(펫렌더러.그리기(패자, 200));
+        패자영역.style.transform = 'rotate(90deg) scaleY(0.8)';
+        패자영역.style.opacity = '0.5';
+        패자영역.style.filter = 'grayscale(0.6) brightness(0.5)';
 
         // 승리자 대형 펫 렌더링
         const 펫영역 = document.getElementById('결과승자펫');
@@ -2776,6 +3331,23 @@ const 화면 = {
             플래시.classList.add('flash');
             setTimeout(() => 플래시.classList.remove('flash'), 200);
         }, 400);
+
+        // 승자 클로즈업 연출 (바스트 샷)
+        const 승자영역 = document.getElementById('결과승자영역');
+        승자영역.style.transition = 'none';
+        승자영역.style.transform = 'scale(0.6) translateX(-100px)';
+        승자영역.style.opacity = '0';
+        // 빠르게 확대되면서 등장
+        requestAnimationFrame(() => {
+            승자영역.style.transition = 'transform .5s cubic-bezier(.2,0,.3,1.4), opacity .3s ease-out';
+            승자영역.style.transform = 'scale(1.15) translateX(0)';
+            승자영역.style.opacity = '1';
+        });
+        // 약간 줄어들면서 안정
+        setTimeout(() => {
+            승자영역.style.transition = 'transform .3s ease-out';
+            승자영역.style.transform = 'scale(1)';
+        }, 500);
 
         // 파티클 시작
         this.결과파티클시작(색);
@@ -2875,8 +3447,344 @@ const 화면 = {
         그리기();
     }
 };
-</script>
-<script>// battle.js - 전투 시스템 (스킬 시스템 통합)
+
+// ===== 스테이지 배경 시스템 =====
+const 스테이지 = {
+    _raf: null,
+    _파티클들: [],
+
+    // 펫 ID별 스테이지 설정
+    _설정: {
+        1: { // 불곰 - 화산/용암
+            bg: 'radial-gradient(ellipse at 50% 80%,#2a0800,#180400 40%,#0a0205)',
+            arena: 'linear-gradient(180deg,rgba(40,10,5,.0) 0%,rgba(60,15,5,.6) 30%,rgba(50,10,0,.9))',
+            파티클색: ['#ff4020','#ff6030','#ff8040','#e03010','#cc4010'],
+            효과: '용암',
+        },
+        4: { // 독수리왕 - 번개 하늘
+            bg: 'radial-gradient(ellipse at 50% 20%,#0a1530,#060c20 50%,#030610)',
+            arena: 'linear-gradient(180deg,rgba(10,20,40,.0) 0%,rgba(15,25,50,.6) 30%,rgba(10,15,35,.9))',
+            파티클색: ['#3080e0','#50a0ff','#80c0ff','#a0d0ff','#ffffff'],
+            효과: '번개',
+        },
+        5: { // 그림자고양이 - 보라빛 어둠 숲
+            bg: 'radial-gradient(ellipse at 50% 40%,#180828,#0c0418 50%,#06020c)',
+            arena: 'linear-gradient(180deg,rgba(20,8,30,.0) 0%,rgba(30,12,40,.6) 30%,rgba(20,8,25,.9))',
+            파티클색: ['#8040c0','#a060e0','#6030a0','#c080ff','#502080'],
+            효과: '안개',
+        },
+        6: { // 철갑거북 - 금속 공장
+            bg: 'radial-gradient(ellipse at 50% 50%,#101418,#0a0c10 50%,#060708)',
+            arena: 'linear-gradient(180deg,rgba(15,18,22,.0) 0%,rgba(25,28,35,.6) 30%,rgba(18,20,28,.9))',
+            파티클색: ['#808890','#a0a8b0','#606870','#c0c8d0','#4a5060'],
+            효과: '스파크',
+        },
+        7: { // 독사킹 - 독 늪지
+            bg: 'radial-gradient(ellipse at 50% 70%,#081808,#040c04 50%,#020602)',
+            arena: 'linear-gradient(180deg,rgba(10,25,10,.0) 0%,rgba(15,35,15,.6) 30%,rgba(10,25,10,.9))',
+            파티클색: ['#30a050','#50c070','#208040','#60e080','#40b060'],
+            효과: '버블',
+        },
+        8: { // 폭탄쥐 - 폭발/불꽃
+            bg: 'radial-gradient(ellipse at 50% 60%,#201008,#140a04 50%,#0a0502)',
+            arena: 'linear-gradient(180deg,rgba(35,20,8,.0) 0%,rgba(50,28,10,.6) 30%,rgba(40,22,8,.9))',
+            파티클색: ['#e0a020','#ff8030','#ffc040','#e06010','#ffdd60'],
+            효과: '폭발',
+        }
+    },
+
+    시작(상대펫) {
+        this.중지();
+        const 설정 = this._설정[상대펫.id];
+        if (!설정) return;
+
+        // 배경색 변경
+        const bg = document.querySelector('.battle-bg');
+        if (bg) bg.style.background = 설정.bg;
+        const arena = document.querySelector('.battle-arena');
+        if (arena) arena.style.background = 설정.arena;
+
+        // 파티클 초기화
+        this._파티클들 = [];
+        const canvas = document.getElementById('스테이지캔버스');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        // 효과별 파티클 생성
+        const 효과 = 설정.효과;
+        const 색들 = 설정.파티클색;
+
+        if (효과 === '용암') {
+            // 아래에서 위로 올라가는 불씨 + 바닥에 흐르는 용암 빛
+            for (let i = 0; i < 40; i++) {
+                this._파티클들.push({
+                    x: Math.random() * 1280,
+                    y: 500 + Math.random() * 220,
+                    vy: -(0.3 + Math.random() * 1.2),
+                    vx: (Math.random() - 0.5) * 0.5,
+                    크기: 2 + Math.random() * 5,
+                    색: 색들[Math.floor(Math.random() * 색들.length)],
+                    알파: 0.3 + Math.random() * 0.5,
+                    흔들림: Math.random() * Math.PI * 2,
+                });
+            }
+        } else if (효과 === '번개') {
+            // 느리게 떨어지는 빗방울 + 간헐적 번개
+            for (let i = 0; i < 60; i++) {
+                this._파티클들.push({
+                    x: Math.random() * 1280,
+                    y: Math.random() * 500,
+                    vy: 2 + Math.random() * 3,
+                    vx: -0.5,
+                    크기: 1 + Math.random() * 2,
+                    길이: 8 + Math.random() * 15,
+                    색: 색들[Math.floor(Math.random() * 색들.length)],
+                    알파: 0.15 + Math.random() * 0.2,
+                });
+            }
+            this._번개타이머 = 0;
+            this._번개알파 = 0;
+            this._번개X = 640;
+        } else if (효과 === '안개') {
+            // 느리게 흐르는 안개 덩어리
+            for (let i = 0; i < 20; i++) {
+                this._파티클들.push({
+                    x: Math.random() * 1280,
+                    y: 200 + Math.random() * 400,
+                    vx: 0.2 + Math.random() * 0.4,
+                    크기: 60 + Math.random() * 120,
+                    색: 색들[Math.floor(Math.random() * 색들.length)],
+                    알파: 0.04 + Math.random() * 0.06,
+                    흔들림: Math.random() * Math.PI * 2,
+                });
+            }
+        } else if (효과 === '스파크') {
+            // 금속 스파크가 튀는 효과
+            for (let i = 0; i < 30; i++) {
+                this._파티클들.push({
+                    x: Math.random() * 1280,
+                    y: 400 + Math.random() * 200,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: -(1 + Math.random() * 2),
+                    크기: 1 + Math.random() * 3,
+                    수명: Math.random(),
+                    최대수명: 0.5 + Math.random() * 1.5,
+                    색: 색들[Math.floor(Math.random() * 색들.length)],
+                });
+            }
+        } else if (효과 === '버블') {
+            // 아래에서 올라오는 독 버블
+            for (let i = 0; i < 25; i++) {
+                this._파티클들.push({
+                    x: Math.random() * 1280,
+                    y: 500 + Math.random() * 220,
+                    vy: -(0.2 + Math.random() * 0.6),
+                    크기: 4 + Math.random() * 12,
+                    색: 색들[Math.floor(Math.random() * 색들.length)],
+                    알파: 0.15 + Math.random() * 0.2,
+                    흔들림: Math.random() * Math.PI * 2,
+                });
+            }
+        } else if (효과 === '폭발') {
+            // 불꽃 파편이 사방으로
+            for (let i = 0; i < 35; i++) {
+                this._파티클들.push({
+                    x: Math.random() * 1280,
+                    y: 300 + Math.random() * 300,
+                    vx: (Math.random() - 0.5) * 1.5,
+                    vy: -(0.5 + Math.random() * 1.5),
+                    크기: 2 + Math.random() * 6,
+                    색: 색들[Math.floor(Math.random() * 색들.length)],
+                    알파: 0.3 + Math.random() * 0.4,
+                    흔들림: Math.random() * Math.PI * 2,
+                });
+            }
+        }
+
+        let t = 0;
+        const 그리기 = () => {
+            ctx.clearRect(0, 0, 1280, 720);
+            t += 0.016;
+
+            if (효과 === '용암') {
+                // 바닥 용암 글로우
+                const grd = ctx.createRadialGradient(640, 720, 0, 640, 720, 500);
+                grd.addColorStop(0, 'rgba(180,40,10,.12)');
+                grd.addColorStop(0.5, 'rgba(120,20,5,.06)');
+                grd.addColorStop(1, 'transparent');
+                ctx.fillStyle = grd;
+                ctx.fillRect(0, 200, 1280, 520);
+
+                for (const p of this._파티클들) {
+                    p.x += p.vx + Math.sin(p.흔들림 + t * 2) * 0.3;
+                    p.y += p.vy;
+                    ctx.globalAlpha = p.알파 * (1 - Math.max(0, (400 - p.y) / 400));
+                    ctx.fillStyle = p.색;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.크기, 0, Math.PI * 2);
+                    ctx.fill();
+                    // 글로우
+                    ctx.globalAlpha = p.알파 * 0.3;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.크기 * 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (p.y < 200) { p.y = 700 + Math.random() * 50; p.x = Math.random() * 1280; }
+                }
+            } else if (효과 === '번개') {
+                // 빗방울
+                for (const p of this._파티클들) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    ctx.globalAlpha = p.알파;
+                    ctx.strokeStyle = p.색;
+                    ctx.lineWidth = p.크기;
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.x + p.vx * 3, p.y + p.길이);
+                    ctx.stroke();
+                    if (p.y > 550) { p.y = -20; p.x = Math.random() * 1280; }
+                }
+                // 번개
+                this._번개타이머 += 0.016;
+                if (this._번개알파 > 0) {
+                    this._번개알파 -= 0.04;
+                    ctx.globalAlpha = Math.max(0, this._번개알파) * 0.3;
+                    ctx.fillStyle = '#a0c0ff';
+                    ctx.fillRect(0, 0, 1280, 720);
+                    // 번개 줄기
+                    ctx.globalAlpha = Math.max(0, this._번개알파) * 0.6;
+                    ctx.strokeStyle = '#c0e0ff';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    let bx = this._번개X, by = 0;
+                    ctx.moveTo(bx, by);
+                    for (let s = 0; s < 8; s++) {
+                        bx += (Math.random() - 0.5) * 60;
+                        by += 50 + Math.random() * 40;
+                        ctx.lineTo(bx, by);
+                    }
+                    ctx.stroke();
+                }
+                if (this._번개타이머 > 2 + Math.random() * 3) {
+                    this._번개타이머 = 0;
+                    this._번개알파 = 1;
+                    this._번개X = 200 + Math.random() * 880;
+                }
+            } else if (효과 === '안개') {
+                for (const p of this._파티클들) {
+                    p.x += p.vx;
+                    p.y += Math.sin(p.흔들림 + t * 0.5) * 0.3;
+                    ctx.globalAlpha = p.알파;
+                    const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.크기);
+                    grd.addColorStop(0, p.색);
+                    grd.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grd;
+                    ctx.fillRect(p.x - p.크기, p.y - p.크기, p.크기 * 2, p.크기 * 2);
+                    if (p.x > 1280 + p.크기) { p.x = -p.크기; p.y = 200 + Math.random() * 400; }
+                }
+            } else if (효과 === '스파크') {
+                for (const p of this._파티클들) {
+                    p.수명 += 0.016;
+                    if (p.수명 > p.최대수명) {
+                        p.수명 = 0;
+                        p.x = Math.random() * 1280;
+                        p.y = 400 + Math.random() * 200;
+                        p.vx = (Math.random() - 0.5) * 2;
+                        p.vy = -(1 + Math.random() * 2);
+                    }
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.05; // 중력
+                    const life = 1 - (p.수명 / p.최대수명);
+                    ctx.globalAlpha = life * 0.6;
+                    ctx.fillStyle = p.색;
+                    // 스파크 선
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.크기 * life, 0, Math.PI * 2);
+                    ctx.fill();
+                    // 꼬리
+                    ctx.globalAlpha = life * 0.2;
+                    ctx.strokeStyle = p.색;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.x - p.vx * 4, p.y - p.vy * 4);
+                    ctx.stroke();
+                }
+            } else if (효과 === '버블') {
+                for (const p of this._파티클들) {
+                    p.x += Math.sin(p.흔들림 + t * 1.5) * 0.5;
+                    p.y += p.vy;
+                    ctx.globalAlpha = p.알파;
+                    ctx.strokeStyle = p.색;
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.크기, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // 하이라이트
+                    ctx.globalAlpha = p.알파 * 0.5;
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(p.x - p.크기 * 0.3, p.y - p.크기 * 0.3, p.크기 * 0.25, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (p.y < 100) { p.y = 700 + Math.random() * 50; p.x = Math.random() * 1280; }
+                }
+            } else if (효과 === '폭발') {
+                // 바닥 불꽃 글로우
+                const grd = ctx.createRadialGradient(640, 600, 0, 640, 600, 400);
+                grd.addColorStop(0, `rgba(200,120,20,${0.06 + Math.sin(t * 3) * 0.03})`);
+                grd.addColorStop(1, 'transparent');
+                ctx.fillStyle = grd;
+                ctx.fillRect(0, 200, 1280, 520);
+
+                for (const p of this._파티클들) {
+                    p.x += p.vx + Math.sin(p.흔들림 + t * 3) * 0.4;
+                    p.y += p.vy;
+                    p.vy += 0.02;
+                    ctx.globalAlpha = p.알파 * Math.max(0, 1 - Math.max(0, (300 - p.y) / 300));
+                    ctx.fillStyle = p.색;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.크기, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = p.알파 * 0.2;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.크기 * 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (p.y < 100 || p.y > 720) {
+                        p.y = 500 + Math.random() * 200;
+                        p.x = Math.random() * 1280;
+                        p.vy = -(0.5 + Math.random() * 1.5);
+                    }
+                }
+            }
+
+            ctx.globalAlpha = 1;
+            if (document.getElementById('전투화면')?.classList.contains('active')) {
+                this._raf = requestAnimationFrame(그리기);
+            }
+        };
+        this._raf = requestAnimationFrame(그리기);
+    },
+
+    중지() {
+        if (this._raf) {
+            cancelAnimationFrame(this._raf);
+            this._raf = null;
+        }
+        const canvas = document.getElementById('스테이지캔버스');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 1280, 720);
+        }
+        // 배경 원래대로
+        const bg = document.querySelector('.battle-bg');
+        if (bg) bg.style.background = '';
+        const arena = document.querySelector('.battle-arena');
+        if (arena) arena.style.background = '';
+    }
+};
+
+// battle.js - 전투 시스템 (스킬 시스템 통합)
 const 전투시스템 = {
     내펫: null,
     상대펫: null,
@@ -3093,13 +4001,15 @@ const 전투시스템 = {
         let 액티브발동 = false;
         let 발동스킬이름 = '';
 
-        // 2) 패시브: 더블 체크 (바위더블/가위더블/보더블)
+        // 2) 패시브: 더블 체크 (바위더블/가위더블/보더블) - 확률 적용
         const 더블id = this._더블스킬[액션];
         if (더블id && this._스킬보유(공격펫, 더블id)) {
-            대미지 *= 2;
             const 스킬 = 게임데이터.스킬찾기(더블id);
-            화면.스킬미니연출(스킬.이름, 스킬.설명, 공격펫.색상);
-            await this.지연(1200);
+            if (this._확률체크(스킬.확률)) {
+                대미지 *= 2;
+                화면.스킬미니연출(스킬.이름, 스킬.설명, 공격펫.색상);
+                await this.지연(1200);
+            }
         }
 
         // 3) 액티브: 분노 체크 (HP 30% 이하 + 60%)
@@ -3124,12 +4034,38 @@ const 전투시스템 = {
             }
         }
 
-        // 4) 패시브: 철벽 체크 (방어측)
-        if (this._스킬보유(방어펫, 4)) {
-            대미지 = Math.max(1, 대미지 - 1);
+        // 3-2) 액티브: 급강하 체크 (30% 확률 대미지 2배)
+        if (!액티브발동 && this._스킬보유(공격펫, 13)) {
+            const 스킬 = 게임데이터.스킬찾기(13);
+            if (this._확률체크(스킬.확률)) {
+                대미지 *= 스킬.배율;
+                액티브발동 = true;
+                발동스킬이름 = 스킬.이름;
+            }
+        }
+
+        // 3-3) 액티브: 회피 체크 (방어측 30% 확률 대미지 0)
+        let 회피발동 = false;
+        if (this._스킬보유(방어펫, 14)) {
+            const 스킬 = 게임데이터.스킬찾기(14);
+            if (this._확률체크(스킬.확률)) {
+                대미지 = 0;
+                회피발동 = true;
+                this.오라활성화(피격대상 === '나' ? 'left' : 'right');
+                await new Promise(resolve => {
+                    화면.스킬컷씬표시(방어펫, 스킬.이름, resolve);
+                });
+            }
+        }
+
+        // 4) 패시브: 철벽 체크 (방어측, 회피 시 스킵) - 확률 적용
+        if (!회피발동 && this._스킬보유(방어펫, 4)) {
             const 스킬 = 게임데이터.스킬찾기(4);
-            화면.스킬미니연출(스킬.이름, 스킬.설명, 방어펫.색상);
-            await this.지연(1200);
+            if (this._확률체크(스킬.확률)) {
+                대미지 = Math.max(1, 대미지 - 1);
+                화면.스킬미니연출(스킬.이름, 스킬.설명, 방어펫.색상);
+                await this.지연(1200);
+            }
         }
 
         // 5) 액티브 발동 시 컷씬
@@ -3172,18 +4108,20 @@ const 전투시스템 = {
 
         await this.지연(300);
 
-        // 7) 패시브: 흡혈 (공격측 HP 2 회복)
+        // 7) 패시브: 흡혈 (공격측 HP 2 회복) - 확률 적용
         if (this._스킬보유(공격펫, 5)) {
-            if (피격대상 === '상대') {
-                this.내HP = Math.min(this.내최대HP, this.내HP + 2);
-                화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
-            } else {
-                this.상대HP = Math.min(this.상대최대HP, this.상대HP + 2);
-                화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
-            }
             const 스킬 = 게임데이터.스킬찾기(5);
-            화면.스킬미니연출(스킬.이름, 'HP +2 회복!', 공격펫.색상);
-            await this.지연(1200);
+            if (this._확률체크(스킬.확률)) {
+                if (피격대상 === '상대') {
+                    this.내HP = Math.min(this.내최대HP, this.내HP + 2);
+                    화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
+                } else {
+                    this.상대HP = Math.min(this.상대최대HP, this.상대HP + 2);
+                    화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
+                }
+                화면.스킬미니연출(스킬.이름, 'HP +2 회복!', 공격펫.색상);
+                await this.지연(1200);
+            }
         }
 
         // 8) 액티브: 연속타 (35% 확률로 추가 2 대미지)
@@ -3227,6 +4165,74 @@ const 전투시스템 = {
                     화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
                     화면.대미지팝업('왼쪽', 반격대미지, true);
                 }
+                await this.지연(400);
+            }
+        }
+
+        // 10) 액티브: 불굴 (방어측 40% 확률 HP 3 회복)
+        if (!회피발동 && this._스킬보유(방어펫, 12)) {
+            const 스킬 = 게임데이터.스킬찾기(12);
+            if (this._확률체크(스킬.확률)) {
+                const 회복량 = 스킬.회복량 || 3;
+                this.오라활성화(피격대상 === '나' ? 'left' : 'right');
+                await new Promise(resolve => {
+                    화면.스킬컷씬표시(방어펫, 스킬.이름, resolve);
+                });
+                if (피격대상 === '나') {
+                    this.내HP = Math.min(this.내최대HP, this.내HP + 회복량);
+                    화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
+                } else {
+                    this.상대HP = Math.min(this.상대최대HP, this.상대HP + 회복량);
+                    화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
+                }
+                setTimeout(() => this.오라비활성화(), 800);
+                await this.지연(400);
+            }
+        }
+
+        // 11) 액티브: 반사 (방어측 25% 확률 받은 대미지 반격)
+        if (!회피발동 && 대미지 > 0 && this._스킬보유(방어펫, 15)) {
+            const 스킬 = 게임데이터.스킬찾기(15);
+            if (this._확률체크(스킬.확률)) {
+                const 반사대미지 = 대미지;
+                this.오라활성화(피격대상 === '나' ? 'left' : 'right');
+                await new Promise(resolve => {
+                    화면.스킬컷씬표시(방어펫, 스킬.이름, resolve);
+                });
+                화면.화면흔들림();
+                const 반격X = 피격대상 === '나' ? 1060 : 180;
+                this.히트스파크(반격X, 220, true, 방어펫);
+                if (피격대상 === '나') {
+                    this.상대HP = Math.max(0, this.상대HP - 반사대미지);
+                    화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
+                    화면.대미지팝업('오른쪽', 반사대미지, true);
+                } else {
+                    this.내HP = Math.max(0, this.내HP - 반사대미지);
+                    화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
+                    화면.대미지팝업('왼쪽', 반사대미지, true);
+                }
+                setTimeout(() => this.오라비활성화(), 800);
+                await this.지연(400);
+            }
+        }
+
+        // 12) 액티브: 탈피 (방어측 35% 확률 HP 2 회복)
+        if (!회피발동 && this._스킬보유(방어펫, 16)) {
+            const 스킬 = 게임데이터.스킬찾기(16);
+            if (this._확률체크(스킬.확률)) {
+                const 회복량 = 스킬.회복량 || 2;
+                this.오라활성화(피격대상 === '나' ? 'left' : 'right');
+                await new Promise(resolve => {
+                    화면.스킬컷씬표시(방어펫, 스킬.이름, resolve);
+                });
+                if (피격대상 === '나') {
+                    this.내HP = Math.min(this.내최대HP, this.내HP + 회복량);
+                    화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
+                } else {
+                    this.상대HP = Math.min(this.상대최대HP, this.상대HP + 회복량);
+                    화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
+                }
+                setTimeout(() => this.오라비활성화(), 800);
                 await this.지연(400);
             }
         }
@@ -3409,6 +4415,44 @@ const 전투시스템 = {
                 await this.지연(800);
             }
         }
+        // 내 펫 기습 (id 17) - 라운드 시작 시 상대에게 선제 대미지
+        if (this._스킬보유(this.내펫, 17)) {
+            const 스킬 = 게임데이터.스킬찾기(17);
+            if (this._확률체크(스킬.확률)) {
+                const 기습대미지 = 스킬.대미지 || 2;
+                this.오라활성화('left');
+                await new Promise(resolve => {
+                    화면.스킬컷씬표시(this.내펫, 스킬.이름, resolve);
+                });
+                화면.화면흔들림();
+                this.히트스파크(1060, 220, true, this.내펫);
+                this.상대HP = Math.max(0, this.상대HP - 기습대미지);
+                화면.HP업데이트('오른쪽', this.상대HP, this.상대최대HP);
+                화면.대미지팝업('오른쪽', 기습대미지, true);
+                setTimeout(() => this.오라비활성화(), 800);
+                await this.지연(600);
+                if (await this.종료체크()) return;
+            }
+        }
+        // 상대 펫 기습
+        if (this._스킬보유(this.상대펫, 17)) {
+            const 스킬 = 게임데이터.스킬찾기(17);
+            if (this._확률체크(스킬.확률)) {
+                const 기습대미지 = 스킬.대미지 || 2;
+                this.오라활성화('right');
+                await new Promise(resolve => {
+                    화면.스킬컷씬표시(this.상대펫, 스킬.이름, resolve);
+                });
+                화면.화면흔들림();
+                this.히트스파크(180, 220, true, this.상대펫);
+                this.내HP = Math.max(0, this.내HP - 기습대미지);
+                화면.HP업데이트('왼쪽', this.내HP, this.내최대HP);
+                화면.대미지팝업('왼쪽', 기습대미지, true);
+                setTimeout(() => this.오라비활성화(), 800);
+                await this.지연(600);
+                if (await this.종료체크()) return;
+            }
+        }
     },
 
     // ========== 기존 유틸 ==========
@@ -3458,20 +4502,31 @@ const 전투시스템 = {
             오른쪽펫.classList.remove('move-center-r', 상대클래스);
             왼쪽펫.classList.remove('hit-react', 'hit-flash');
         } else {
-            // 무승부 - 양쪽 돌진 후 충돌
-            왼쪽펫.classList.add(내클래스, 'move-center-l');
-            오른쪽펫.classList.add(상대클래스, 'move-center-r');
-            await this.지연(250);
+            // 무승부 - 가운데로 빠르게 돌진 → 충돌 → 튕겨나감
+            왼쪽펫.classList.remove('idle');
+            오른쪽펫.classList.remove('idle');
+            왼쪽펫.classList.add(내클래스, 'draw-rush-l');
+            오른쪽펫.classList.add(상대클래스, 'draw-rush-r');
+            await this.지연(200);
+            // 충돌 순간
             화면.전투플래시();
             화면.화면흔들림();
             화면.히트이펙트(640, 220);
             this.히트스파크(640, 220, false);
-            // 양쪽 모두 약한 리코일
             왼쪽펫.classList.add('hit-flash');
             오른쪽펫.classList.add('hit-flash');
+            await this.지연(100);
+            // 튕겨나감
+            왼쪽펫.classList.remove('draw-rush-l');
+            오른쪽펫.classList.remove('draw-rush-r');
+            왼쪽펫.classList.add('draw-bounce-l');
+            오른쪽펫.classList.add('draw-bounce-r');
             await this.지연(400);
-            왼쪽펫.classList.remove('move-center-l', 내클래스, 'hit-flash');
-            오른쪽펫.classList.remove('move-center-r', 상대클래스, 'hit-flash');
+            // 원래 위치로 복귀
+            왼쪽펫.classList.remove('draw-bounce-l', 내클래스, 'hit-flash');
+            오른쪽펫.classList.remove('draw-bounce-r', 상대클래스, 'hit-flash');
+            왼쪽펫.classList.add('idle');
+            오른쪽펫.classList.add('idle');
         }
     },
 
@@ -3537,6 +4592,8 @@ const 전투시스템 = {
             const el = document.getElementById(id);
             if (el) el.classList.remove('defeat-stagger', 'defeat-fall', 'defeat-bounce', 'defeat-final', 'victory', 'hit-react', 'hit-heavy', 'hit-flash');
         });
+        // 스테이지 배경 정리
+        스테이지.중지();
     },
 
     지연(ms) {
@@ -3699,8 +4756,8 @@ const 전투시스템 = {
     `;
     document.head.appendChild(style);
 })();
-</script>
-<script>// app.js - 메인 게임 컨트롤러
+
+// app.js - 메인 게임 컨트롤러
 const 게임 = {
     현재화면: null,
     내펫: null,
@@ -3726,6 +4783,7 @@ const 게임 = {
         this.화면전환('타이틀화면');
         화면.타이틀펫배치();
         화면.타이틀파티클시작();
+        화면.타이틀연출시작();
 
         // 타이틀 화면 전체 클릭으로 시작
         document.getElementById('타이틀화면').onclick = () => {
@@ -3797,6 +4855,7 @@ const 게임 = {
                     this.화면전환('타이틀화면');
                     화면.타이틀펫배치();
                     화면.타이틀파티클시작();
+                    화면.타이틀연출시작();
                 }
             );
         }, 1000);
